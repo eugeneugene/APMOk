@@ -5,7 +5,7 @@ namespace APMTest
 {
     public class HW
     {
-        [DllImport("hw.dll", CharSet = CharSet.Unicode)]
-        public static extern IntPtr EnumerateDisks(out EnumDiskInfo[] diskInfo);
+        [DllImport("hw.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern IntPtr EnumerateDisks(ref EnumDiskInfo[] diskInfo);
     }
 }

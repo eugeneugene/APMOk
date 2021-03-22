@@ -2,7 +2,7 @@
 
 namespace APMTest
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack =2)]
     public class EnumDiskInfo
     {
         public ushort DiskIndex;

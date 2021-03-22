@@ -6,7 +6,8 @@ namespace APMTest
     {
         static void Main(string[] args)
         {
-            HW.EnumerateDisks(out EnumDiskInfo[] diskInfo);
+            EnumDiskInfo[] diskInfo = new EnumDiskInfo[16];
+            HW.EnumerateDisks(ref diskInfo);
             Console.WriteLine("Hello World!");
         }
     }

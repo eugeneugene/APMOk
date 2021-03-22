@@ -6,4 +6,10 @@
     <Platforms>x64</Platforms>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\hw\hw.vcxproj">
+      <Private>true</Private>
+    </ProjectReference>
+  </ItemGroup>
+
 </Project>
