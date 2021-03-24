@@ -7,26 +7,24 @@ namespace APMTest
     {
         static void Main(string[] args)
         {
-            int res = HW.EnumerateDisks(out var diskInfoEnum);
-
-            switch (res)
+            try
             {
-                case 0:
-                    Console.WriteLine("No hard drives were found");
-                    break;
-                case -1:
-                    Console.WriteLine("Error occurred");
-                    break;
-                default:
-                    {
-                        var diskInfo = diskInfoEnum.Take(res);
+                int res = HW.EnumerateDisks(out var diskInfoEnum);
 
-                        foreach (var di in diskInfo)
-                        {
-                            Console.WriteLine(di.Caption);
-                        }
+                if (res == 0)
+                    Console.WriteLine("No hard drives were found");
+                else
+                {
+                    var diskInfo = diskInfoEnum.Take(res);
+                    foreach (var di in diskInfo)
+                    {
+                        Console.WriteLine(di.Caption);
                     }
-                    break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception: {0}", ex.Message);
             }
 
             foreach (int i in new int[] { 0, 1, 2 })
