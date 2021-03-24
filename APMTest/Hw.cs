@@ -14,6 +14,9 @@ namespace APMTest
         [DllImport("hw.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int GetAPM([In] string dskName);
 
+        [DllImport("hw.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern int SetAPM([In] string dskName, byte val, bool disable);
+
         public static int EnumerateDisks(out IEnumerable<EnumDiskInfo> diskInfo)
         {
             int EnumDiskInfoSize = Marshal.SizeOf(new EnumDiskInfo());
@@ -44,14 +47,30 @@ namespace APMTest
             }
         }
 
-        public static int GetAPM(int Index)
+        public static bool GetAPM(int Index, out int apm)
         {
             string dskName = $"\\\\.\\PhysicalDrive{Index}";
 
             var result = GetAPM(dskName);
-            if (result < 0)
+            if (result == -1 || result == -2)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
-            return result;
+            if (result == -3)
+            {
+                apm = 0;
+                return false;
+            }
+            apm = result;
+            return true;
+        }
+
+        public static bool SetAPM(int Index, byte val, bool disable)
+        {
+            string dskName = $"\\\\.\\PhysicalDrive{Index}";
+
+            var result = SetAPM(dskName, val, disable);
+            if (result == -1)
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            return result != 0;
         }
     }
 }

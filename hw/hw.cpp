@@ -3,6 +3,7 @@
 #include "atahdd.h"
 
 BOOL GeHDDId(HANDLE hDrive, IDENTIFY_DEVICE_DATA* hddid);
+BOOL SetAPM(HANDLE hDrive, BYTE APMVal, BOOL Disable);
 
 extern "C" HWLIBRARY_API int EnumerateDisks(void* ptr)
 {
@@ -160,10 +161,20 @@ extern "C" HWLIBRARY_API int GetAPM(wchar_t* dskName)
 	return APMVal;
 }
 
+extern "C" HWLIBRARY_API int SetAPM(wchar_t* dskName, byte val, bool disable)
+{
+	HANDLE hDrive = CreateFile(dskName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
+	if (hDrive == INVALID_HANDLE_VALUE)
+		return -1;
+
+	BOOL rez = SetAPM(hDrive, val, disable);
+	return rez;
+}
+
 BOOL GeHDDId(HANDLE hDrive, IDENTIFY_DEVICE_DATA* hddid)
 {
 	BOOL rez = false;
-	DWORD size1, bytesRet;
+	DWORD bytesRet;
 	ATA_PASS_THROUGH_EX_WITH_BUFFERS aptexb;
 	void* ptr;
 
@@ -177,10 +188,9 @@ BOOL GeHDDId(HANDLE hDrive, IDENTIFY_DEVICE_DATA* hddid)
 	CurrentTaskFile.bSectorCountReg = 1;
 	memcpy_s(aptexb.AtaPassThroughEx.CurrentTaskFile, sizeof(aptexb.AtaPassThroughEx.CurrentTaskFile), &CurrentTaskFile, sizeof IDEREGS);
 	aptexb.AtaPassThroughEx.TimeOutValue = 3;
-	size1 = sizeof ATA_PASS_THROUGH_EX;
 
 	bytesRet = 0;
-	rez = DeviceIoControl(hDrive, IOCTL_ATA_PASS_THROUGH, &aptexb, size1, &aptexb,
+	rez = DeviceIoControl(hDrive, IOCTL_ATA_PASS_THROUGH, &aptexb, sizeof ATA_PASS_THROUGH_EX, &aptexb,
 		sizeof ATA_PASS_THROUGH_EX_WITH_BUFFERS, &bytesRet, NULL);
 
 	if (rez == 0)
@@ -192,33 +202,36 @@ BOOL GeHDDId(HANDLE hDrive, IDENTIFY_DEVICE_DATA* hddid)
 	return rez;
 }
 
-BOOL SetAPM(HANDLE hDrive, WORD APMVal, BOOL Disable)
+BOOL SetAPM(HANDLE hDrive, BYTE APMVal, BOOL Disable)
 {
 	BOOL rez = false;
-	DWORD size1, bytesRet;
+	DWORD bytesRet;
 	ATA_PASS_THROUGH_EX_WITH_BUFFERS aptex;
 
-	aptex.Length = sizeof ATA_PASS_THROUGH_EX;
-	aptex.AtaFlags = ATA_FLAGS_DATA_IN;
-	aptex.DataTransferLength = 512;
-	aptex.DataBufferOffset = sizeof ATA_PASS_THROUGH_EX;
-	aptex.TimeOutValue = 1;
-	aptex.CurrentTaskFile.bCommandReg = WIN_SETFEATURES;
-	aptex.CurrentTaskFile.bSectorCountReg = 0;
-	size1 = sizeof ATA_PASS_THROUGH_EX;
+	aptex.AtaPassThroughEx.Length = sizeof ATA_PASS_THROUGH_EX;
+	aptex.AtaPassThroughEx.AtaFlags = ATA_FLAGS_DATA_IN;
+	aptex.AtaPassThroughEx.DataTransferLength = DataBufSize;
+	aptex.AtaPassThroughEx.DataBufferOffset = sizeof ATA_PASS_THROUGH_EX;
+	aptex.AtaPassThroughEx.TimeOutValue = 1;
+
+	IDEREGS CurrentTaskFile;
+	CurrentTaskFile.bCommandReg = WIN_SETFEATURES;
+	CurrentTaskFile.bSectorCountReg = 0;
 
 	if (Disable)
 	{
-		aptex.CurrentTaskFile.bFeaturesReg = SETFEATURES_DIS_APM;
+		CurrentTaskFile.bFeaturesReg = SETFEATURES_DIS_APM;
 	}
 	else
 	{
-		aptex.CurrentTaskFile.bFeaturesReg = SETFEATURES_EN_APM;
-		aptex.CurrentTaskFile.bSectorCountReg = (BYTE)APMVal;
+		CurrentTaskFile.bFeaturesReg = SETFEATURES_EN_APM;
+		CurrentTaskFile.bSectorCountReg = APMVal;
 	}
 
+	memcpy_s(aptex.AtaPassThroughEx.CurrentTaskFile, sizeof(aptex.AtaPassThroughEx.CurrentTaskFile), &CurrentTaskFile, sizeof IDEREGS);
+
 	bytesRet = 0;
-	rez = DeviceIoControl(hDrive, IOCTL_ATA_PASS_THROUGH, &aptex, size1, &aptex,
+	rez = DeviceIoControl(hDrive, IOCTL_ATA_PASS_THROUGH, &aptex, sizeof ATA_PASS_THROUGH_EX, &aptex,
 		sizeof ATA_PASS_THROUGH_EX_WITH_BUFFERS, &bytesRet, NULL);
 
 	return rez;

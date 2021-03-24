@@ -29,32 +29,29 @@ namespace APMTest
                     break;
             }
 
-            try
+            foreach (int i in new int[] { 0, 1, 2 })
             {
-                int apm0 = HW.GetAPM(0);
-                Console.WriteLine("Drive 0 APM: {0}", apm0);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception: {0}", ex.Message);
-            }
-            try
-            {
-                int apm1 = HW.GetAPM(1);
-                Console.WriteLine("Drive 1 APM: {0}", apm1);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception: {0}", ex.Message);
-            }
-            try
-            {
-                int apm2 = HW.GetAPM(2);
-                Console.WriteLine("Drive 2 APM: {0}", apm2);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception: {0}", ex.Message);
+                try
+                {
+                    if (HW.GetAPM(i, out int apm0))
+                        Console.WriteLine("Drive {0} APM: {1}", i, apm0);
+                    else
+                        Console.WriteLine("Drive {0} APM is not available", i);
+                    HW.SetAPM(i, 1, false);
+                    if (HW.GetAPM(i, out int apm1))
+                        Console.WriteLine("Drive {0} APM: {1}", i, apm1);
+                    else
+                        Console.WriteLine("Drive {0} APM is not available", i);
+                    HW.SetAPM(i, 1, true);
+                    if (HW.GetAPM(i, out int apm2))
+                        Console.WriteLine("Drive {0} APM: {1}", i, apm2);
+                    else
+                        Console.WriteLine("Drive {0} APM is not available", i);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Drive {0} Exception: {1}", i, ex.Message);
+                }
             }
         }
     }

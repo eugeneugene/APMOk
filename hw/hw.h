@@ -9,6 +9,9 @@
 #endif
 
 #define WIN_IDENTIFYDEVICE 0xEC
+#define WIN_SETFEATURES 0xEF
+#define SETFEATURES_EN_APM 0x05
+#define SETFEATURES_DIS_APM 0x85 
 
 struct EnumDiskInfo		// 2124
 {
@@ -35,3 +38,4 @@ typedef struct _ATA_PASS_THROUGH_EX_WITH_BUFFERS
 } ATA_PASS_THROUGH_EX_WITH_BUFFERS, * PATA_PASS_THROUGH_EX_WITH_BUFFERS;
 
 extern "C" HWLIBRARY_API int EnumerateDisks(void* ptr);
+extern "C" HWLIBRARY_API int SetAPM(wchar_t* dskName, byte val, bool disable);
