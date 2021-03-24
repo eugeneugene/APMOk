@@ -8,6 +8,8 @@
 #define HWLIBRARY_API __declspec(dllimport)
 #endif
 
+#define WIN_IDENTIFYDEVICE 0xEC
+
 struct EnumDiskInfo		// 2124
 {
 	uint16_t DiskIndex;					// 2
@@ -24,5 +26,12 @@ struct EnumDiskInfo		// 2124
 	wchar_t SerialNumber[64];			// 128
 	wchar_t Status[16];					// 32
 };
+
+const int DataBufSize = 512;
+typedef struct _ATA_PASS_THROUGH_EX_WITH_BUFFERS
+{
+	ATA_PASS_THROUGH_EX AtaPassThroughEx;
+	UCHAR ucDataBuf[DataBufSize];
+} ATA_PASS_THROUGH_EX_WITH_BUFFERS, * PATA_PASS_THROUGH_EX_WITH_BUFFERS;
 
 extern "C" HWLIBRARY_API int EnumerateDisks(void* ptr);

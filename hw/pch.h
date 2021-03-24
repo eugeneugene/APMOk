@@ -15,6 +15,8 @@
 #include <atlbase.h>
 
 #include <Wbemidl.h>
+#include <winioctl.h>
+#include <ntddscsi.h>
 
 #if defined(_DEBUG)
 #define BOOST_LIB_DIAGNOSTIC

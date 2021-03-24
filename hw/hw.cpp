@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "hw.h"
+#include "atahdd.h"
+
+BOOL GeHDDId(HANDLE hDrive, IDENTIFY_DEVICE_DATA* hddid);
 
 extern "C" HWLIBRARY_API int EnumerateDisks(void* ptr)
 {
@@ -9,7 +12,7 @@ extern "C" HWLIBRARY_API int EnumerateDisks(void* ptr)
 
 	if (FAILED(hr))
 	{
-		_RPTF0(_CRT_ERROR, _T("Failed to initialize COM\n"));
+		_RPTF0(_CRT_ERROR, L"Failed to initialize COM\n");
 		return -1;
 	}
 
@@ -79,61 +82,144 @@ extern "C" HWLIBRARY_API int EnumerateDisks(void* ptr)
 
 							info->DiskIndex = index++;
 
-							hr = pclsObj->Get(_T("Availability"), 0, &var, &cType, 0);
+							hr = pclsObj->Get(L"Availability", 0, &var, &cType, 0);
 							info->Availability = var.uiVal;
 
-							hr = pclsObj->Get(_T("Caption"), 0, &var, &cType, 0);
+							hr = pclsObj->Get(L"Caption", 0, &var, &cType, 0);
 							wcscpy_s(info->Caption, var.bstrVal);
 
-							hr = pclsObj->Get(_T("ConfigManagerErrorCode"), 0, &var, &cType, 0);
+							hr = pclsObj->Get(L"ConfigManagerErrorCode", 0, &var, &cType, 0);
 							info->ConfigManagerErrorCode = var.uintVal;
 
-							hr = pclsObj->Get(_T("Description"), 0, &var, &cType, 0);
+							hr = pclsObj->Get(L"Description", 0, &var, &cType, 0);
 							wcscpy_s(info->Description, var.bstrVal);
 
-							hr = pclsObj->Get(_T("DeviceID"), 0, &var, &cType, 0);
+							hr = pclsObj->Get(L"DeviceID", 0, &var, &cType, 0);
 							wcscpy_s(info->DeviceID, var.bstrVal);
 
-							hr = pclsObj->Get(_T("Index"), 0, &var, &cType, 0);
+							hr = pclsObj->Get(L"Index", 0, &var, &cType, 0);
 							info->Index = var.uintVal;
 
-							hr = pclsObj->Get(_T("InterfaceType"), 0, &var, &cType, 0);
+							hr = pclsObj->Get(L"InterfaceType", 0, &var, &cType, 0);
 							wcscpy_s(info->InterfaceType, var.bstrVal);
 
-							hr = pclsObj->Get(_T("Manufacturer"), 0, &var, &cType, 0);
+							hr = pclsObj->Get(L"Manufacturer", 0, &var, &cType, 0);
 							wcscpy_s(info->Manufacturer, var.bstrVal);
 
-							hr = pclsObj->Get(_T("Model"), 0, &var, &cType, 0);
+							hr = pclsObj->Get(L"Model", 0, &var, &cType, 0);
 							wcscpy_s(info->Model, var.bstrVal);
 
-							hr = pclsObj->Get(_T("Name"), 0, &var, &cType, 0);
+							hr = pclsObj->Get(L"Name", 0, &var, &cType, 0);
 							wcscpy_s(info->Name, var.bstrVal);
 
-							hr = pclsObj->Get(_T("SerialNumber"), 0, &var, &cType, 0);
+							hr = pclsObj->Get(L"SerialNumber", 0, &var, &cType, 0);
 							wcscpy_s(info->SerialNumber, var.bstrVal);
 
-							hr = pclsObj->Get(_T("Status"), 0, &var, &cType, 0);
+							hr = pclsObj->Get(L"Status", 0, &var, &cType, 0);
 							wcscpy_s(info->Status, var.bstrVal);
 						}
 						CoUninitialize();
 						return index;
 					}
 					else
-						_RPTFWN(_CRT_ERROR, _T("Failed to get Disk Drive information. Error code = %x\n"), hr);
+						_RPTFWN(_CRT_ERROR, L"Failed to get Disk Drive information. Error code = %x\n", hr);
 				}
 				else
-					_RPTFWN(_CRT_ERROR, _T("Failed to set proxy blanket. Error code = %x\n"), hr);
+					_RPTFWN(_CRT_ERROR, L"Failed to set proxy blanket. Error code = %x\n", hr);
 			}
 			else
-				_RPTFWN(_CRT_ERROR, _T("Failed to connect to root namespace. Error code = %x\n"), hr);
+				_RPTFWN(_CRT_ERROR, L"Failed to connect to root namespace. Error code = %x\n", hr);
 		}
 		else
-			_RPTFWN(_CRT_ERROR, _T("Failed to create IWbemLocator object. Error code = %x\n"), hr);
+			_RPTFWN(_CRT_ERROR, L"Failed to create IWbemLocator object. Error code = %x\n", hr);
 	}
 	else
-		_RPTFWN(_CRT_ERROR, _T("Failed to set COM Security. Error code = %x\n"), hr);
+		_RPTFWN(_CRT_ERROR, L"Failed to set COM Security. Error code = %x\n", hr);
 
 	CoUninitialize();
 
 	return -1;
+}
+
+extern "C" HWLIBRARY_API int GetAPM(wchar_t* dskName)
+{
+	HANDLE hDrive = CreateFile(dskName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
+	if (hDrive == INVALID_HANDLE_VALUE)
+		return -1;
+
+	IDENTIFY_DEVICE_DATA hddid;
+	BOOL rez = GeHDDId(hDrive, &hddid);
+	if (!rez)
+		return -2;
+
+	if ((hddid.command_set_2 & 0x08) == 0)
+		return -3;
+
+	uint16_t APMVal = hddid.CurAPMvalues & 0x00FF;
+
+	return APMVal;
+}
+
+BOOL GeHDDId(HANDLE hDrive, IDENTIFY_DEVICE_DATA* hddid)
+{
+	BOOL rez = false;
+	DWORD size1, bytesRet;
+	ATA_PASS_THROUGH_EX_WITH_BUFFERS aptexb;
+	void* ptr;
+
+	aptexb.AtaPassThroughEx.Length = sizeof ATA_PASS_THROUGH_EX;
+	aptexb.AtaPassThroughEx.AtaFlags = ATA_FLAGS_DATA_IN;
+	aptexb.AtaPassThroughEx.DataTransferLength = DataBufSize;
+	aptexb.AtaPassThroughEx.DataBufferOffset = sizeof ATA_PASS_THROUGH_EX;
+
+	IDEREGS CurrentTaskFile;
+	CurrentTaskFile.bCommandReg = WIN_IDENTIFYDEVICE;
+	CurrentTaskFile.bSectorCountReg = 1;
+	memcpy_s(aptexb.AtaPassThroughEx.CurrentTaskFile, sizeof(aptexb.AtaPassThroughEx.CurrentTaskFile), &CurrentTaskFile, sizeof IDEREGS);
+	aptexb.AtaPassThroughEx.TimeOutValue = 3;
+	size1 = sizeof ATA_PASS_THROUGH_EX;
+
+	bytesRet = 0;
+	rez = DeviceIoControl(hDrive, IOCTL_ATA_PASS_THROUGH, &aptexb, size1, &aptexb,
+		sizeof ATA_PASS_THROUGH_EX_WITH_BUFFERS, &bytesRet, NULL);
+
+	if (rez == 0)
+		return 0;
+
+	ptr = (void*)(&aptexb.ucDataBuf);
+	memcpy(hddid, ptr, sizeof IDENTIFY_DEVICE_DATA);
+
+	return rez;
+}
+
+BOOL SetAPM(HANDLE hDrive, WORD APMVal, BOOL Disable)
+{
+	BOOL rez = false;
+	DWORD size1, bytesRet;
+	ATA_PASS_THROUGH_EX_WITH_BUFFERS aptex;
+
+	aptex.Length = sizeof ATA_PASS_THROUGH_EX;
+	aptex.AtaFlags = ATA_FLAGS_DATA_IN;
+	aptex.DataTransferLength = 512;
+	aptex.DataBufferOffset = sizeof ATA_PASS_THROUGH_EX;
+	aptex.TimeOutValue = 1;
+	aptex.CurrentTaskFile.bCommandReg = WIN_SETFEATURES;
+	aptex.CurrentTaskFile.bSectorCountReg = 0;
+	size1 = sizeof ATA_PASS_THROUGH_EX;
+
+	if (Disable)
+	{
+		aptex.CurrentTaskFile.bFeaturesReg = SETFEATURES_DIS_APM;
+	}
+	else
+	{
+		aptex.CurrentTaskFile.bFeaturesReg = SETFEATURES_EN_APM;
+		aptex.CurrentTaskFile.bSectorCountReg = (BYTE)APMVal;
+	}
+
+	bytesRet = 0;
+	rez = DeviceIoControl(hDrive, IOCTL_ATA_PASS_THROUGH, &aptex, size1, &aptex,
+		sizeof ATA_PASS_THROUGH_EX_WITH_BUFFERS, &bytesRet, NULL);
+
+	return rez;
 }
