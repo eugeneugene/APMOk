@@ -34,12 +34,12 @@ namespace APMTest
                 }
                 else
                 {
-                    int error = Marshal.GetLastWin32Error();
-                    Debug.WriteLine("Win32 Error: ", error);
+                    var win32error = Marshal.GetLastWin32Error();
+                    if (win32error != 0)
+                        throw new Win32Exception(win32error);
+                    diskInfo = null;
+                    return 0;
                 }
-
-                diskInfo = null;
-                return 0;
             }
             finally
             {
@@ -70,7 +70,14 @@ namespace APMTest
             var result = SetAPM(dskName, val, disable);
             if (result == -1)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
-            return result != 0;
+            if (result == 0)
+            {
+                var win32error = Marshal.GetLastWin32Error();
+                if (win32error != 0)
+                    throw new Win32Exception(win32error);
+                return false;
+            }
+            return true;
         }
     }
 }
