@@ -1,15 +1,16 @@
 #include "pch.h"
 #include "hw.h"
 
-extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo diskInfo[])
+extern "C" HWLIBRARY_API int EnumerateDisks(void* ptr)
 {
+	EnumDiskInfo* diskInfo = (EnumDiskInfo*)ptr;
 	HRESULT hr;
 	hr = CoInitializeEx(0, COINIT_MULTITHREADED);
 
 	if (FAILED(hr))
 	{
 		_RPTF0(_CRT_ERROR, _T("Failed to initialize COM\n"));
-		return 1;
+		return -1;
 	}
 
 	hr = CoInitializeSecurity(
@@ -66,7 +67,7 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo diskInfo[])
 							CComVariant var;
 							ULONG uReturn;
 
-							EnumDiskInfo* info = &diskInfo[index++];
+							EnumDiskInfo* info = &diskInfo[index];
 
 							if (index == 16)
 								break;
@@ -76,46 +77,46 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo diskInfo[])
 							if (0 == uReturn)
 								break;
 
-							info->DiskIndex = index;
+							info->DiskIndex = index++;
 
 							hr = pclsObj->Get(_T("Availability"), 0, &var, &cType, 0);
 							info->Availability = var.uiVal;
 
 							hr = pclsObj->Get(_T("Caption"), 0, &var, &cType, 0);
-							_tcscpy_s(info->Caption, var.bstrVal);
+							wcscpy_s(info->Caption, var.bstrVal);
 
 							hr = pclsObj->Get(_T("ConfigManagerErrorCode"), 0, &var, &cType, 0);
 							info->ConfigManagerErrorCode = var.uintVal;
 
 							hr = pclsObj->Get(_T("Description"), 0, &var, &cType, 0);
-							_tcscpy_s(info->Description, var.bstrVal);
+							wcscpy_s(info->Description, var.bstrVal);
 
 							hr = pclsObj->Get(_T("DeviceID"), 0, &var, &cType, 0);
-							_tcscpy_s(info->DeviceID, var.bstrVal);
+							wcscpy_s(info->DeviceID, var.bstrVal);
 
 							hr = pclsObj->Get(_T("Index"), 0, &var, &cType, 0);
 							info->Index = var.uintVal;
 
 							hr = pclsObj->Get(_T("InterfaceType"), 0, &var, &cType, 0);
-							_tcscpy_s(info->InterfaceType, var.bstrVal);
+							wcscpy_s(info->InterfaceType, var.bstrVal);
 
 							hr = pclsObj->Get(_T("Manufacturer"), 0, &var, &cType, 0);
-							_tcscpy_s(info->Manufacturer, var.bstrVal);
+							wcscpy_s(info->Manufacturer, var.bstrVal);
 
 							hr = pclsObj->Get(_T("Model"), 0, &var, &cType, 0);
-							_tcscpy_s(info->Model, var.bstrVal);
+							wcscpy_s(info->Model, var.bstrVal);
 
 							hr = pclsObj->Get(_T("Name"), 0, &var, &cType, 0);
-							_tcscpy_s(info->Name, var.bstrVal);
+							wcscpy_s(info->Name, var.bstrVal);
 
 							hr = pclsObj->Get(_T("SerialNumber"), 0, &var, &cType, 0);
-							_tcscpy_s(info->SerialNumber, var.bstrVal);
+							wcscpy_s(info->SerialNumber, var.bstrVal);
 
 							hr = pclsObj->Get(_T("Status"), 0, &var, &cType, 0);
-							_tcscpy_s(info->Status, var.bstrVal);
+							wcscpy_s(info->Status, var.bstrVal);
 						}
 						CoUninitialize();
-						return 0;
+						return index;
 					}
 					else
 						_RPTFWN(_CRT_ERROR, _T("Failed to get Disk Drive information. Error code = %x\n"), hr);
@@ -134,5 +135,5 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo diskInfo[])
 
 	CoUninitialize();
 
-	return 0;
+	return -1;
 }

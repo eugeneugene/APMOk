@@ -2,10 +2,11 @@
 
 namespace APMTest
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack =2)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public class EnumDiskInfo
     {
         public ushort DiskIndex;
+        public uint Index;
         public ushort Availability;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
         public string Caption;
@@ -14,7 +15,6 @@ namespace APMTest
         public string Description;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
         public string DeviceID;
-        public uint Index;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)]
         public string InterfaceType;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]

@@ -8,21 +8,21 @@
 #define HWLIBRARY_API __declspec(dllimport)
 #endif
 
-struct EnumDiskInfo
+struct EnumDiskInfo		// 2124
 {
-	UINT16 DiskIndex;
-	UINT16 Availability;
-	TCHAR Caption[256];
-	UINT32 ConfigManagerErrorCode;
-	TCHAR Description[256];
-	TCHAR DeviceID[256];
-	UINT32 Index;
-	TCHAR InterfaceType[16];
-	TCHAR Manufacturer[64];
-	TCHAR Model[64];
-	TCHAR Name[64];
-	TCHAR SerialNumber[64];
-	TCHAR Status[16];
+	uint16_t DiskIndex;					// 2
+	uint32_t Index;						// 4
+	uint16_t Availability;				// 2
+	wchar_t Caption[256];				// 512
+	uint32_t ConfigManagerErrorCode;	// 4
+	wchar_t Description[256];			// 512
+	wchar_t DeviceID[256];				// 512
+	wchar_t InterfaceType[16];			// 32
+	wchar_t Manufacturer[64];			// 128
+	wchar_t Model[64];					// 128
+	wchar_t Name[64];					// 128
+	wchar_t SerialNumber[64];			// 128
+	wchar_t Status[16];					// 32
 };
 
-extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo diskInfo[]);
+extern "C" HWLIBRARY_API int EnumerateDisks(void* ptr);
