@@ -8,10 +8,10 @@
 #define HWLIBRARY_API __declspec(dllimport)
 #endif
 
-#define WIN_IDENTIFYDEVICE 0xEC
-#define WIN_SETFEATURES 0xEF
-#define SETFEATURES_EN_APM 0x05
-#define SETFEATURES_DIS_APM 0x85 
+constexpr auto WIN_IDENTIFYDEVICE = 0xEC;
+constexpr auto WIN_SETFEATURES = 0xEF;
+constexpr auto SETFEATURES_EN_APM = 0x05;
+constexpr auto SETFEATURES_DIS_APM = 0x85 ;
 
 struct EnumDiskInfo		// 2124
 {
