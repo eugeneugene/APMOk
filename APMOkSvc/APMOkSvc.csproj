@@ -4,12 +4,18 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<UserSecretsId>dotnet-APMOkSvc-29FF406E-ED1A-4831-B643-AF357DA51037</UserSecretsId>
 		<Platforms>x64</Platforms>
+		<StartupObject>APMOkSvc.Program</StartupObject>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Remove="NLog.config" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-		<PackageReference Include="NLog.Web.AspNetCore" Version="4.11.0" />
+		<PackageReference Include="NLog.Config" Version="4.7.9" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="4.12.0" />
 		<PackageReference Include="protobuf-net.Grpc.AspNetCore" Version="1.0.152" />
 		<PackageReference Include="protobuf-net.Grpc.AspNetCore.Reflection" Version="1.0.152" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="4.8.1" />
@@ -37,7 +43,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\hw\hw.vcxproj" >
+		<ProjectReference Include="..\hw\hw.vcxproj">
 			<OutputItemType>None</OutputItemType>
 		</ProjectReference>
 	</ItemGroup>
@@ -47,6 +53,18 @@
 			<Link>hw.dll</Link>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="NLog.config">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="NLog.xsd">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>
