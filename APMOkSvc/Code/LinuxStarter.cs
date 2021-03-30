@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using APMData;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -173,9 +174,16 @@ namespace APMOkSvc.Code
             hostbuilder = hostbuilder.UseSystemd();
             logger.Info("Using Linux Systemd Service");
 
+            if (File.Exists(SocketData.SocketPath))
+                File.Delete(SocketData.SocketPath);
+
             hostbuilder = hostbuilder.ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<TStartup>();
+                webBuilder.ConfigureKestrel(options =>
+                {
+                    options.ListenUnixSocket(SocketData.SocketPath);
+                });
             });
 
             return hostbuilder;

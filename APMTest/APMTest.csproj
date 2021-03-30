@@ -4,20 +4,24 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net5.0</TargetFramework>
 		<Platforms>x64</Platforms>
-		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<StartupObject>APMTest.Program</StartupObject>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\hw\hw.vcxproj" >
-			<OutputItemType>None</OutputItemType>
-		</ProjectReference>
+		<PackageReference Include="Google.Protobuf" Version="3.15.6" />
+		<PackageReference Include="Grpc.Net.Client" Version="2.36.0" />
+		<PackageReference Include="Grpc.Tools" Version="2.36.4">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="$(SolutionDir)hw/x64/$(Configuration)/hw.dll">
-			<Link>hw.dll</Link>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
+	  <ProjectReference Include="..\APMData\APMData.csproj" />
 	</ItemGroup>
-	
+
+	<ItemGroup>
+		<Protobuf Include="..\APMData\Proto\DiskInfo.proto" GrpcServices="Client" />
+	</ItemGroup>
+
 </Project>

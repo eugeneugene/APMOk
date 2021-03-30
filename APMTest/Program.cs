@@ -1,56 +1,48 @@
-﻿using System;
-using System.Linq;
+﻿using APMData;
+using APMData.Code;
+using APMData.Proto;
+using Grpc.Net.Client;
+using System;
+using System.Net.Http;
+using System.Net.Sockets;
 
 namespace APMTest
 {
     class Program
     {
-        static void Main(string[] _)
+        static void Main(string[] args)
         {
             try
             {
-                int res = HW.EnumerateDisks(out var diskInfoEnum);
-
-                if (res == 0)
-                    Console.WriteLine("No hard drives were found");
-                else
-                {
-                    var diskInfo = diskInfoEnum.Take(res);
-                    foreach (var di in diskInfo)
-                    {
-                        Console.WriteLine(di.Caption);
-                    }
-                }
+                using var channel = CreateChannel();
+                var client = new APMData.Proto.APMData.APMDataClient(channel);
+                var reply = client.EnumerateDisks(new Empty());
+                Console.WriteLine("Reply ResponseResult: " + reply.ResponseResult);
+                Console.WriteLine("Reply ResponseTimeStamp: " + reply.ResponseTimeStamp);
+                foreach (var entry in reply.DiskInfoEntries)
+                    Console.WriteLine("Reply DiskInfo entry: " + entry.Caption);
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Exception: {0}", ex.Message);
             }
+        }
 
-            foreach (int i in new int[] { 0, 1, 2 })
+        public static GrpcChannel CreateChannel()
+        {
+            var udsEndPoint = new UnixDomainSocketEndPoint(SocketData.SocketPath);
+            var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
+            var socketsHttpHandler = new SocketsHttpHandler
             {
-                try
-                {
-                    if (HW.GetAPM(i, out int apm0))
-                        Console.WriteLine("Drive {0} APM: {1}", i, apm0);
-                    else
-                        Console.WriteLine("Drive {0} APM is not available", i);
-                    HW.SetAPM(i, 1, false);
-                    if (HW.GetAPM(i, out int apm1))
-                        Console.WriteLine("Drive {0} APM: {1}", i, apm1);
-                    else
-                        Console.WriteLine("Drive {0} APM is not available", i);
-                    HW.SetAPM(i, 1, true);
-                    if (HW.GetAPM(i, out int apm2))
-                        Console.WriteLine("Drive {0} APM: {1}", i, apm2);
-                    else
-                        Console.WriteLine("Drive {0} APM is not available", i);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Drive {0} Exception: {1}", i, ex.Message);
-                }
-            }
+                ConnectCallback = connectionFactory.ConnectAsync
+            };
+
+            return GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
+            {
+                HttpHandler = socketsHttpHandler
+            });
         }
     }
 }

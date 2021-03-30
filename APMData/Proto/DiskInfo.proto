@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option csharp_namespace = "APMData.Proto";
+
+package APMData;
+
+import "google/protobuf/timestamp.proto";
+
+service APMData {
+  rpc EnumerateDisks (Empty) returns (SystemDiskInfoReply);
+}
+
+message Empty {
+}
+
+message DiskInfoEntry {
+  uint32 DiskIndex = 1;
+  uint32 Index = 2;
+  uint32 Availability = 3;
+  string Caption = 4;
+  uint32 ConfigManagerErrorCode =5;
+  string Description = 6;
+  string DeviceID = 7;
+  string InterfaceType = 8;
+  string Manufacturer = 9;
+  string Model = 10;
+  string Name = 11;
+  string SerialNumber = 12;
+  string Status = 13;
+}
+
+message SystemDiskInfoReply {
+  int32 ResponseResult = 1;
+  google.protobuf.Timestamp ResponseTimeStamp = 2;
+  repeated DiskInfoEntry DiskInfoEntries = 3;
+}
