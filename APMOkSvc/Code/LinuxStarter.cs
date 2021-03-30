@@ -22,7 +22,7 @@ namespace APMOkSvc.Code
         private bool console;
         private bool daemon;
 
-        private readonly NLog.Logger logger = NLogBuilder.ConfigureNLog("NLog.config").GetCurrentClassLogger();
+        private readonly Logger logger = NLogBuilder.ConfigureNLog("NLog.config").GetCurrentClassLogger();
         private readonly List<string> HostArgs = new() { };
         private readonly string location;
         private readonly string file;

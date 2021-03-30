@@ -1,4 +1,4 @@
-﻿namespace APMOkSvc.Code
+﻿namespace APMTest.Code
 {
     public enum StarterRunResult
     {

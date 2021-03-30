@@ -11,9 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,7 +32,7 @@ namespace APMOkSvc.Code
         private readonly string longDescription = Properties.Resources.LongDescription;
 
         private readonly TimeSpan ServiceRestartDelay = TimeSpan.FromSeconds(5);
-        private readonly NLog.Logger logger = NLogBuilder.ConfigureNLog("NLog.config").GetCurrentClassLogger();
+        private readonly Logger logger = NLogBuilder.ConfigureNLog("NLog.config").GetCurrentClassLogger();
         private readonly List<string> HostArgs = new() { };
         private readonly string location;
         private readonly string file;
