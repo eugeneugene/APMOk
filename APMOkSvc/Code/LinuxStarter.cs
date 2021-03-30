@@ -1,5 +1,6 @@
 ﻿using APMData;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -182,7 +183,10 @@ namespace APMOkSvc.Code
                 webBuilder.UseStartup<TStartup>();
                 webBuilder.ConfigureKestrel(options =>
                 {
-                    options.ListenUnixSocket(SocketData.SocketPath);
+                    options.ListenUnixSocket(SocketData.SocketPath, options =>
+                    {
+                        options.Protocols = HttpProtocols.Http1;
+                    });
                 });
             });
 

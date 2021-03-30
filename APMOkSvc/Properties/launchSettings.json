@@ -1,11 +1,12 @@
-﻿{
+{
   "profiles": {
     "APMOkSvc": {
       "commandName": "Project",
-      "dotnetRunMessages": "true",
+      "commandLineArgs": "/c",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
-      }
+      },
+      "dotnetRunMessages": "true"
     }
   }
 }

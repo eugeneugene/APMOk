@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "APMTest": {
+      "commandName": "Project"
+    }
+  }
+}

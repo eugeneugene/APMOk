@@ -2,9 +2,13 @@
 using APMData.Code;
 using APMData.Proto;
 using Grpc.Net.Client;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Net;
 using System.Net.Http;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 
 namespace APMTest
 {
@@ -39,10 +43,32 @@ namespace APMTest
                 ConnectCallback = connectionFactory.ConnectAsync
             };
 
-            return GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
+            var handler = new HttpClientHandler
             {
-                HttpHandler = socketsHttpHandler
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+            };
+            handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+            handler.ServerCertificateCustomValidationCallback = ServerCertificateCustomValidationCallback;
+
+            return GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
+            {
+                HttpHandler = socketsHttpHandler,
+                HttpClient = new HttpClient(handler, disposeHandler: true),
             });
+        }
+
+        public static bool ServerCertificateCustomValidationCallback(HttpRequestMessage httpRequestMessage, X509Certificate2 x509Certificate, X509Chain x509Chain, SslPolicyErrors sslPolicyErrors)
+        {
+            if (x509Certificate == null)
+                throw new ArgumentNullException(nameof(x509Certificate));
+
+            Console.WriteLine("HttpRequestMessage: {0} Server Certificate: Subject: {1} Issuer: {2} NotBefore: {3} NotAfter: {4} Thumbprint: {5}",
+                httpRequestMessage, x509Certificate.Subject, x509Certificate.Issuer, x509Certificate.NotBefore, x509Certificate.NotAfter, x509Certificate.Thumbprint);
+
+            if (!x509Certificate.Verify())
+                Console.WriteLine("Сертификат невалидный!");
+
+            return true;
         }
     }
 }

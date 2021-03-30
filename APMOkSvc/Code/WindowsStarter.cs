@@ -1,5 +1,6 @@
 ﻿using APMData;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.WindowsServices;
@@ -10,7 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -369,7 +372,14 @@ namespace APMOkSvc.Code
                 webBuilder.UseStartup<TStartup>();
                 webBuilder.ConfigureKestrel(options =>
                 {
-                    options.ListenUnixSocket(SocketData.SocketPath);
+                    var configuration = options.ApplicationServices.GetService(typeof(IConfiguration)) as IConfiguration;
+                    var path = configuration["Kestrel:EndpointDefaults:Certificate:Path"];
+                    var password = configuration["Kestrel:EndpointDefaults:Certificate:Password"];
+                    options.ListenUnixSocket(SocketData.SocketPath, options =>
+                    {
+                        options.UseHttps(path, password);
+                        options.Protocols = HttpProtocols.Http2;
+                    });
                 });
             });
 
