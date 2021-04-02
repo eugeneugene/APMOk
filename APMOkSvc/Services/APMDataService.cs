@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using static APMData.Proto.APMData;
+using Empty = APMData.Proto.Empty;
 
 namespace APMOkSvc.Services
 {
-    public class APMDataService : APMDataBase
+    public class APMDataService : DiskInfoService.DiskInfoServiceBase
     {
         private readonly ILogger _logger;
         public APMDataService(ILogger<APMDataService> logger)
@@ -19,7 +19,7 @@ namespace APMOkSvc.Services
             _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
         }
 
-        public override Task<SystemDiskInfoReply> EnumerateDisks(APMData.Proto.Empty request, ServerCallContext context)
+        public override Task<SystemDiskInfoReply> EnumerateDisks(Empty request, ServerCallContext context)
         {
             int res = HW.EnumerateDisks(out var diskInfoEnum);
 

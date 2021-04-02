@@ -6,7 +6,7 @@ package APMData;
 
 import "google/protobuf/timestamp.proto";
 
-service APMData {
+service DiskInfoService {
   rpc EnumerateDisks (Empty) returns (SystemDiskInfoReply);
 }
 
