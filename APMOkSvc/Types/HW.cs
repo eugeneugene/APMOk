@@ -5,8 +5,10 @@ using System.Runtime.InteropServices;
 
 namespace APMOkSvc.Types
 {
-    public class HW
+    public static class HW
     {
+        public static int LastWin32Error { get; private set; } = 0;
+
         [DllImport("hw.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int EnumerateDisks([In, Out] IntPtr diskInfo);
 
@@ -23,22 +25,20 @@ namespace APMOkSvc.Types
             try
             {
                 var res = EnumerateDisks(ptr);
-                if (res > 0)
+                if (res == 0)
                 {
                     var result = new HWDiskInfo[16];
                     for (int i = 0; i < 16; i++)
                         result[i] = (HWDiskInfo)Marshal.PtrToStructure(new IntPtr(ptr.ToInt64() + (i * EnumDiskInfoSize)), typeof(HWDiskInfo));
                     diskInfo = result;
-                    return res;
+                    LastWin32Error = 0;
                 }
                 else
                 {
-                    var win32error = Marshal.GetLastWin32Error();
-                    if (win32error != 0)
-                        throw new Win32Exception(win32error);
                     diskInfo = null;
-                    return 0;
+                    LastWin32Error = Marshal.GetLastWin32Error();
                 }
+                return res;
             }
             finally
             {

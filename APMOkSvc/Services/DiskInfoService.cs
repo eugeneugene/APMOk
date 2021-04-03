@@ -4,13 +4,13 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Empty = APMData.Proto.Empty;
 
 namespace APMData
 {
-    public class DiskInfoService : Proto.DiskInfoService.DiskInfoServiceBase
+    public partial class DiskInfoService : Proto.DiskInfoService.DiskInfoServiceBase
     {
         private readonly ILogger _logger;
         public DiskInfoService(ILogger<DiskInfoService> logger)
@@ -27,9 +27,19 @@ namespace APMData
             {
                 ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow),
             };
-            if (res == 0)
+            if (res != 0)
             {
-                reply.ResponseResult = 1;
+                if (EnumerateDisksErrors.ContainsKey(res))
+                    _logger.LogError("Hardware error: {0}", EnumerateDisksErrors[res]);
+                else
+                    _logger.LogError("Hardware error: {0}", res);
+
+                if (HW.LastWin32Error != 0)
+                {
+                    var ex = new Win32Exception(HW.LastWin32Error);
+                    _logger.LogError(ex.Message);
+                }
+                reply.ResponseResult = res;
                 return Task.FromResult(reply);
             }
             else
@@ -60,7 +70,6 @@ namespace APMData
                 }
                 return Task.FromResult(reply);
             }
-            // return base.EnumerateDisks(request, context);
         }
     }
 }

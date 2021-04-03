@@ -1,6 +1,7 @@
 ﻿using APMData;
 using APMData.Code;
 using APMData.Proto;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.Client;
 using System;
 using System.Diagnostics;
@@ -14,7 +15,7 @@ namespace APMTest
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main(string[] _)
         {
             try
             {
@@ -23,7 +24,7 @@ namespace APMTest
                 var reply = client.EnumerateDisks(new Empty());
                 Console.WriteLine("Reply ResponseResult: " + reply.ResponseResult);
                 Console.WriteLine("Reply ResponseTimeStamp: " + reply.ResponseTimeStamp);
-                foreach (var entry in reply.DiskInfoEntries)
+                foreach (DiskInfoEntry entry in reply.DiskInfoEntries)
                     Console.WriteLine("Reply DiskInfo entry: " + (entry.InfoValid ? entry.Caption : "<Invalid>"));
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey();
@@ -49,32 +50,10 @@ namespace APMTest
                 }
             };
 
-            //var handler = new HttpClientHandler
-            //{
-            //    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-            //    ClientCertificateOptions = ClientCertificateOption.Manual,
-            //    ServerCertificateCustomValidationCallback = ServerCertificateCustomValidationCallback,
-            //};
-
             return GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
             {
                 HttpHandler = socketsHttpHandler,
-                //HttpClient = new HttpClient(handler, disposeHandler: true),
             });
-        }
-
-        private static bool ServerCertificateCustomValidationCallback(HttpRequestMessage httpRequestMessage, X509Certificate2 x509Certificate, X509Chain x509Chain, SslPolicyErrors sslPolicyErrors)
-        {
-            if (x509Certificate == null)
-                throw new ArgumentNullException(nameof(x509Certificate));
-
-            Console.WriteLine("HttpRequestMessage: {0} Server Certificate: Subject: {1} Issuer: {2} NotBefore: {3} NotAfter: {4} Thumbprint: {5}",
-                httpRequestMessage, x509Certificate.Subject, x509Certificate.Issuer, x509Certificate.NotBefore, x509Certificate.NotAfter, x509Certificate.Thumbprint);
-
-            if (!x509Certificate.Verify())
-                Console.WriteLine("Сертификат невалидный!");
-
-            return true;
         }
 
         private static bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)

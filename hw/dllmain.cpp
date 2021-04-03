@@ -1,24 +1,18 @@
 #include "pch.h"
 
-HANDLE hLog;
 void WriteLog(const wchar_t* format, ...);
+
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
-	hLog = INVALID_HANDLE_VALUE;
-
 	switch (ul_reason_for_call)
 	{
-	case DLL_PROCESS_ATTACH:
 	case DLL_THREAD_ATTACH:
-#if _DEBUG
-		hLog = ::CreateFileW(L"hw.log", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-#endif
+	case DLL_PROCESS_ATTACH:
 		break;
+
 	case DLL_THREAD_DETACH:
 	case DLL_PROCESS_DETACH:
-		if (hLog != INVALID_HANDLE_VALUE)
-			::CloseHandle(hLog);
 		break;
 	}
 	return TRUE;
@@ -27,6 +21,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 void WriteLog(const wchar_t* format, ...)
 {
 #if _DEBUG
+	HANDLE hLog;
+	hLog = ::CreateFileW(L"hw.log", FILE_APPEND_DATA, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
 	if (hLog != INVALID_HANDLE_VALUE)
 	{
 		wchar_t buffer[256];
@@ -35,6 +32,7 @@ void WriteLog(const wchar_t* format, ...)
 		int i = _vsnwprintf_s(buffer, 256, format, args);
 		::WriteFile(hLog, buffer, i << 1, NULL, NULL);
 		va_end(args);
+		::CloseHandle(hLog);
 	}
 #endif
 }

@@ -1,35 +1,58 @@
 #include "pch.h"
 #include "hw.h"
 
+HRESULT hrInit = HRESULT_CODE(-1);
+HRESULT hrInitSec = HRESULT_CODE(-1);
+
+/// <summary>
+/// Вернуть массив из 16 элементов типа EnumDiskInfo в аргументе diskInfo
+/// Вызывающая сторона резервирует память под diskInfo
+/// Возврат:     0 - Успех
+///	         Иначе - Ошибка
+/// </summary>
+/// <param name="diskInfo">Массив из 16 элементов типа EnumDiskInfo</param>
+/// <returns>
+/// 0 - Успех
+/// 1 - Failed to get Disk Drive information
+/// 2 - Failed to set proxy blanket
+/// 3 - Failed to connect to root namespace
+/// 4 - Failed to create IWbemLocator object
+/// 5 - Failed to set COM Security
+/// 6 - Failed to initialize COM
+/// </returns>
 extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 {
-	HRESULT hr;
-	hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+	int retVal = 0;
 
-	if (FAILED(hr))
+	if (FAILED(hrInit))
+		hrInit = CoInitializeEx(0, COINIT_MULTITHREADED);
+
+	if (FAILED(hrInit))
 	{
-		WriteLog(L"Failed to initialize COM\r\n");
-		return 0;
+		WriteLog(L"Failed to initialize COM. Error code = %x\r\n", hrInit);
+		return 6;
 	}
 
-	hr = CoInitializeSecurity(
-		NULL,
-		-1,                          // COM authentication
-		NULL,                        // Authentication services
-		NULL,                        // Reserved
-		RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
-		RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
-		NULL,                        // Authentication info
-		EOAC_NONE,                   // Additional capabilities 
-		NULL                         // Reserved
-	);
-
-	if (SUCCEEDED(hr))
+	if (FAILED(hrInitSec))
 	{
+		hrInitSec = CoInitializeSecurity(
+			NULL,
+			-1,                          // COM authentication
+			NULL,                        // Authentication services
+			NULL,                        // Reserved
+			RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
+			RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
+			NULL,                        // Authentication info
+			EOAC_NONE,                   // Additional capabilities 
+			NULL                         // Reserved
+		);
+	}
+
+	if (SUCCEEDED(hrInitSec))
+	{
+		HRESULT hr;
 		CComPtr<IWbemLocator> pLoc;
-
 		hr = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID*)&pLoc);
-
 		if (SUCCEEDED(hr))
 		{
 			CComPtr<IWbemServices> pSvc;
@@ -37,7 +60,6 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 			if (SUCCEEDED(hr))
 			{
 				CComPtr<IEnumWbemClassObject> pEnumerator;
-
 				hr = CoSetProxyBlanket(
 					pSvc,                        // Indicates the proxy to set
 					RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
@@ -48,12 +70,10 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 					NULL,                        // client identity
 					EOAC_NONE                    // proxy capabilities 
 				);
-
 				if (SUCCEEDED(hr))
 				{
 					hr = pSvc->ExecQuery(CComBSTR(L"WQL"), CComBSTR(L"SELECT * FROM Win32_DiskDrive"),
 						WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
-
 					if (SUCCEEDED(hr))
 					{
 						for (UINT16 index = 0U; index < 16U; index++)
@@ -127,27 +147,53 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 								}
 							}
 						}
-						CoUninitialize();
-						return 1;
+						retVal = 0;
 					}
 					else
+					{
 						WriteLog(L"Failed to get Disk Drive information. Error code = %x\r\n", hr);
+						CoUninitialize();
+						hrInit = HRESULT_CODE(-1);
+						retVal = 1;
+					}
 				}
 				else
+				{
 					WriteLog(L"Failed to set proxy blanket. Error code = %x\r\n", hr);
+					CoUninitialize();
+					hrInit = HRESULT_CODE(-1);
+					retVal = 2;
+				}
 			}
 			else
+			{
 				WriteLog(L"Failed to connect to root namespace. Error code = %x\r\n", hr);
+				CoUninitialize();
+				hrInit = HRESULT_CODE(-1);
+				retVal = 3;
+			}
 		}
 		else
+		{
 			WriteLog(L"Failed to create IWbemLocator object. Error code = %x\r\n", hr);
+			CoUninitialize();
+			hrInit = HRESULT_CODE(-1);
+			retVal = 4;
+		}
 	}
 	else
-		WriteLog(L"Failed to set COM Security. Error code = %x\r\n", hr);
+	{
+		WriteLog(L"Failed to set COM Security. Error code = %x\r\n", hrInitSec);
+		CoUninitialize();
+		hrInit = HRESULT_CODE(-1);
+		retVal = 5;
+	}
 
 	CoUninitialize();
+	hrInit = HRESULT_CODE(-1);
 
-	return 0;
+	return retVal;
+
 }
 
 extern "C" HWLIBRARY_API int GetAPM(wchar_t* dskName)

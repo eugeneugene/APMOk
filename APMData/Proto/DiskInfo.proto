@@ -5,12 +5,10 @@ option csharp_namespace = "APMData.Proto";
 package APMData;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/Empty.proto";
 
 service DiskInfoService {
-  rpc EnumerateDisks (Empty) returns (SystemDiskInfoReply);
-}
-
-message Empty {
+  rpc EnumerateDisks (google.protobuf.Empty) returns (SystemDiskInfoReply);
 }
 
 message DiskInfoEntry {

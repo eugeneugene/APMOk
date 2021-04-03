@@ -20,7 +20,7 @@
                 Margin="15"
                 HorizontalAlignment="Left"
                 DataContext="{StaticResource DriveStatusViewSource}"
-                ItemsSource="{Binding}" />
+                ItemsSource="{Binding Path=Caption}" />
             <GroupBox Margin="5" Header="Drive Status">
                 <DataGrid
                     x:Name="DriveStatusGrid"

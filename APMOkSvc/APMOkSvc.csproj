@@ -11,6 +11,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
 		<PackageReference Include="NLog.Web.AspNetCore" Version="4.12.0" />
+		<PackageReference Include="System.Collections" Version="4.3.0" />
 		<PackageReference Include="System.ServiceModel.Primitives" Version="4.8.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="5.0.1" />
@@ -48,5 +49,15 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
+
+	<UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="$(SolutionDir)DC.Build.Tasks\DC.Build.Tasks.dll" />
+	<Target Name="BeforeBuildActionsProject" BeforeTargets="BeforeBuild" >
+		<GetCurrentBuildVersion BaseVersion="$(FileVersion)">
+			<Output TaskParameter="Version" PropertyName="FileVersion" />
+		</GetCurrentBuildVersion>
+		<PropertyGroup>
+			<AssemblyVersion>$(FileVersion)</AssemblyVersion>
+		</PropertyGroup>
+	</Target>
 
 </Project>
