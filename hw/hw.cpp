@@ -1,20 +1,15 @@
 #include "pch.h"
 #include "hw.h"
-#include "atahdd.h"
 
-BOOL GeHDDId(HANDLE hDrive, IDENTIFY_DEVICE_DATA* hddid);
-BOOL SetAPM(HANDLE hDrive, BYTE APMVal, BOOL Disable);
-
-extern "C" HWLIBRARY_API int EnumerateDisks(void* ptr)
+extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 {
-	EnumDiskInfo* diskInfo = (EnumDiskInfo*)ptr;
 	HRESULT hr;
 	hr = CoInitializeEx(0, COINIT_MULTITHREADED);
 
 	if (FAILED(hr))
 	{
-		_RPTF0(_CRT_ERROR, L"Failed to initialize COM\n");
-		return -1;
+		WriteLog(L"Failed to initialize COM\r\n");
+		return 0;
 	}
 
 	hr = CoInitializeSecurity(
@@ -61,100 +56,113 @@ extern "C" HWLIBRARY_API int EnumerateDisks(void* ptr)
 
 					if (SUCCEEDED(hr))
 					{
-						CIMTYPE cType;
-
-						UINT16 index = 0U;
-
-						while (pEnumerator)
+						for (UINT16 index = 0U; index < 16U; index++)
 						{
-							CComPtr<IWbemClassObject> pclsObj;
-							CComVariant var;
-							ULONG uReturn;
-
 							EnumDiskInfo* info = &diskInfo[index];
+							info->InfoValid = FALSE;
+							if (pEnumerator)
+							{
+								CComPtr<IWbemClassObject> pclsObj;
+								CComVariant var;
+								ULONG uReturn;
+								CIMTYPE cType;
 
-							if (index == 16)
-								break;
+								hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
 
-							hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+								if (uReturn)
+								{
+									info->InfoValid = TRUE;
+									WriteLog(L"InfoValid: %i\r\n", TRUE);
 
-							if (0 == uReturn)
-								break;
+									info->DiskIndex = index;
+									WriteLog(L"DiskIndex: %i\r\n", index);
 
-							info->DiskIndex = index++;
+									hr = pclsObj->Get(L"Availability", 0, &var, &cType, 0);
+									info->Availability = var.uiVal;
+									WriteLog(L"Availability: %u\r\n", info->Availability);
 
-							hr = pclsObj->Get(L"Availability", 0, &var, &cType, 0);
-							info->Availability = var.uiVal;
+									hr = pclsObj->Get(L"Caption", 0, &var, &cType, 0);
+									wcscpy_s(info->Caption, var.bstrVal);
+									WriteLog(L"Caption: %s\r\n", info->Caption);
 
-							hr = pclsObj->Get(L"Caption", 0, &var, &cType, 0);
-							wcscpy_s(info->Caption, var.bstrVal);
+									hr = pclsObj->Get(L"ConfigManagerErrorCode", 0, &var, &cType, 0);
+									info->ConfigManagerErrorCode = var.uintVal;
+									WriteLog(L"ConfigManagerErrorCode: %u\r\n", info->ConfigManagerErrorCode);
 
-							hr = pclsObj->Get(L"ConfigManagerErrorCode", 0, &var, &cType, 0);
-							info->ConfigManagerErrorCode = var.uintVal;
+									hr = pclsObj->Get(L"Description", 0, &var, &cType, 0);
+									wcscpy_s(info->Description, var.bstrVal);
+									WriteLog(L"Description: %s\r\n", info->Description);
 
-							hr = pclsObj->Get(L"Description", 0, &var, &cType, 0);
-							wcscpy_s(info->Description, var.bstrVal);
+									hr = pclsObj->Get(L"DeviceID", 0, &var, &cType, 0);
+									wcscpy_s(info->DeviceID, var.bstrVal);
+									WriteLog(L"DeviceID: %s\r\n", info->DeviceID);
 
-							hr = pclsObj->Get(L"DeviceID", 0, &var, &cType, 0);
-							wcscpy_s(info->DeviceID, var.bstrVal);
+									hr = pclsObj->Get(L"Index", 0, &var, &cType, 0);
+									info->Index = var.uintVal;
+									WriteLog(L"Index: %u\r\n", info->Index);
 
-							hr = pclsObj->Get(L"Index", 0, &var, &cType, 0);
-							info->Index = var.uintVal;
+									hr = pclsObj->Get(L"InterfaceType", 0, &var, &cType, 0);
+									wcscpy_s(info->InterfaceType, var.bstrVal);
+									WriteLog(L"InterfaceType: %s\r\n", info->InterfaceType);
 
-							hr = pclsObj->Get(L"InterfaceType", 0, &var, &cType, 0);
-							wcscpy_s(info->InterfaceType, var.bstrVal);
+									hr = pclsObj->Get(L"Manufacturer", 0, &var, &cType, 0);
+									wcscpy_s(info->Manufacturer, var.bstrVal);
+									WriteLog(L"Manufacturer: %s\r\n", info->Manufacturer);
 
-							hr = pclsObj->Get(L"Manufacturer", 0, &var, &cType, 0);
-							wcscpy_s(info->Manufacturer, var.bstrVal);
+									hr = pclsObj->Get(L"Model", 0, &var, &cType, 0);
+									wcscpy_s(info->Model, var.bstrVal);
+									WriteLog(L"Model: %s\r\n", info->Model);
 
-							hr = pclsObj->Get(L"Model", 0, &var, &cType, 0);
-							wcscpy_s(info->Model, var.bstrVal);
+									hr = pclsObj->Get(L"Name", 0, &var, &cType, 0);
+									wcscpy_s(info->Name, var.bstrVal);
+									WriteLog(L"Name: %s\r\n", info->Name);
 
-							hr = pclsObj->Get(L"Name", 0, &var, &cType, 0);
-							wcscpy_s(info->Name, var.bstrVal);
+									hr = pclsObj->Get(L"SerialNumber", 0, &var, &cType, 0);
+									wcscpy_s(info->SerialNumber, var.bstrVal);
+									WriteLog(L"SerialNumber: %s\r\n", info->SerialNumber);
 
-							hr = pclsObj->Get(L"SerialNumber", 0, &var, &cType, 0);
-							wcscpy_s(info->SerialNumber, var.bstrVal);
-
-							hr = pclsObj->Get(L"Status", 0, &var, &cType, 0);
-							wcscpy_s(info->Status, var.bstrVal);
+									hr = pclsObj->Get(L"Status", 0, &var, &cType, 0);
+									wcscpy_s(info->Status, var.bstrVal);
+									WriteLog(L"Status: %s\r\n", info->Status);
+								}
+							}
 						}
 						CoUninitialize();
-						return index;
+						return 1;
 					}
 					else
-						_RPTFWN(_CRT_ERROR, L"Failed to get Disk Drive information. Error code = %x\n", hr);
+						WriteLog(L"Failed to get Disk Drive information. Error code = %x\r\n", hr);
 				}
 				else
-					_RPTFWN(_CRT_ERROR, L"Failed to set proxy blanket. Error code = %x\n", hr);
+					WriteLog(L"Failed to set proxy blanket. Error code = %x\r\n", hr);
 			}
 			else
-				_RPTFWN(_CRT_ERROR, L"Failed to connect to root namespace. Error code = %x\n", hr);
+				WriteLog(L"Failed to connect to root namespace. Error code = %x\r\n", hr);
 		}
 		else
-			_RPTFWN(_CRT_ERROR, L"Failed to create IWbemLocator object. Error code = %x\n", hr);
+			WriteLog(L"Failed to create IWbemLocator object. Error code = %x\r\n", hr);
 	}
 	else
-		_RPTFWN(_CRT_ERROR, L"Failed to set COM Security. Error code = %x\n", hr);
+		WriteLog(L"Failed to set COM Security. Error code = %x\r\n", hr);
 
 	CoUninitialize();
 
-	return -1;
+	return 0;
 }
 
 extern "C" HWLIBRARY_API int GetAPM(wchar_t* dskName)
 {
 	HANDLE hDrive = CreateFile(dskName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
 	if (hDrive == INVALID_HANDLE_VALUE)
-		return -1;
+		return 0;
 
 	IDENTIFY_DEVICE_DATA hddid;
 	BOOL rez = GeHDDId(hDrive, &hddid);
 	if (!rez)
-		return -2;
+		return 0;
 
 	if ((hddid.command_set_2 & 0x08) == 0)
-		return -3;
+		return 0;
 
 	uint16_t APMVal = hddid.CurAPMvalues & 0x00FF;
 
@@ -165,7 +173,7 @@ extern "C" HWLIBRARY_API int SetAPM(wchar_t* dskName, byte val, bool disable)
 {
 	HANDLE hDrive = CreateFile(dskName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
 	if (hDrive == INVALID_HANDLE_VALUE)
-		return -1;
+		return 0;
 
 	BOOL rez = SetAPM(hDrive, val, disable);
 	return rez;
@@ -190,10 +198,9 @@ BOOL GeHDDId(HANDLE hDrive, IDENTIFY_DEVICE_DATA* hddid)
 	aptexb.AtaPassThroughEx.TimeOutValue = 3;
 
 	bytesRet = 0;
-	rez = DeviceIoControl(hDrive, IOCTL_ATA_PASS_THROUGH, &aptexb, sizeof ATA_PASS_THROUGH_EX, &aptexb,
-		sizeof ATA_PASS_THROUGH_EX_WITH_BUFFERS, &bytesRet, NULL);
+	rez = DeviceIoControl(hDrive, IOCTL_ATA_PASS_THROUGH, &aptexb, sizeof ATA_PASS_THROUGH_EX, &aptexb, sizeof ATA_PASS_THROUGH_EX_WITH_BUFFERS, &bytesRet, NULL);
 
-	if (rez == 0)
+	if (!rez)
 		return 0;
 
 	ptr = (void*)(&aptexb.ucDataBuf);
@@ -231,8 +238,7 @@ BOOL SetAPM(HANDLE hDrive, BYTE APMVal, BOOL Disable)
 	memcpy_s(aptex.AtaPassThroughEx.CurrentTaskFile, sizeof(aptex.AtaPassThroughEx.CurrentTaskFile), &CurrentTaskFile, sizeof IDEREGS);
 
 	bytesRet = 0;
-	rez = DeviceIoControl(hDrive, IOCTL_ATA_PASS_THROUGH, &aptex, sizeof ATA_PASS_THROUGH_EX, &aptex,
-		sizeof ATA_PASS_THROUGH_EX_WITH_BUFFERS, &bytesRet, NULL);
+	rez = DeviceIoControl(hDrive, IOCTL_ATA_PASS_THROUGH, &aptex, sizeof ATA_PASS_THROUGH_EX, &aptex, sizeof ATA_PASS_THROUGH_EX_WITH_BUFFERS, &bytesRet, NULL);
 
 	return rez;
 }

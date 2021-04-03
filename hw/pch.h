@@ -5,6 +5,7 @@
 #include "framework.h"
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <tchar.h>
 #include <atlbase.h>
 

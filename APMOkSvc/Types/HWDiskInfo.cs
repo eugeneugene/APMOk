@@ -5,6 +5,7 @@ namespace APMOkSvc.Types
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public class HWDiskInfo
     {
+        public uint InfoValid;
         public ushort DiskIndex;
         public uint Index;
         public ushort Availability;

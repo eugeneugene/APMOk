@@ -23,6 +23,8 @@ namespace APMOk
                     CanExecuteFunc = () => Application.Current.MainWindow == null,
                     CommandAction = () =>
                     {
+                        DeviceStatusWindow deviceStatusWindow = new();
+                        deviceStatusWindow.Show();
                         //Application.Current.MainWindow = new MainWindow();
                         //Application.Current.MainWindow.Show();
                     }

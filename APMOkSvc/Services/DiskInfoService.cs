@@ -8,12 +8,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Empty = APMData.Proto.Empty;
 
-namespace APMOkSvc.Services
+namespace APMData
 {
-    public class APMDataService : DiskInfoService.DiskInfoServiceBase
+    public class DiskInfoService : Proto.DiskInfoService.DiskInfoServiceBase
     {
         private readonly ILogger _logger;
-        public APMDataService(ILogger<APMDataService> logger)
+        public DiskInfoService(ILogger<DiskInfoService> logger)
         {
             _logger = logger;
             _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
@@ -25,7 +25,7 @@ namespace APMOkSvc.Services
 
             SystemDiskInfoReply reply = new()
             {
-                ResponseTimeStamp = Timestamp.FromDateTime(DateTime.Now),
+                ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow),
             };
             if (res == 0)
             {
@@ -34,8 +34,9 @@ namespace APMOkSvc.Services
             }
             else
             {
-                var diskInfos = diskInfoEnum.Select(item => new DiskInfoEntry()
+                var diskInfos = diskInfoEnum.Select(item => new Proto.DiskInfoEntry()
                 {
+                    InfoValid = item.InfoValid != 0,
                     DiskIndex = item.DiskIndex,
                     Index = item.Index,
                     Availability = item.Availability,
@@ -53,10 +54,9 @@ namespace APMOkSvc.Services
 
                 reply.DiskInfoEntries.AddRange(diskInfos);
 
-                var diskInfo = diskInfoEnum.Take(res);
-                foreach (var di in diskInfo)
+                foreach (var di in diskInfos)
                 {
-                    _logger.LogTrace(di.Caption);
+                    _logger.LogTrace(di.InfoValid ? di.Caption : "<Invalid>");
                 }
                 return Task.FromResult(reply);
             }

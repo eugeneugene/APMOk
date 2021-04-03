@@ -24,7 +24,7 @@ namespace APMTest
                 Console.WriteLine("Reply ResponseResult: " + reply.ResponseResult);
                 Console.WriteLine("Reply ResponseTimeStamp: " + reply.ResponseTimeStamp);
                 foreach (var entry in reply.DiskInfoEntries)
-                    Console.WriteLine("Reply DiskInfo entry: " + entry.Caption);
+                    Console.WriteLine("Reply DiskInfo entry: " + (entry.InfoValid ? entry.Caption : "<Invalid>"));
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey();
             }
