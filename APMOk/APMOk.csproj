@@ -30,6 +30,4 @@
 	  <ProjectReference Include="..\APMOkLib\APMOkLib.csproj" />
 	</ItemGroup>
 
-	
-
 </Project>

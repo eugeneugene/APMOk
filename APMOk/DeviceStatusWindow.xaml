@@ -1,45 +1,71 @@
-﻿<Window
-    x:Class="APMOk.DeviceStatusWindow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:APMOk"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="DeviceStatusWindow"
-    Width="800"
-    Height="450"
-    Loaded="WindowLoaded"
-    mc:Ignorable="d">
+﻿<Window x:Class="APMOk.DeviceStatusWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:APMOk"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Title="DeviceStatusWindow"
+        Width="800"
+        Height="450"
+        Loaded="WindowLoaded"
+        mc:Ignorable="d"
+        x:ClassModifier="internal">
     <Window.Resources>
-        <CollectionViewSource x:Key="DriveStatusViewSource" CollectionViewType="ListCollectionView" />
+        <CollectionViewSource x:Key="DeviceStatusDataSource"
+                              CollectionViewType="ListCollectionView" />
     </Window.Resources>
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <ComboBox
-                Width="300"
-                Margin="15"
-                HorizontalAlignment="Left"
-                DataContext="{StaticResource DriveStatusViewSource}"
-                ItemsSource="{Binding Path=Caption}" />
-            <GroupBox Margin="5" Header="Drive Status">
-                <DataGrid
-                    x:Name="DriveStatusGrid"
-                    Margin="5"
-                    AutoGenerateColumns="False"
-                    CanUserAddRows="False"
-                    CanUserDeleteRows="False"
-                    CanUserResizeColumns="False"
-                    CanUserResizeRows="False"
-                    CanUserSortColumns="False"
-                    DataContext="{StaticResource DriveStatusViewSource}"
-                    ItemsSource="{Binding}"
-                    ScrollViewer.HorizontalScrollBarVisibility="Hidden">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn />
-                        <DataGridTextColumn />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </GroupBox>
-        </StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="65" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="70*" />
+            <ColumnDefinition Width="30*" />
+        </Grid.ColumnDefinitions>
+        <GroupBox Margin="5"
+                  Header="Select disk"
+                  Grid.Row="0"
+                  Grid.Column="0">
+            <ComboBox Margin="5"
+                      x:Name="SelectDiskCombo"
+                      Height="22"
+                      HorizontalAlignment="Left"
+                      DataContext="{StaticResource DeviceStatusDataSource}"
+                      ItemsSource="{Binding}"
+                      DisplayMemberPath="Caption" />
+        </GroupBox>
+        <GroupBox Margin="5"
+                  Header="Refresh"
+                  Grid.Row="0"
+                  Grid.Column="1">
+            <Button Click="Button_Click"
+                    Content="P"
+                    Height="22"
+                    Width="22"
+                    Margin="15,0,0,0"
+                    FontFamily="Wingdings 3"
+                    Grid.Row="0"
+                    Grid.Column="1" />
+        </GroupBox>
+        <GroupBox Margin="5"
+                  Header="Status"
+                  Grid.Row="1"
+                  Grid.ColumnSpan="2">
+            <DataGrid x:Name="DriveStatusGrid"
+                      Margin="5"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      CanUserResizeColumns="False"
+                      CanUserResizeRows="False"
+                      CanUserSortColumns="False"
+                      ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                <DataGrid.Columns>
+                    <DataGridTextColumn />
+                    <DataGridTextColumn />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
     </Grid>
 </Window>

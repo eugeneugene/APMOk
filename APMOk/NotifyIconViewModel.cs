@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 
 namespace APMOk
@@ -11,6 +10,7 @@ namespace APMOk
     /// </summary>
     public class NotifyIconViewModel
     {
+        DeviceStatusWindow deviceStatusWindow = null;
         /// <summary>
         /// Shows a window, if none is already open.
         /// </summary>
@@ -20,14 +20,12 @@ namespace APMOk
             {
                 return new DelegateCommand
                 {
-                    CanExecuteFunc = () => Application.Current.MainWindow == null,
+                    CanExecuteFunc = () => deviceStatusWindow == null || !deviceStatusWindow.IsOpen(),
                     CommandAction = () =>
                     {
-                        DeviceStatusWindow deviceStatusWindow = new();
+                        deviceStatusWindow = new();
                         deviceStatusWindow.Show();
-                        //Application.Current.MainWindow = new MainWindow();
-                        //Application.Current.MainWindow.Show();
-                    }
+                    },
                 };
             }
         }
@@ -41,8 +39,12 @@ namespace APMOk
             {
                 return new DelegateCommand
                 {
-                    CommandAction = () => Application.Current.MainWindow.Close(),
-                    CanExecuteFunc = () => Application.Current.MainWindow != null
+                    CanExecuteFunc = () => deviceStatusWindow != null && deviceStatusWindow.IsOpen(),
+                    CommandAction = () =>
+                    {
+                        deviceStatusWindow?.Close();
+                        deviceStatusWindow = null;
+                    },
                 };
             }
         }
@@ -55,34 +57,8 @@ namespace APMOk
         {
             get
             {
-                return new DelegateCommand {CommandAction = () => Application.Current.Shutdown()};
+                return new DelegateCommand { CommandAction = () => Application.Current.Shutdown() };
             }
-        }
-    }
-
-
-    /// <summary>
-    /// Simplistic delegate command for the demo.
-    /// </summary>
-    public class DelegateCommand : ICommand
-    {
-        public Action CommandAction { get; set; }
-        public Func<bool> CanExecuteFunc { get; set; }
-
-        public void Execute(object parameter)
-        {
-            CommandAction();
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return CanExecuteFunc == null  || CanExecuteFunc();
-        }
-
-        public event EventHandler CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
         }
     }
 }

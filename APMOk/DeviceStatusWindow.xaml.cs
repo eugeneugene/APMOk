@@ -20,17 +20,18 @@ namespace APMOk
     /// <summary>
     /// Interaction logic for DeviceStatusWindow.xaml
     /// </summary>
-    public partial class DeviceStatusWindow : Window
+    internal partial class DeviceStatusWindow : Window
     {
-        private readonly ObservableCollection<DiskInfoEntry> _diskInfo = new() ;
+        public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
 
         public DeviceStatusWindow()
         {
             InitializeComponent();
 
-            CollectionViewSource driveStatusViewSource;
-            driveStatusViewSource = (CollectionViewSource)FindResource("DriveStatusViewSource");
-            driveStatusViewSource.Source = _diskInfo;
+            //DeviceStatusDataSource
+            CollectionViewSource itemCollectionViewSource;
+            itemCollectionViewSource = (CollectionViewSource)FindResource("DeviceStatusDataSource");
+            itemCollectionViewSource.Source = DiskInfo;
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -45,14 +46,19 @@ namespace APMOk
                 using var channel = CreateChannel();
                 var client = new DiskInfoService.DiskInfoServiceClient(channel);
                 var reply = client.EnumerateDisks(new Empty());
-                _diskInfo.Clear();
+                DiskInfo.Clear();
                 if (reply.ResponseResult == 0)
                 {
                     foreach (var entry in reply.DiskInfoEntries.Where(item => item.InfoValid))
-                        _diskInfo.Add(entry);
+                        DiskInfo.Add(entry);
+
+                    if (DiskInfo.Any())
+                        SelectDiskCombo.SelectedIndex = 0;
+                    else
+                        SelectDiskCombo.SelectedIndex = -1;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
             }
@@ -89,6 +95,11 @@ namespace APMOk
         private static bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             return true;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
