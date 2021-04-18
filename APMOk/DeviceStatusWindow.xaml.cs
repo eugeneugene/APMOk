@@ -4,6 +4,7 @@ using APMData.Proto;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.Client;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -13,6 +14,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace APMOk
@@ -24,14 +26,19 @@ namespace APMOk
     {
         public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
 
+        public ObservableCollection<KeyValuePair<string, object>> DiskInfoItems { get; } = new();
+
         public DeviceStatusWindow()
         {
             InitializeComponent();
 
-            //DeviceStatusDataSource
-            CollectionViewSource itemCollectionViewSource;
-            itemCollectionViewSource = (CollectionViewSource)FindResource("DeviceStatusDataSource");
-            itemCollectionViewSource.Source = DiskInfo;
+            // DeviceStatusDataSource
+            CollectionViewSource deviceStatusDataSource = FindResource("DeviceStatusDataSource") as CollectionViewSource;
+            deviceStatusDataSource.Source = DiskInfo;
+
+            // DiskInfoItemsSource
+            CollectionViewSource diskInfoItemsSource = FindResource("DiskInfoItemsSource") as CollectionViewSource;
+            diskInfoItemsSource.Source = DiskInfoItems;
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -97,9 +104,23 @@ namespace APMOk
             return true;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void SelectDiskComboSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            e.Handled = true;
+            DiskInfoItems.Clear();
+            if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry Item)
+            {
+                DiskInfoItems.Add(new(nameof(Item.Availability), Item.Availability));
+                DiskInfoItems.Add(new(nameof(Item.Caption), Item.Caption));
+                DiskInfoItems.Add(new(nameof(Item.Description), Item.Description));
+                DiskInfoItems.Add(new(nameof(Item.DeviceID), Item.DeviceID));
+                DiskInfoItems.Add(new(nameof(Item.DiskIndex), Item.DiskIndex));
+                DiskInfoItems.Add(new(nameof(Item.Manufacturer), Item.Manufacturer));
+                DiskInfoItems.Add(new(nameof(Item.Model), Item.Model));
+                DiskInfoItems.Add(new(nameof(Item.Name), Item.Name));
+                DiskInfoItems.Add(new(nameof(Item.SerialNumber), Item.SerialNumber));
+                DiskInfoItems.Add(new(nameof(Item.Status), Item.Status));
+            }
         }
     }
 }

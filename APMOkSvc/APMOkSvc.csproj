@@ -4,6 +4,7 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<UserSecretsId>dotnet-APMOkSvc-29FF406E-ED1A-4831-B643-AF357DA51037</UserSecretsId>
 		<Platforms>x64</Platforms>
+		<NeutralLanguage>en</NeutralLanguage>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -51,7 +52,7 @@
 	</ItemGroup>
 
 	<UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="$(SolutionDir)DC.Build.Tasks\DC.Build.Tasks.dll" />
-	<Target Name="BeforeBuildActionsProject" BeforeTargets="BeforeBuild" >
+	<Target Name="BeforeBuildActionsProject" BeforeTargets="BeforeBuild">
 		<GetCurrentBuildVersion BaseVersion="$(FileVersion)">
 			<Output TaskParameter="Version" PropertyName="FileVersion" />
 		</GetCurrentBuildVersion>

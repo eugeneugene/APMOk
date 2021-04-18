@@ -110,15 +110,9 @@ namespace APMData
             return sa;
         }
 
-        public override string ToString()
-        {
-            return (filename);
-        }
+        public override string ToString() => filename;
 
-        public override int GetHashCode()
-        {
-            return filename.GetHashCode();
-        }
+        public override int GetHashCode() => filename.GetHashCode();
 
         public override bool Equals(object o)
         {

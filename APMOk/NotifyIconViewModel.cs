@@ -10,55 +10,38 @@ namespace APMOk
     /// </summary>
     public class NotifyIconViewModel
     {
-        DeviceStatusWindow deviceStatusWindow = null;
+        private DeviceStatusWindow deviceStatusWindow = null;
+
         /// <summary>
         /// Shows a window, if none is already open.
         /// </summary>
-        public ICommand ShowWindowCommand
+        public ICommand ShowWindowCommand => new DelegateCommand
         {
-            get
+            CanExecuteFunc = () => deviceStatusWindow == null || !deviceStatusWindow.IsOpen(),
+            CommandAction = () =>
             {
-                return new DelegateCommand
-                {
-                    CanExecuteFunc = () => deviceStatusWindow == null || !deviceStatusWindow.IsOpen(),
-                    CommandAction = () =>
-                    {
-                        deviceStatusWindow = new();
-                        deviceStatusWindow.Show();
-                    },
-                };
-            }
-        }
+                deviceStatusWindow = new();
+                deviceStatusWindow.Show();
+            },
+        };
 
         /// <summary>
         /// Hides the main window. This command is only enabled if a window is open.
         /// </summary>
-        public ICommand HideWindowCommand
+        public ICommand HideWindowCommand => new DelegateCommand
         {
-            get
+            CanExecuteFunc = () => deviceStatusWindow != null && deviceStatusWindow.IsOpen(),
+            CommandAction = () =>
             {
-                return new DelegateCommand
-                {
-                    CanExecuteFunc = () => deviceStatusWindow != null && deviceStatusWindow.IsOpen(),
-                    CommandAction = () =>
-                    {
-                        deviceStatusWindow?.Close();
-                        deviceStatusWindow = null;
-                    },
-                };
-            }
-        }
+                deviceStatusWindow?.Close();
+                deviceStatusWindow = null;
+            },
+        };
 
 
         /// <summary>
         /// Shuts down the application.
         /// </summary>
-        public ICommand ExitApplicationCommand
-        {
-            get
-            {
-                return new DelegateCommand { CommandAction = () => Application.Current.Shutdown() };
-            }
-        }
+        public static ICommand ExitApplicationCommand => new DelegateCommand { CommandAction = () => Application.Current.Shutdown() };
     }
 }
