@@ -2,10 +2,12 @@
 using APMData.Code;
 using APMData.Proto;
 using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
 using Grpc.Net.Client;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -28,6 +30,8 @@ namespace APMOk
 
         public ObservableCollection<KeyValuePair<string, object>> DiskInfoItems { get; } = new();
 
+        public DeviceStatusWindowModel ViewModel { get; set; }
+
         public DeviceStatusWindow()
         {
             InitializeComponent();
@@ -39,6 +43,8 @@ namespace APMOk
             // DiskInfoItemsSource
             CollectionViewSource diskInfoItemsSource = FindResource("DiskInfoItemsSource") as CollectionViewSource;
             diskInfoItemsSource.Source = DiskInfoItems;
+
+            DataContext = ViewModel = new DeviceStatusWindowModel();
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -63,11 +69,13 @@ namespace APMOk
                         SelectDiskCombo.SelectedIndex = 0;
                     else
                         SelectDiskCombo.SelectedIndex = -1;
+                    ViewModel.Connected = true;
                 }
             }
-            catch (Exception ex)
+            catch (RpcException rex)
             {
-                Debug.WriteLine(ex.Message);
+                ViewModel.Connected = false;
+                Debug.WriteLine(rex.Message);
             }
         }
 
