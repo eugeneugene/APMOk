@@ -8,14 +8,15 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/Empty.proto";
 
 service DiskInfoService {
-  rpc EnumerateDisks (google.protobuf.Empty) returns (SystemDiskInfoReply);
+	rpc EnumerateDisks (google.protobuf.Empty) returns (SystemDiskInfoReply);
+	rpc GetAPM (GetAPMRequest) returns (GetAPMReply);
 }
 
 message DiskInfoEntry {
   bool InfoValid = 1;
-  uint32 DiskIndex = 2;
-  uint32 Index = 3;
-  uint32 Availability = 4;
+  uint32 Index = 2;
+  uint32 Availability = 3;
+  uint32 APMValue = 4;
   string Caption = 5;
   uint32 ConfigManagerErrorCode = 6;
   string Description = 7;
@@ -32,4 +33,14 @@ message SystemDiskInfoReply {
   int32 ResponseResult = 1;
   google.protobuf.Timestamp ResponseTimeStamp = 2;
   repeated DiskInfoEntry DiskInfoEntries = 3;
+}
+
+message GetAPMRequest {
+	int32 DiskId = 1;
+}
+
+message GetAPMReply {
+	int32 ResponseResult = 1;
+	google.protobuf.Timestamp ResponseTimeStamp = 2;
+	int32 APMValue = 3;
 }

@@ -17,9 +17,9 @@ constexpr auto SETFEATURES_DIS_APM = 0x85;
 struct EnumDiskInfo		// 2128
 {
 	uint32_t InfoValid;					// 4
-	uint16_t DiskIndex;					// 2
 	uint32_t Index;						// 4
 	uint16_t Availability;				// 2
+	uint16_t APMValue;					// 2
 	wchar_t Caption[256];				// 512
 	uint32_t ConfigManagerErrorCode;	// 4
 	wchar_t Description[256];			// 512
@@ -40,10 +40,10 @@ typedef struct _ATA_PASS_THROUGH_EX_WITH_BUFFERS
 } ATA_PASS_THROUGH_EX_WITH_BUFFERS, * PATA_PASS_THROUGH_EX_WITH_BUFFERS;
 
 extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo* diskInfo);
-extern "C" HWLIBRARY_API int GetAPM(wchar_t* dskName);
+extern "C" HWLIBRARY_API uint16_t GetAPM(wchar_t* dskName);
 extern "C" HWLIBRARY_API int SetAPM(wchar_t* dskName, byte val, bool disable);
 
-BOOL GeHDDId(HANDLE hDrive, IDENTIFY_DEVICE_DATA* hddid);
+BOOL GetHDDId(HANDLE hDrive, IDENTIFY_DEVICE_DATA* hddid);
 BOOL SetAPM(HANDLE hDrive, BYTE APMVal, BOOL Disable);
 
 void WriteLog(const wchar_t* format, ...);

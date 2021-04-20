@@ -94,12 +94,13 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 									info->InfoValid = TRUE;
 									WriteLog(L"InfoValid: %i\r\n", TRUE);
 
-									info->DiskIndex = index;
-									WriteLog(L"DiskIndex: %i\r\n", index);
+									hr = pclsObj->Get(L"Index", 0, &var, &cType, 0);
+									info->Index = var.uintVal;
+									WriteLog(L"Index: %u\r\n", info->Index);
 
 									hr = pclsObj->Get(L"Availability", 0, &var, &cType, 0);
 									info->Availability = var.uiVal;
-									WriteLog(L"Availability: %u\r\n", info->Availability);
+									WriteLog(L"Availability: %hu\r\n", info->Availability);
 
 									hr = pclsObj->Get(L"Caption", 0, &var, &cType, 0);
 									wcscpy_s(info->Caption, var.bstrVal);
@@ -117,9 +118,8 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 									wcscpy_s(info->DeviceID, var.bstrVal);
 									WriteLog(L"DeviceID: %s\r\n", info->DeviceID);
 
-									hr = pclsObj->Get(L"Index", 0, &var, &cType, 0);
-									info->Index = var.uintVal;
-									WriteLog(L"Index: %u\r\n", info->Index);
+									info->APMValue = (uint16_t)GetAPM(info->DeviceID);
+									WriteLog(L"APMValue: %hu\r\n", info->APMValue);
 
 									hr = pclsObj->Get(L"InterfaceType", 0, &var, &cType, 0);
 									wcscpy_s(info->InterfaceType, var.bstrVal);
@@ -196,19 +196,29 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 
 }
 
-extern "C" HWLIBRARY_API int GetAPM(wchar_t* dskName)
+extern "C" HWLIBRARY_API uint16_t GetAPM(wchar_t* dskName)
 {
+	WriteLog(L"GetAPM = %s\r\n", dskName);
 	HANDLE hDrive = CreateFile(dskName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
 	if (hDrive == INVALID_HANDLE_VALUE)
-		return 0;
+	{
+		WriteLog(L"GetAPM: Invalid handle\r\n");
+		return UINT16_MAX;
+	}
 
 	IDENTIFY_DEVICE_DATA hddid;
-	BOOL rez = GeHDDId(hDrive, &hddid);
+	BOOL rez = GetHDDId(hDrive, &hddid);
 	if (!rez)
-		return 0;
+	{
+		WriteLog(L"GetAPM: Invalid HDD Id. Error code = 0x%04X\r\n", GetLastError());
+		return UINT16_MAX - 1;
+	}
 
 	if ((hddid.command_set_2 & 0x08) == 0)
-		return 0;
+	{
+		WriteLog(L"GetAPM: Invalid CommandSet\r\n");
+		return UINT16_MAX - 2;
+	}
 
 	uint16_t APMVal = hddid.CurAPMvalues & 0x00FF;
 
@@ -225,7 +235,7 @@ extern "C" HWLIBRARY_API int SetAPM(wchar_t* dskName, byte val, bool disable)
 	return rez;
 }
 
-BOOL GeHDDId(HANDLE hDrive, IDENTIFY_DEVICE_DATA* hddid)
+BOOL GetHDDId(HANDLE hDrive, IDENTIFY_DEVICE_DATA* hddid)
 {
 	BOOL rez = false;
 	DWORD bytesRet;

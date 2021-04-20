@@ -47,9 +47,9 @@ namespace APMData
                 var diskInfos = diskInfoEnum.Select(item => new Proto.DiskInfoEntry()
                 {
                     InfoValid = item.InfoValid != 0,
-                    DiskIndex = item.DiskIndex,
                     Index = item.Index,
                     Availability = item.Availability,
+                    APMValue=item.APMValue,
                     Caption = item.Caption,
                     ConfigManagerErrorCode = item.ConfigManagerErrorCode,
                     Description = item.Description,
@@ -70,6 +70,13 @@ namespace APMData
                 }
                 return Task.FromResult(reply);
             }
+        }
+
+        public override Task<GetAPMReply> GetAPM(GetAPMRequest request, ServerCallContext context)
+        {
+            if (HW.GetAPM(request.DiskId, out int apmValue))
+                return Task.FromResult<GetAPMReply>(new() { APMValue = apmValue, ResponseResult = 1, ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
+            return Task.FromResult<GetAPMReply>(new() { APMValue = 0, ResponseResult = 0, ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
         }
     }
 }

@@ -6,9 +6,9 @@ namespace APMOkSvc.Types
     public class HWDiskInfo
     {
         public uint InfoValid;
-        public ushort DiskIndex;
         public uint Index;
         public ushort Availability;
+        public ushort APMValue;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
         public string Caption;
         public uint ConfigManagerErrorCode;
