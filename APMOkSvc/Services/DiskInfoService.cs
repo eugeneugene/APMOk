@@ -49,7 +49,7 @@ namespace APMData
                     InfoValid = item.InfoValid != 0,
                     Index = item.Index,
                     Availability = item.Availability,
-                    APMValue=item.APMValue,
+                    APMValue = item.APMValue,
                     Caption = item.Caption,
                     ConfigManagerErrorCode = item.ConfigManagerErrorCode,
                     Description = item.Description,

@@ -13,7 +13,7 @@ namespace APMOkSvc.Types
         private static extern int EnumerateDisks([In, Out] IntPtr diskInfo);
 
         [DllImport("hw.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern int GetAPM([In] string dskName);
+        private static extern short GetAPM([In] string dskName);
 
         [DllImport("hw.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int SetAPM([In] string dskName, byte val, bool disable);

@@ -193,7 +193,6 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 	hrInit = HRESULT_CODE(-1);
 
 	return retVal;
-
 }
 
 extern "C" HWLIBRARY_API uint16_t GetAPM(wchar_t* dskName)

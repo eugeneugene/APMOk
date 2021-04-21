@@ -1,6 +1,7 @@
 ﻿using APMData;
 using APMData.Code;
 using APMData.Proto;
+using APMOkLib;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -116,11 +117,13 @@ namespace APMOk
             DiskInfoItems.Clear();
             if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry Item)
             {
-                DiskInfoItems.Add(new(nameof(Item.Availability), Item.Availability));
+                var availability = Availability.FromValue((ushort)Item.Availability).Name;
+                var apmValue = ((short)Item.APMValue < 0) ? "Unavailable" : Item.APMValue.ToString();
+                DiskInfoItems.Add(new(nameof(Item.Availability), availability));
                 DiskInfoItems.Add(new(nameof(Item.Caption), Item.Caption));
                 DiskInfoItems.Add(new(nameof(Item.Description), Item.Description));
                 DiskInfoItems.Add(new(nameof(Item.DeviceID), Item.DeviceID));
-                DiskInfoItems.Add(new(nameof(Item.APMValue), Item.APMValue));
+                DiskInfoItems.Add(new(nameof(Item.APMValue), apmValue));
                 DiskInfoItems.Add(new(nameof(Item.Manufacturer), Item.Manufacturer));
                 DiskInfoItems.Add(new(nameof(Item.Model), Item.Model));
                 DiskInfoItems.Add(new(nameof(Item.Name), Item.Name));
