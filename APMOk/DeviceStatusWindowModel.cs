@@ -19,14 +19,25 @@ namespace APMOk
             }
         }
 
+        private PowerState _battery;
+        public PowerState Battery
+        {
+            get => _battery;
+            set
+            {
+                if (_battery != value)
+                {
+                    _battery = value;
+                    NotifyPropertyChanged(nameof(Battery));
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (string.IsNullOrEmpty(propertyName))
-            {
-                return;
-            }
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (!string.IsNullOrEmpty(propertyName))
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

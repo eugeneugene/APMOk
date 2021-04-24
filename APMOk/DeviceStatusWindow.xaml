@@ -13,7 +13,7 @@
     <Window.Resources>
         <CollectionViewSource x:Key="DeviceStatusDataSource" CollectionViewType="ListCollectionView" />
         <CollectionViewSource x:Key="DiskInfoItemsSource" CollectionViewType="ListCollectionView" />
-        <Style x:Key="TextBlockStatus" TargetType="TextBlock">
+        <Style x:Key="ConnectionStatus" TargetType="TextBlock">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Connected}" Value="false">
                     <Setter Property="Foreground" Value="Salmon" />
@@ -22,6 +22,22 @@
                 <DataTrigger Binding="{Binding Connected}" Value="true">
                     <Setter Property="Foreground" Value="MediumSpringGreen" />
                     <Setter Property="Text" Value="Online" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="BatteryStatus" TargetType="TextBlock">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Battery}" Value="0">
+                    <Setter Property="Foreground" Value="Salmon" />
+                    <Setter Property="Text" Value="Battery" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Battery}" Value="1">
+                    <Setter Property="Foreground" Value="MediumSpringGreen" />
+                    <Setter Property="Text" Value="Power" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Battery}" Value="255">
+                    <Setter Property="Foreground" Value="DimGray" />
+                    <Setter Property="Text" Value="Unknown" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -51,14 +67,43 @@
                 ItemsSource="{Binding}"
                 SelectionChanged="SelectDiskComboSelectionChanged" />
         </GroupBox>
-        <TextBlock
-            Grid.Row="0"
-            Grid.Column="1"
-            Margin="5"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            FontSize="36"
-            Style="{StaticResource TextBlockStatus}" />
+        <Grid Grid.Row="0" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Border
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="1,1,5,1"
+                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                BorderThickness="1">
+                <TextBlock
+                    x:Name="ConnectionStatus"
+                    Margin="5"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Style="{StaticResource ConnectionStatus}" />
+            </Border>
+            <Border
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="1,1,5,1"
+                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                BorderThickness="1">
+                <TextBlock
+                    x:Name="BatteryStatus"
+                    Margin="5"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Style="{StaticResource BatteryStatus}" />
+            </Border>
+        </Grid>
         <GroupBox
             Grid.Row="1"
             Grid.ColumnSpan="2"

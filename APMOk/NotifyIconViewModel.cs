@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Input;
 
 namespace APMOk
@@ -10,18 +11,29 @@ namespace APMOk
     /// </summary>
     public class NotifyIconViewModel
     {
-        private DeviceStatusWindow deviceStatusWindow = null;
+        private readonly IServiceProvider _services;
+        private DeviceStatusWindow deviceStatusWindow;
+
+        public NotifyIconViewModel(IServiceProvider services)
+        {
+            _services = services;
+        }
 
         /// <summary>
         /// Shows a window, if none is already open.
         /// </summary>
         public ICommand ShowWindowCommand => new DelegateCommand
         {
-            CanExecuteFunc = () => deviceStatusWindow == null || !deviceStatusWindow.IsOpen(),
+            CanExecuteFunc = () => deviceStatusWindow == null || deviceStatusWindow.IsOpen(),
             CommandAction = () =>
             {
-                deviceStatusWindow = new();
-                deviceStatusWindow.Show();
+                if (deviceStatusWindow == null)
+                {
+                    deviceStatusWindow = _services.GetService(typeof(DeviceStatusWindow)) as DeviceStatusWindow;
+                    deviceStatusWindow?.Show();
+                }
+                else
+                    deviceStatusWindow.Activate();
             },
         };
 
@@ -37,7 +49,6 @@ namespace APMOk
                 deviceStatusWindow = null;
             },
         };
-
 
         /// <summary>
         /// Shuts down the application.

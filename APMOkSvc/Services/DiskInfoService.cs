@@ -4,13 +4,14 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace APMData
+namespace APMOkSvc.Services
 {
-    public partial class DiskInfoService : Proto.DiskInfoService.DiskInfoServiceBase
+    public class DiskInfoService : APMData.Proto.DiskInfoService.DiskInfoServiceBase
     {
         private readonly ILogger _logger;
         public DiskInfoService(ILogger<DiskInfoService> logger)
@@ -44,7 +45,7 @@ namespace APMData
             }
             else
             {
-                var diskInfos = diskInfoEnum.Select(item => new Proto.DiskInfoEntry()
+                var diskInfos = diskInfoEnum.Select(item => new DiskInfoEntry()
                 {
                     InfoValid = item.InfoValid != 0,
                     Index = item.Index,
@@ -78,5 +79,15 @@ namespace APMData
                 return Task.FromResult<GetAPMReply>(new() { APMValue = apmValue, ResponseResult = 1, ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
             return Task.FromResult<GetAPMReply>(new() { APMValue = 0, ResponseResult = 0, ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
         }
+
+        public Dictionary<int, string> EnumerateDisksErrors = new()
+        {
+            { 1, "Failed to get Disk Drive information" },
+            { 2, "Failed to set proxy blanket" },
+            { 3, "Failed to connect to root namespace" },
+            { 4, "Failed to create IWbemLocator object" },
+            { 5, "Failed to set COM Security" },
+            { 6, "Failed to initialize COM" },
+        };
     }
 }

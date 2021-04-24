@@ -12,6 +12,10 @@ service DiskInfoService {
 	rpc GetAPM (GetAPMRequest) returns (GetAPMReply);
 }
 
+service PowerStateService {
+	rpc GetPowerState (google.protobuf.Empty) returns (PowerStateReply);
+}
+
 message DiskInfoEntry {
   bool InfoValid = 1;
   uint32 Index = 2;
@@ -43,4 +47,28 @@ message GetAPMReply {
 	int32 ResponseResult = 1;
 	google.protobuf.Timestamp ResponseTimeStamp = 2;
 	int32 APMValue = 3;
+}
+
+enum EACLineStatus {
+	Offline = 0;
+	Online = 1;
+	LineStatusUnknown = 255;
+}
+
+enum EBatteryFlag {
+	None = 0;
+	High = 1;
+	Low = 2;
+	Critical = 4;
+	Charging = 8;
+	NoSystemBattery = 128;
+	BatteryFlagUnknown = 255;
+}
+
+message PowerStateReply {
+	EACLineStatus ACLineStatus = 1;
+	EBatteryFlag BatteryFlag = 2;
+	int32 BatteryLifePercent = 3;
+	int32 BatteryLifeTime = 4;
+	int32 BatteryFullLifeTime = 5;
 }

@@ -49,6 +49,7 @@ namespace APMOk
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             LoadDisksInfo();
+            LoadBatteryStatus();
         }
 
         private void LoadDisksInfo()
@@ -74,6 +75,22 @@ namespace APMOk
             catch (RpcException rex)
             {
                 ViewModel.Connected = false;
+                Debug.WriteLine(rex.Message);
+            }
+        }
+
+        private void LoadBatteryStatus()
+        {
+            try
+            {
+                using var channel = CreateChannel();
+                var client = new PowerStateService.PowerStateServiceClient(channel);
+                var reply = client.GetPowerState(new Empty());
+                ViewModel.Battery = (PowerState)reply.ACLineStatus;
+            }
+            catch (RpcException rex)
+            {
+                ViewModel.Battery = PowerState.Error;
                 Debug.WriteLine(rex.Message);
             }
         }
