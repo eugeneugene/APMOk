@@ -5,6 +5,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 using System.Windows.Markup;
+using RecurrentTasks;
+using APMOk.Tasks;
+using CustomConfiguration;
+using APMOk.Services;
 
 namespace APMOk
 {
@@ -12,12 +16,6 @@ namespace APMOk
     {
         private IHost host;
         private TaskbarIcon notifyIcon;
-
-        private void ConfigureServices(IServiceCollection services)
-        {
-            services.AddTransient<DeviceStatusWindow>();
-            services.AddSingleton(notifyIcon);
-        }
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -34,7 +32,14 @@ namespace APMOk
             hostBuilder.ConfigureAppConfiguration((context, builder) => { });
             hostBuilder.ConfigureServices((context, services) =>
             {
-                ConfigureServices(services);
+                services.AddTransient<DeviceStatusWindow>();
+                services.AddSingleton(notifyIcon);
+                services.AddSingleton<APMOkData>();
+                services.AddTransient<DiskInfoService>();
+                services.AddTransient<PowerStateService>();
+
+                TasksStartupConfiguration tasksStartupConfiguration = new(context.Configuration);
+                services.AddTask<BatteryStatusReaderTask>(task => task.AutoStart(tasksStartupConfiguration.BatteryStatusReader.Value));
             });
             host = hostBuilder.Build();
             notifyIcon.DataContext = new NotifyIconViewModel(host.Services);

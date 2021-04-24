@@ -19,8 +19,8 @@ namespace APMOk
             }
         }
 
-        private PowerState _battery;
-        public PowerState Battery
+        private ACLineStatus _battery;
+        public ACLineStatus Battery
         {
             get => _battery;
             set

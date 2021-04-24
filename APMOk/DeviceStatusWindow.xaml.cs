@@ -1,22 +1,16 @@
-﻿using APMData;
-using APMData.Code;
-using APMData.Proto;
+﻿using APMData.Proto;
 using APMOkLib;
-using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using Grpc.Net.Client;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Security;
-using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using APMOk.Services;
 
 namespace APMOk
 {
@@ -25,15 +19,21 @@ namespace APMOk
     /// </summary>
     internal partial class DeviceStatusWindow : Window
     {
+        private readonly APMOkData _data;
+        private readonly IServiceProvider _serviceProvider;
+
         public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
 
         public ObservableCollection<KeyValuePair<string, object>> DiskInfoItems { get; } = new();
 
         public DeviceStatusWindowModel ViewModel { get; set; }
 
-        public DeviceStatusWindow()
+        public DeviceStatusWindow(IServiceProvider serviceProvider, APMOkData data)
         {
             InitializeComponent();
+
+            _data = data;
+            _serviceProvider = serviceProvider;
 
             // DeviceStatusDataSource
             CollectionViewSource deviceStatusDataSource = FindResource("DeviceStatusDataSource") as CollectionViewSource;
@@ -56,9 +56,9 @@ namespace APMOk
         {
             try
             {
-                using var channel = CreateChannel();
-                var client = new DiskInfoService.DiskInfoServiceClient(channel);
-                var reply = client.EnumerateDisks(new Empty());
+                using var diskInfoService = _serviceProvider.GetRequiredService<Services.DiskInfoService>();
+
+                var reply = diskInfoService.EnumerateDisksAsync().GetAwaiter().GetResult();
                 DiskInfo.Clear();
                 if (reply.ResponseResult == 0)
                 {
@@ -83,49 +83,15 @@ namespace APMOk
         {
             try
             {
-                using var channel = CreateChannel();
-                var client = new PowerStateService.PowerStateServiceClient(channel);
-                var reply = client.GetPowerState(new Empty());
-                ViewModel.Battery = (PowerState)reply.ACLineStatus;
+                using var diskInfoService = _serviceProvider.GetRequiredService<Services.PowerStateService>();
+                var reply = diskInfoService.GetPowerStateAsync().GetAwaiter().GetResult();
+                ViewModel.Battery = (ACLineStatus)reply.ACLineStatus;
             }
             catch (RpcException rex)
             {
-                ViewModel.Battery = PowerState.Error;
+                ViewModel.Battery = ACLineStatus.Error;
                 Debug.WriteLine(rex.Message);
             }
-        }
-
-        public static GrpcChannel CreateChannel()
-        {
-            var udsEndPoint = new UnixDomainSocketEndPoint(SocketData.SocketPath);
-            var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
-            var socketsHttpHandler = new SocketsHttpHandler
-            {
-                ConnectCallback = connectionFactory.ConnectAsync,
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-                SslOptions = new SslClientAuthenticationOptions
-                {
-                    RemoteCertificateValidationCallback = RemoteCertificateValidationCallback,
-                }
-            };
-
-            //var handler = new HttpClientHandler
-            //{
-            //    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-            //    ClientCertificateOptions = ClientCertificateOption.Manual,
-            //    ServerCertificateCustomValidationCallback = ServerCertificateCustomValidationCallback,
-            //};
-
-            return GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
-            {
-                HttpHandler = socketsHttpHandler,
-                //HttpClient = new HttpClient(handler, disposeHandler: true),
-            });
-        }
-
-        private static bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-        {
-            return true;
         }
 
         private void SelectDiskComboSelectionChanged(object sender, SelectionChangedEventArgs e)

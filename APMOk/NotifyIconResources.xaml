@@ -14,9 +14,5 @@
         ContextMenu="{StaticResource SysTrayMenu}"
         DoubleClickCommand="{Binding ShowWindowCommand}"
         IconSource="/Red.ico"
-        ToolTipText="Double-click for window, right-click for menu">
-        <!--<tb:TaskbarIcon.DataContext>
-            <local:NotifyIconViewModel />
-        </tb:TaskbarIcon.DataContext>-->
-    </tb:TaskbarIcon>
+        ToolTipText="Double-click for window, right-click for menu" />
 </ResourceDictionary>
