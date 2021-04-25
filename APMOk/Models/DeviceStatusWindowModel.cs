@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using APMData.Proto;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace APMOk
@@ -19,8 +20,8 @@ namespace APMOk
             }
         }
 
-        private ACLineStatus _battery;
-        public ACLineStatus Battery
+        private EACLineStatus _battery;
+        public EACLineStatus Battery
         {
             get => _battery;
             set

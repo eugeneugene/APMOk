@@ -5,6 +5,7 @@
 		<UserSecretsId>dotnet-APMOkSvc-29FF406E-ED1A-4831-B643-AF357DA51037</UserSecretsId>
 		<Platforms>x64</Platforms>
 		<NeutralLanguage>en</NeutralLanguage>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
 	</PropertyGroup>
 
 	<ItemGroup>

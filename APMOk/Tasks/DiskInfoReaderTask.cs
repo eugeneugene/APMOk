@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace APMOk.Tasks
 {
-    public class BatteryStatusReaderTask : IRunnable
+    public class DiskInfoReaderTask : IRunnable
     {
         private readonly APMOkData _apmOkData;
 
-        public BatteryStatusReaderTask(APMOkData apmOkData)
+        public DiskInfoReaderTask(APMOkData apmOkData)
         {
             _apmOkData = apmOkData;
         }
@@ -20,10 +20,10 @@ namespace APMOk.Tasks
         {
             try
             {
-                using var diskInfoService = scopeServiceProvider.GetRequiredService<Services.PowerStateService>();
-                var reply = await diskInfoService.GetPowerStateAsync();
-                _apmOkData.PowerState = reply ?? throw new Exception("Service is offline");
-                Debug.WriteLine(_apmOkData.PowerState);
+                using var diskInfoService = scopeServiceProvider.GetRequiredService<Services.DiskInfoService>();
+                var reply = await diskInfoService.EnumerateDisksAsync();
+                _apmOkData.SystemDiskInfo = reply ?? throw new Exception("Service is offline");
+                Debug.WriteLine(_apmOkData.SystemDiskInfo);
             }
             catch (Exception rex)
             {

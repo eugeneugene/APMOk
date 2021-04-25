@@ -1,52 +1,46 @@
-﻿using System;
+﻿using APMData.Proto;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace APMOk
 {
-    public class APMOkData : JsonToString
+    public class APMOkData : JsonToString, INotifyPropertyChanged
     {
-        public PowerState PowerState { get; set; }
-    }
-
-    public class PowerState : JsonToEnumString, IEquatable<PowerState>
-    {
-        public ACLineStatus ACLineStatus { get; set; }
-        public BatteryFlag BatteryFlag { get; set; }
-        public int BatteryLifePercent { get; set; }
-        public int BatteryLifeTime { get; set; }
-        public int BatteryFullLifeTime { get; set; }
-
-        public override bool Equals(object other)
+        private SystemDiskInfoReply _systemDiskInfo;
+        public SystemDiskInfoReply SystemDiskInfo
         {
-            return Equals(other as PowerState);
+            get => _systemDiskInfo; 
+            set
+            {
+                if (_systemDiskInfo != value)
+                {
+                    _systemDiskInfo = value;
+                    NotifyPropertyChanged(nameof(SystemDiskInfo));
+                }
+            } 
         }
 
-        public bool Equals(PowerState other)
+        private PowerStateReply _powerState;
+        public PowerStateReply PowerState
         {
-            if (other is null)
+            get => _powerState; 
+            set
             {
-                return false;
+                if (_powerState != value)
+                {
+                    _powerState = value;
+                    NotifyPropertyChanged(nameof(PowerState));
+                }
             }
-            if (ReferenceEquals(other, this))
-            {
-                return true;
-            }
-            if (ACLineStatus != other.ACLineStatus) return false;
-            if (BatteryFlag != other.BatteryFlag) return false;
-            if (BatteryLifePercent != other.BatteryLifePercent) return false;
-            if (BatteryLifeTime != other.BatteryLifeTime) return false;
-            if (BatteryFullLifeTime != other.BatteryFullLifeTime) return false;
-            return true;
         }
 
-        public override int GetHashCode()
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            int hash = 1;
-            if (ACLineStatus != ACLineStatus.Offline) hash ^= ACLineStatus.GetHashCode();
-            if (BatteryFlag != BatteryFlag.None) hash ^= BatteryFlag.GetHashCode();
-            if (BatteryLifePercent != 0) hash ^= BatteryLifePercent.GetHashCode();
-            if (BatteryLifeTime != 0) hash ^= BatteryLifeTime.GetHashCode();
-            if (BatteryFullLifeTime != 0) hash ^= BatteryFullLifeTime.GetHashCode();
-            return hash;
+            if (string.IsNullOrEmpty(propertyName))
+                return;
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

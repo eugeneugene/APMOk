@@ -32,19 +32,26 @@ namespace APMOk
             hostBuilder.ConfigureAppConfiguration((context, builder) => { });
             hostBuilder.ConfigureServices((context, services) =>
             {
-                services.AddTransient<DeviceStatusWindow>();
                 services.AddSingleton(notifyIcon);
+                services.AddTransient<DeviceStatusWindow>();
                 services.AddSingleton<APMOkData>();
                 services.AddTransient<DiskInfoService>();
                 services.AddTransient<PowerStateService>();
 
                 TasksStartupConfiguration tasksStartupConfiguration = new(context.Configuration);
                 services.AddTask<BatteryStatusReaderTask>(task => task.AutoStart(tasksStartupConfiguration.BatteryStatusReader.Value));
+                services.AddTask<DiskInfoReaderTask>(task => task.AutoStart(tasksStartupConfiguration.DiskStatusReader.Value));
             });
             host = hostBuilder.Build();
             notifyIcon.DataContext = new NotifyIconViewModel(host.Services);
 
             await host.StartAsync();
+
+            var _batteryStatusReaderTask= host.Services.GetRequiredService<ITask<BatteryStatusReaderTask>>();
+            _batteryStatusReaderTask.TryRunImmediately();
+
+            var _diskInfoReaderTask = host.Services.GetRequiredService<ITask<DiskInfoReaderTask>>();
+            _diskInfoReaderTask.TryRunImmediately();
 
             base.OnStartup(e);
         }
