@@ -34,6 +34,20 @@ namespace APMOk
             }
         }
 
+        private bool _connectFailure;
+        public bool ConnectFailure
+        {
+            get => _connectFailure;
+            set
+            {
+                if (_connectFailure != value)
+                {
+                    _connectFailure = value;
+                    NotifyPropertyChanged(nameof(ConnectFailure));
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {

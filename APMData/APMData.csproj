@@ -17,4 +17,8 @@
 		<Protobuf Include="Proto\DiskInfo.proto" GrpcServices="None" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Code\" />
+	</ItemGroup>
+
 </Project>

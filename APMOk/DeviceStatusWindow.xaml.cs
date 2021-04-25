@@ -23,8 +23,6 @@ namespace APMOk
 
         public ObservableCollection<KeyValuePair<string, object>> DiskInfoItems { get; } = new();
 
-        public DeviceStatusWindowModel ViewModel { get; set; }
-
         public DeviceStatusWindow(APMOkData data)
         {
             InitializeComponent();
@@ -39,7 +37,7 @@ namespace APMOk
             CollectionViewSource diskInfoItemsSource = FindResource("DiskInfoItemsSource") as CollectionViewSource;
             diskInfoItemsSource.Source = DiskInfoItems;
 
-            DataContext = ViewModel = new DeviceStatusWindowModel();
+            DataContext = _data;
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -67,8 +65,11 @@ namespace APMOk
         private void LoadDisksInfo(SystemDiskInfoReply reply)
         {
             DiskInfo.Clear();
-            if (reply != null)
+            if (reply == null)
+                _data.ConnectFailure = true;
+            else
             {
+                _data.ConnectFailure = false;
                 if (reply.ResponseResult == 0)
                 {
                     foreach (var entry in reply.DiskInfoEntries.Where(item => item.InfoValid))
@@ -78,7 +79,7 @@ namespace APMOk
                         SelectDiskCombo.SelectedIndex = 0;
                     else
                         SelectDiskCombo.SelectedIndex = -1;
-                    ViewModel.Connected = true;
+                    _data.ConnectFailure = true;
                 }
             }
         }
@@ -86,9 +87,15 @@ namespace APMOk
         private void LoadBatteryStatus(PowerStateReply reply)
         {
             if (reply == null)
-                ViewModel.Battery = EACLineStatus.LineStatusUnknown;
+            {
+                _data.ConnectFailure = true;
+                _data.PowerState = PowerStateReply.FailureReply;
+            }
             else
-                ViewModel.Battery = reply.ACLineStatus;
+            {
+                _data.ConnectFailure = false;
+                _data.PowerState = reply;
+            }
         }
 
         private void SelectDiskComboSelectionChanged(object sender, SelectionChangedEventArgs e)
