@@ -57,6 +57,8 @@ namespace APMOk
                 case "PowerState":
                     LoadBatteryStatus(_data.PowerState);
                     break;
+                case "ConnectFailure":
+                    break;
                 default:
                     throw new NotImplementedException();
             }
@@ -64,24 +66,27 @@ namespace APMOk
 
         private void LoadDisksInfo(SystemDiskInfoReply reply)
         {
-            DiskInfo.Clear();
-            if (reply == null)
-                _data.ConnectFailure = true;
-            else
+            Dispatcher.Invoke(() =>
             {
-                _data.ConnectFailure = false;
-                if (reply.ResponseResult == 0)
-                {
-                    foreach (var entry in reply.DiskInfoEntries.Where(item => item.InfoValid))
-                        DiskInfo.Add(entry);
-
-                    if (DiskInfo.Any())
-                        SelectDiskCombo.SelectedIndex = 0;
-                    else
-                        SelectDiskCombo.SelectedIndex = -1;
+                DiskInfo.Clear();
+                if (reply == null)
                     _data.ConnectFailure = true;
+                else
+                {
+                    _data.ConnectFailure = false;
+                    if (reply.ResponseResult == 0)
+                    {
+                        foreach (var entry in reply.DiskInfoEntries.Where(item => item.InfoValid))
+                            DiskInfo.Add(entry);
+
+                        if (DiskInfo.Any())
+                            SelectDiskCombo.SelectedIndex = 0;
+                        else
+                            SelectDiskCombo.SelectedIndex = -1;
+                        _data.ConnectFailure = true;
+                    }
                 }
-            }
+            });
         }
 
         private void LoadBatteryStatus(PowerStateReply reply)
@@ -101,22 +106,25 @@ namespace APMOk
         private void SelectDiskComboSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             e.Handled = true;
-            DiskInfoItems.Clear();
-            if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry Item)
+            Dispatcher.Invoke(() =>
             {
-                var availability = Availability.FromValue((ushort)Item.Availability).Name;
-                var apmValue = ((short)Item.APMValue < 0) ? "Unavailable" : Item.APMValue.ToString();
-                DiskInfoItems.Add(new(nameof(Item.Availability), availability));
-                DiskInfoItems.Add(new(nameof(Item.Caption), Item.Caption));
-                DiskInfoItems.Add(new(nameof(Item.Description), Item.Description));
-                DiskInfoItems.Add(new(nameof(Item.DeviceID), Item.DeviceID));
-                DiskInfoItems.Add(new(nameof(Item.APMValue), apmValue));
-                DiskInfoItems.Add(new(nameof(Item.Manufacturer), Item.Manufacturer));
-                DiskInfoItems.Add(new(nameof(Item.Model), Item.Model));
-                DiskInfoItems.Add(new(nameof(Item.Name), Item.Name));
-                DiskInfoItems.Add(new(nameof(Item.SerialNumber), Item.SerialNumber));
-                DiskInfoItems.Add(new(nameof(Item.Status), Item.Status));
-            }
+                DiskInfoItems.Clear();
+                if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry Item)
+                {
+                    var availability = Availability.FromValue((ushort)Item.Availability).Name;
+                    var apmValue = ((short)Item.APMValue < 0) ? "Unavailable" : Item.APMValue.ToString();
+                    DiskInfoItems.Add(new(nameof(Item.Availability), availability));
+                    DiskInfoItems.Add(new(nameof(Item.Caption), Item.Caption));
+                    DiskInfoItems.Add(new(nameof(Item.Description), Item.Description));
+                    DiskInfoItems.Add(new(nameof(Item.DeviceID), Item.DeviceID));
+                    DiskInfoItems.Add(new(nameof(Item.APMValue), apmValue));
+                    DiskInfoItems.Add(new(nameof(Item.Manufacturer), Item.Manufacturer));
+                    DiskInfoItems.Add(new(nameof(Item.Model), Item.Model));
+                    DiskInfoItems.Add(new(nameof(Item.Name), Item.Name));
+                    DiskInfoItems.Add(new(nameof(Item.SerialNumber), Item.SerialNumber));
+                    DiskInfoItems.Add(new(nameof(Item.Status), Item.Status));
+                }
+            });
         }
 
         protected virtual void Dispose(bool disposing)
