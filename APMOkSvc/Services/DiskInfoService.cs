@@ -22,62 +22,79 @@ namespace APMOkSvc.Services
 
         public override Task<SystemDiskInfoReply> EnumerateDisks(Empty request, ServerCallContext context)
         {
-            int res = HW.EnumerateDisks(out var diskInfoEnum);
-
             SystemDiskInfoReply reply = new()
             {
                 ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow),
             };
-            if (res != 0)
+
+            try
             {
-                if (EnumerateDisksErrors.ContainsKey(res))
-                    _logger.LogError("Hardware error: {0}", EnumerateDisksErrors[res]);
+                int res = HW.EnumerateDisks(out var diskInfoEnum);
+
+                if (res != 0)
+                {
+                    if (EnumerateDisksErrors.ContainsKey(res))
+                        _logger.LogError("Hardware error: {0}", EnumerateDisksErrors[res]);
+                    else
+                        _logger.LogError("Hardware error: {0}", res);
+
+                    if (HW.LastWin32Error != 0)
+                    {
+                        var ex = new Win32Exception(HW.LastWin32Error);
+                        _logger.LogError(ex.Message);
+                    }
+                    reply.ReplyResult = res;
+                    return Task.FromResult(reply);
+                }
                 else
-                    _logger.LogError("Hardware error: {0}", res);
-
-                if (HW.LastWin32Error != 0)
                 {
-                    var ex = new Win32Exception(HW.LastWin32Error);
-                    _logger.LogError(ex.Message);
+                    var diskInfos = diskInfoEnum.Select(item => new DiskInfoEntry()
+                    {
+                        InfoValid = item.InfoValid != 0,
+                        Index = item.Index,
+                        Availability = item.Availability,
+                        APMValue = item.APMValue,
+                        Caption = item.Caption,
+                        ConfigManagerErrorCode = item.ConfigManagerErrorCode,
+                        Description = item.Description,
+                        DeviceID = item.DeviceID,
+                        InterfaceType = item.InterfaceType,
+                        Manufacturer = item.Manufacturer,
+                        Model = item.Model,
+                        Name = item.Name,
+                        SerialNumber = item.SerialNumber,
+                        Status = item.Status,
+                    });
+
+                    reply.DiskInfoEntries.AddRange(diskInfos);
+
+                    foreach (var di in diskInfos)
+                    {
+                        _logger.LogTrace(di.InfoValid ? di.Caption : "<Invalid>");
+                    }
+                    return Task.FromResult(reply);
                 }
-                reply.ResponseResult = res;
-                return Task.FromResult(reply);
             }
-            else
+            catch(Exception ex)
             {
-                var diskInfos = diskInfoEnum.Select(item => new DiskInfoEntry()
-                {
-                    InfoValid = item.InfoValid != 0,
-                    Index = item.Index,
-                    Availability = item.Availability,
-                    APMValue = item.APMValue,
-                    Caption = item.Caption,
-                    ConfigManagerErrorCode = item.ConfigManagerErrorCode,
-                    Description = item.Description,
-                    DeviceID = item.DeviceID,
-                    InterfaceType = item.InterfaceType,
-                    Manufacturer = item.Manufacturer,
-                    Model = item.Model,
-                    Name = item.Name,
-                    SerialNumber = item.SerialNumber,
-                    Status = item.Status,
-                });
-
-                reply.DiskInfoEntries.AddRange(diskInfos);
-
-                foreach (var di in diskInfos)
-                {
-                    _logger.LogTrace(di.InfoValid ? di.Caption : "<Invalid>");
-                }
-                return Task.FromResult(reply);
+                _logger.LogError("Exception: {0}", ex);
+                reply.ReplyResult = 0;
             }
+            return Task.FromResult(reply);
         }
 
         public override Task<GetAPMReply> GetAPM(GetAPMRequest request, ServerCallContext context)
         {
-            if (HW.GetAPM(request.DiskId, out int apmValue))
-                return Task.FromResult<GetAPMReply>(new() { APMValue = apmValue, ResponseResult = 1, ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
-            return Task.FromResult<GetAPMReply>(new() { APMValue = 0, ResponseResult = 0, ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
+            try
+            {
+                if (HW.GetAPM(request.DiskId, out int apmValue))
+                    return Task.FromResult<GetAPMReply>(new() { APMValue = apmValue, ReplyResult = 1, ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Exception: {0}", ex);
+            }
+            return Task.FromResult<GetAPMReply>(new() { APMValue = 0, ReplyResult = 0, ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
         }
 
         public Dictionary<int, string> EnumerateDisksErrors = new()

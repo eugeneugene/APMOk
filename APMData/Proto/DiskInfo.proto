@@ -16,27 +16,32 @@ service PowerStateService {
 	rpc GetPowerState (google.protobuf.Empty) returns (PowerStateReply);
 }
 
+service ConfigurationService {
+	rpc GetDriveAPMConfiguration (google.protobuf.Empty) returns (DriveAPMConfigurationReply);
+	rpc SetDriveAPMConfiguration (DriveAPMConfiguration) returns (google.protobuf.Empty);
+}
+
 message DiskInfoEntry {
-  bool InfoValid = 1;
-  uint32 Index = 2;
-  uint32 Availability = 3;
-  uint32 APMValue = 4;
-  string Caption = 5;
-  uint32 ConfigManagerErrorCode = 6;
-  string Description = 7;
-  string DeviceID = 8;
-  string InterfaceType = 9;
-  string Manufacturer = 10;
-  string Model = 11;
-  string Name = 12;
-  string SerialNumber = 13;
-  string Status = 14;
+	bool InfoValid = 1;
+	uint32 Index = 2;
+	uint32 Availability = 3;
+	uint32 APMValue = 4;
+	string Caption = 5;
+	uint32 ConfigManagerErrorCode = 6;
+	string Description = 7;
+	string DeviceID = 8;
+	string InterfaceType = 9;
+	string Manufacturer = 10;
+	string Model = 11;
+	string Name = 12;
+	string SerialNumber = 13;
+	string Status = 14;
 }
 
 message SystemDiskInfoReply {
-  int32 ResponseResult = 1;
-  google.protobuf.Timestamp ResponseTimeStamp = 2;
-  repeated DiskInfoEntry DiskInfoEntries = 3;
+	int32 ReplyResult = 1;
+	google.protobuf.Timestamp ResponseTimeStamp = 2;
+	repeated DiskInfoEntry DiskInfoEntries = 3;
 }
 
 message GetAPMRequest {
@@ -44,7 +49,7 @@ message GetAPMRequest {
 }
 
 message GetAPMReply {
-	int32 ResponseResult = 1;
+	int32 ReplyResult = 1;
 	google.protobuf.Timestamp ResponseTimeStamp = 2;
 	int32 APMValue = 3;
 }
@@ -66,9 +71,35 @@ enum EBatteryFlag {
 }
 
 message PowerStateReply {
-	EACLineStatus ACLineStatus = 1;
-	EBatteryFlag BatteryFlag = 2;
-	int32 BatteryLifePercent = 3;
-	int32 BatteryLifeTime = 4;
-	int32 BatteryFullLifeTime = 5;
+	int32 ReplyResult = 1;
+	EACLineStatus ACLineStatus = 2;
+	EBatteryFlag BatteryFlag = 3;
+	int32 BatteryLifePercent = 4;
+	int32 BatteryLifeTime = 5;
+	int32 BatteryFullLifeTime = 6;
+}
+
+message DriveAPMConfiguration {
+	repeated DriveAPMConfigurationEntry DriveAPMConfigurationEntries = 1;
+}
+
+message DriveAPMConfigurationEntry {
+	uint32 Index = 1;
+	string Caption = 2;
+	EAPMLevel APMLevel = 3;
+	uint32 CustomLevel = 4;
+}
+
+enum EAPMLevel {
+	LevelNone = 0;
+	MinimumWithStandby = 1;
+	IntermediateWithStandby = 2;
+	MinimumWithoutStandby = 128;
+	IntermediateWithoutStandby = 129;
+	Maximum = 254;
+}
+
+message DriveAPMConfigurationReply {
+	int32 ReplyResult = 1;
+	repeated DriveAPMConfigurationEntry DriveAPMConfigurationEntries = 2;
 }

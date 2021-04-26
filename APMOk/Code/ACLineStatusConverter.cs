@@ -1,6 +1,5 @@
 ﻿using APMData.Proto;
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Data;
 
