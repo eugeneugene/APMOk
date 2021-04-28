@@ -24,7 +24,7 @@ namespace APMOkSvc.Services
         {
             SystemDiskInfoReply reply = new()
             {
-                ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow),
+                ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow),
             };
 
             try
@@ -88,13 +88,13 @@ namespace APMOkSvc.Services
             try
             {
                 if (HW.GetAPM(request.DiskId, out int apmValue))
-                    return Task.FromResult<GetAPMReply>(new() { APMValue = apmValue, ReplyResult = 1, ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
+                    return Task.FromResult<GetAPMReply>(new() { APMValue = apmValue, ReplyResult = 1, ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
             }
             catch(Exception ex)
             {
                 _logger.LogError("Exception: {0}", ex);
             }
-            return Task.FromResult<GetAPMReply>(new() { APMValue = 0, ReplyResult = 0, ResponseTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
+            return Task.FromResult<GetAPMReply>(new() { APMValue = 0, ReplyResult = 0, ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
         }
 
         public Dictionary<int, string> EnumerateDisksErrors = new()

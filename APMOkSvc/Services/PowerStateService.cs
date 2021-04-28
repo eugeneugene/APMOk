@@ -32,6 +32,7 @@ namespace APMOkSvc.Services
                 return Task.FromResult(new PowerStateReply()
                 {
                     ReplyResult = 1,
+                    ReplyTimeStamp = Timestamp.FromDateTime(DateTime.Now),
                     ACLineStatus = (EACLineStatus)powerState.ACLineStatus,
                     BatteryFlag = (EBatteryFlag)powerState.BatteryFlag,
                     BatteryFullLifeTime = powerState.BatteryFullLifeTime,
@@ -39,7 +40,7 @@ namespace APMOkSvc.Services
                     BatteryLifeTime = powerState.BatteryLifeTime,
                 });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError("Exception: {0}", ex);
                 return Task.FromResult(new PowerStateReply()

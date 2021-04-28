@@ -40,7 +40,7 @@ message DiskInfoEntry {
 
 message SystemDiskInfoReply {
 	int32 ReplyResult = 1;
-	google.protobuf.Timestamp ResponseTimeStamp = 2;
+	google.protobuf.Timestamp ReplyTimeStamp = 2;
 	repeated DiskInfoEntry DiskInfoEntries = 3;
 }
 
@@ -50,7 +50,7 @@ message GetAPMRequest {
 
 message GetAPMReply {
 	int32 ReplyResult = 1;
-	google.protobuf.Timestamp ResponseTimeStamp = 2;
+	google.protobuf.Timestamp ReplyTimeStamp = 2;
 	int32 APMValue = 3;
 }
 
@@ -72,11 +72,12 @@ enum EBatteryFlag {
 
 message PowerStateReply {
 	int32 ReplyResult = 1;
-	EACLineStatus ACLineStatus = 2;
-	EBatteryFlag BatteryFlag = 3;
-	int32 BatteryLifePercent = 4;
-	int32 BatteryLifeTime = 5;
-	int32 BatteryFullLifeTime = 6;
+	google.protobuf.Timestamp ReplyTimeStamp = 2;
+	EACLineStatus ACLineStatus = 3;
+	EBatteryFlag BatteryFlag = 4;
+	int32 BatteryLifePercent = 5;
+	int32 BatteryLifeTime = 6;
+	int32 BatteryFullLifeTime = 7;
 }
 
 message DriveAPMConfiguration {
@@ -101,5 +102,6 @@ enum EAPMLevel {
 
 message DriveAPMConfigurationReply {
 	int32 ReplyResult = 1;
-	repeated DriveAPMConfigurationEntry DriveAPMConfigurationEntries = 2;
+	google.protobuf.Timestamp ReplyTimeStamp = 2;
+	repeated DriveAPMConfigurationEntry DriveAPMConfigurationEntries = 3;
 }

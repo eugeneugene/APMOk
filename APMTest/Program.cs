@@ -21,7 +21,7 @@ namespace APMTest
                 using var channel = CreateChannel();
                 var client = new DiskInfoService.DiskInfoServiceClient(channel);
                 var reply = client.EnumerateDisks(new Empty());
-                Console.WriteLine("Reply ResponseResult: " + reply.ResponseResult);
+                Console.WriteLine("Reply ResponseResult: " + reply.ReplyResult);
                 Console.WriteLine("Reply ResponseTimeStamp: " + reply.ResponseTimeStamp);
                 foreach (DiskInfoEntry entry in reply.DiskInfoEntries)
                     Console.WriteLine("Reply DiskInfo entry: " + (entry.InfoValid ? entry.Caption : "<Invalid>"));
