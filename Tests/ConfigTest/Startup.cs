@@ -20,7 +20,8 @@ namespace ConfigTest
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<IAPMConfiguration>(Configuration.GetSection(APMConfiguration._sectionName));
+            services.Configure<WritableOptions<APMConfiguration>>(nameof(IWritableOptions<APMConfiguration>),Configuration.GetSection(APMConfiguration._sectionName));
+            services.Configure<IAPMConfiguration>(nameof(IAPMConfiguration), Configuration.GetSection(APMConfiguration._sectionName));
             services.AddHostedService<HostedService>();
         }
 

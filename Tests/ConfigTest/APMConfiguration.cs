@@ -1,22 +1,40 @@
-﻿using System;
+﻿using APMOk;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace ConfigTest
 {
     public interface IAPMConfiguration
     {
         string SectionName { get; }
-        string DiskCaption { get; set; }
-        byte APMValue { get; set; }
+
+        [JsonPropertyName("APMConfiguration")]
+        IEnumerable<APMConfigurationItem> ConfigurationItems { get; }
     }
 
-    public class APMConfiguration : IAPMConfiguration
+    public class APMConfiguration : JsonToString, IAPMConfiguration
     {
         public const string _sectionName = "APMConfiguration";
+
+        public APMConfiguration()
+        {
+            ConfigurationItems = new List<APMConfigurationItem>();
+        }
+
         public string SectionName { get; } = _sectionName;
+
+        [JsonPropertyName("APMConfiguration")]
+        public IEnumerable<APMConfigurationItem> ConfigurationItems { get; }
+    }
+
+    public class APMConfigurationItem
+    {
+        public APMConfigurationItem(string diskCaption, byte apmValue)
+        {
+            DiskCaption = diskCaption;
+            APMValue = apmValue;
+        }
+
         public string DiskCaption { get; set; }
         public byte APMValue { get; set; }
     }
