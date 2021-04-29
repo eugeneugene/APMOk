@@ -6,8 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Config.Net" Version="4.15.0" />
-    <PackageReference Include="Config.Net.Json" Version="4.15.0" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.12.0" />
   </ItemGroup>
 
