@@ -19,11 +19,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\APMData\APMData.csproj" />
+	  <ProjectReference Include="..\..\APMData\APMData.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Protobuf Include="..\APMData\Proto\DiskInfo.proto" GrpcServices="Client" />
+		<Protobuf Include="..\..\APMData\Proto\DiskInfo.proto" GrpcServices="Client" />
 	</ItemGroup>
 
 </Project>
