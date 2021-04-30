@@ -1,10 +1,10 @@
 ﻿using APMData.Proto;
+using APMOkSvc.Code;
 using APMOkSvc.Types;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,13 +14,20 @@ namespace APMOkSvc.Services
     public class DiskInfoService : APMData.Proto.DiskInfoService.DiskInfoServiceBase
     {
         private readonly ILogger _logger;
+
         public DiskInfoService(ILogger<DiskInfoService> logger)
         {
             _logger = logger;
             _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
         }
-
+       
         public override Task<SystemDiskInfoReply> EnumerateDisks(Empty request, ServerCallContext context)
+        {
+            var reply = EnumerateDisks();
+            return Task.FromResult(reply);
+        }
+
+        public SystemDiskInfoReply EnumerateDisks()
         {
             SystemDiskInfoReply reply = new()
             {
@@ -33,8 +40,8 @@ namespace APMOkSvc.Services
 
                 if (res != 0)
                 {
-                    if (EnumerateDisksErrors.ContainsKey(res))
-                        _logger.LogError("Hardware error: {0}", EnumerateDisksErrors[res]);
+                    if (EnumerateDisksErrors.Errors.ContainsKey(res))
+                        _logger.LogError("Hardware error: {0}", EnumerateDisksErrors.Errors[res]);
                     else
                         _logger.LogError("Hardware error: {0}", res);
 
@@ -44,7 +51,6 @@ namespace APMOkSvc.Services
                         _logger.LogError(ex.Message);
                     }
                     reply.ReplyResult = res;
-                    return Task.FromResult(reply);
                 }
                 else
                 {
@@ -72,17 +78,16 @@ namespace APMOkSvc.Services
                     {
                         _logger.LogTrace(di.InfoValid ? di.Caption : "<Invalid>");
                     }
-                    return Task.FromResult(reply);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError("Exception: {0}", ex);
                 reply.ReplyResult = 0;
             }
-            return Task.FromResult(reply);
+            return reply;
         }
-
+        
         public override Task<GetAPMReply> GetAPM(GetAPMRequest request, ServerCallContext context)
         {
             try
@@ -96,15 +101,5 @@ namespace APMOkSvc.Services
             }
             return Task.FromResult<GetAPMReply>(new() { APMValue = 0, ReplyResult = 0, ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), });
         }
-
-        public Dictionary<int, string> EnumerateDisksErrors = new()
-        {
-            { 1, "Failed to get Disk Drive information" },
-            { 2, "Failed to set proxy blanket" },
-            { 3, "Failed to connect to root namespace" },
-            { 4, "Failed to create IWbemLocator object" },
-            { 5, "Failed to set COM Security" },
-            { 6, "Failed to initialize COM" },
-        };
     }
 }

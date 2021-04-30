@@ -1,4 +1,5 @@
-﻿using APMData.Proto;
+﻿using APMData;
+using APMData.Proto;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 

@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 
-namespace APMOk
+namespace APMData
 {
     /// <summary>
     /// Универсальный конвертер типов в строки

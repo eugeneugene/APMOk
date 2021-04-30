@@ -11,6 +11,6 @@ namespace CustomConfiguration
             _defaultValue = defaultValue;
         }
 
-        public T ExtractValue(IConfiguration configuration, string section) => configuration.GetValue(section, _defaultValue);
+        public T ExtractValue(IConfiguration configuration, string section) => configuration .GetValue(section, _defaultValue);
     }
 }

@@ -6,6 +6,7 @@ namespace ConfigTest
 {
     public interface IAPMConfiguration
     {
+        [JsonIgnore]
         string SectionName { get; }
 
         [JsonPropertyName("APMConfiguration")]
@@ -21,6 +22,7 @@ namespace ConfigTest
             ConfigurationItems = new List<APMConfigurationItem>();
         }
 
+        [JsonIgnore]
         public string SectionName { get; } = _sectionName;
 
         [JsonPropertyName("APMConfiguration")]

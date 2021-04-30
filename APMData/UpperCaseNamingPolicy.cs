@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Text.Json;
 
-namespace APMOk
+namespace APMData
 {
     public class UpperCaseNamingPolicy : JsonNamingPolicy
     {

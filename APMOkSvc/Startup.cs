@@ -1,6 +1,10 @@
-﻿using APMOkSvc.Services;
+﻿using APMOkSvc.Code;
+using APMOkSvc.Data;
+using APMOkSvc.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -8,9 +12,25 @@ namespace APMOkSvc
 {
     internal class Startup
     {
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public static void ConfigureServices(IServiceCollection services)
+        private readonly IConfiguration _configuration;
+        private readonly IHostEnvironment _environment;
+
+        public Startup(IConfiguration configuration, IHostEnvironment environment)
         {
+            _configuration = configuration;
+            _environment = environment;
+        }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            ConnectionStringsConfiguration connectionStringsConfiguration = new(_configuration);
+            services.AddDbContext<DataContext>(options =>
+            {
+                options.UseSqlite(connectionStringsConfiguration.DataContext.Value);
+                options.EnableSensitiveDataLogging(_environment.IsDevelopment());
+            });
+
             services.AddGrpc();
         }
 

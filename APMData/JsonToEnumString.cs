@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace APMOk
+namespace APMData
 {
     public abstract class JsonToEnumString : JsonToString
     {

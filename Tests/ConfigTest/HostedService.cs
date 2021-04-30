@@ -10,11 +10,13 @@ namespace ConfigTest
     class HostedService : IHostedService
     {
         private readonly ILogger _logger;
-        private readonly IWritableOptions<APMConfiguration> _APMConfiguration;
+        private readonly IWritableOptions<APMConfiguration> _writableOptions;
+        private readonly APMConfiguration _APMConfiguration;
 
-        public HostedService(ILogger<HostedService> logger, IOptions<WritableOptions<APMConfiguration>> APMConfiguration)
+        public HostedService(ILogger<HostedService> logger, IWritableOptions<APMConfiguration> APMConfiguration)
         {
             _logger = logger;
+            _writableOptions = APMConfiguration;
             _APMConfiguration = APMConfiguration.Value;
         }
 
@@ -26,7 +28,7 @@ namespace ConfigTest
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _APMConfiguration.Update((changes) => { _ = changes.ConfigurationItems.Append(new APMConfigurationItem("Hello", 5)); });
+            _writableOptions.Update((changes) => { _ = changes.ConfigurationItems.Append(new APMConfigurationItem("Hello", 5)); });
             _logger.LogTrace("APMConfiguration: {0}", _APMConfiguration);
             return Task.CompletedTask;
         }
