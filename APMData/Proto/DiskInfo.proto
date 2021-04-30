@@ -18,7 +18,7 @@ service PowerStateService {
 
 service ConfigurationService {
 	rpc GetDriveAPMConfiguration (google.protobuf.Empty) returns (DriveAPMConfigurationReply);
-	rpc SetDriveAPMConfiguration (DriveAPMConfiguration) returns (google.protobuf.Empty);
+	rpc SetDriveAPMConfiguration (DriveAPMConfigurationRequest) returns (google.protobuf.Empty);
 }
 
 message DiskInfoEntry {
@@ -80,24 +80,14 @@ message PowerStateReply {
 	int32 BatteryFullLifeTime = 7;
 }
 
-message DriveAPMConfiguration {
+message DriveAPMConfigurationRequest {
 	repeated DriveAPMConfigurationEntry DriveAPMConfigurationEntries = 1;
 }
 
 message DriveAPMConfigurationEntry {
-	uint32 Index = 1;
-	string Caption = 2;
-	EAPMLevel APMLevel = 3;
-	uint32 CustomLevel = 4;
-}
-
-enum EAPMLevel {
-	LevelNone = 0;
-	MinimumWithStandby = 1;
-	IntermediateWithStandby = 2;
-	MinimumWithoutStandby = 128;
-	IntermediateWithoutStandby = 129;
-	Maximum = 254;
+	string Caption = 1;
+	uint32 DefaultValue = 2;
+	uint32 CurrentValue = 3;
 }
 
 message DriveAPMConfigurationReply {

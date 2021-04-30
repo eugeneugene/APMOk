@@ -30,7 +30,7 @@ namespace APMOkSvc
                 options.UseSqlite(connectionStringsConfiguration.DataContext.Value);
                 options.EnableSensitiveDataLogging(_environment.IsDevelopment());
             });
-
+            services.AddHostedService<HostedService>();
             services.AddGrpc();
         }
 

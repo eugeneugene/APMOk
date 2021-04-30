@@ -22,7 +22,7 @@ namespace APMOkSvc.Services
             return base.GetDriveAPMConfiguration(request, context);
         }
 
-        public override Task<Empty> SetDriveAPMConfiguration(DriveAPMConfiguration request, ServerCallContext context)
+        public override Task<Empty> SetDriveAPMConfiguration(DriveAPMConfigurationRequest request, ServerCallContext context)
         {
             return base.SetDriveAPMConfiguration(request, context);
         }
