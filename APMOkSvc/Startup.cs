@@ -31,6 +31,8 @@ namespace APMOkSvc
                 options.EnableSensitiveDataLogging(_environment.IsDevelopment());
             });
             services.AddHostedService<HostedService>();
+            services.AddTransient<DiskInfoServiceImpl>();
+            services.AddTransient<PowerStateServiceImpl>();
             services.AddGrpc();
         }
 

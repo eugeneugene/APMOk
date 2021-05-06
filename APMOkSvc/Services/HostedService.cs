@@ -1,4 +1,5 @@
 ﻿using APMOkSvc.Data;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System.Threading;
@@ -8,27 +9,30 @@ namespace APMOkSvc.Services
 {
     public class HostedService : IHostedService
     {
-        private readonly DataContext _datacontext;
-        private readonly DiskInfoService _diskInfoService;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly DiskInfoServiceImpl _diskInfoServiceImpl;
         private readonly IHostApplicationLifetime _appLifetime;
 
-        public HostedService( DataContext datacontext, DiskInfoService diskInfoService, IHostApplicationLifetime appLifetime)
+        public HostedService(IServiceScopeFactory serviceScopeFactory, DiskInfoServiceImpl diskInfoServiceImpl, IHostApplicationLifetime appLifetime)
         {
-            _datacontext = datacontext;
-            _diskInfoService = diskInfoService;
+            _serviceScopeFactory = serviceScopeFactory;
+            _diskInfoServiceImpl = diskInfoServiceImpl;
             _appLifetime = appLifetime;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            var reply = _diskInfoService.EnumerateDisks();
+            var reply = _diskInfoServiceImpl.EnumerateDisks();
             if (reply.ReplyResult == 0)
             {
+                using var serviceScope = _serviceScopeFactory.CreateScope();
+                var db = serviceScope.ServiceProvider.GetService<DataContext>();
+
                 foreach (var disk in reply.DiskInfoEntries)
                 {
-                    if (_datacontext.ConfigDataSet.Any(item => item.Caption == disk.Caption))
+                    if (db.ConfigDataSet.Any(item => item.Caption == disk.Caption))
                     {
-                        var item = _datacontext.ConfigDataSet.Single(item => item.Caption == disk.Caption);
+                        var item = db.ConfigDataSet.Single(item => item.Caption == disk.Caption);
                         item.DefaultValue = disk.APMValue;
                     }
                     else
@@ -38,10 +42,10 @@ namespace APMOkSvc.Services
                             Caption = disk.Caption,
                             DefaultValue = disk.APMValue
                         };
-                        _datacontext.ConfigDataSet.Add(item);
+                        db.ConfigDataSet.Add(item);
                     }
                 }
-                await _datacontext.SaveChangesAsync(_appLifetime.ApplicationStopping);
+                await db.SaveChangesAsync(_appLifetime.ApplicationStopping);
             }
         }
 
