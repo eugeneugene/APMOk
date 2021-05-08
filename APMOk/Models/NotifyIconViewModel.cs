@@ -24,10 +24,10 @@ namespace APMOk
         /// </summary>
         public ICommand ShowWindowCommand => new DelegateCommand
         {
-            CanExecuteFunc = () => deviceStatusWindow == null || deviceStatusWindow.IsOpen(),
+            CanExecuteFunc = () => deviceStatusWindow == null || !deviceStatusWindow.IsOpen(),
             CommandAction = () =>
             {
-                if (deviceStatusWindow == null)
+                if (deviceStatusWindow == null || !deviceStatusWindow.IsActive)
                 {
                     deviceStatusWindow = _services.GetService(typeof(DeviceStatusWindow)) as DeviceStatusWindow;
                     deviceStatusWindow?.Show();

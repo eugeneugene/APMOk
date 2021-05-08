@@ -23,13 +23,15 @@ namespace APMOk.Tasks
                 using var diskInfoService = scopeServiceProvider.GetRequiredService<Services.DiskInfoService>();
                 var reply = await diskInfoService.EnumerateDisksAsync();
                 _apmOkData.SystemDiskInfo = reply ?? throw new Exception("Service is offline");
+                _apmOkData.ConnectFailure = false;
                 Debug.WriteLine(_apmOkData.SystemDiskInfo);
             }
-            catch (Exception rex)
+            catch (Exception ex)
             {
-                Debug.WriteLine(rex.Message);
+                Debug.WriteLine(ex.Message);
                 _apmOkData.PowerState = null;
                 _apmOkData.SystemDiskInfo = null;
+                _apmOkData.ConnectFailure = true;
             }
         }
     }

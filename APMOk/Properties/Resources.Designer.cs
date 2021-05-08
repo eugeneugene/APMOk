@@ -63,9 +63,9 @@ namespace APMOk.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon _checked {
+        internal static System.Drawing.Icon Battery {
             get {
-                object obj = ResourceManager.GetObject("_checked", resourceCulture);
+                object obj = ResourceManager.GetObject("Battery", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace APMOk.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon battery {
+        internal static System.Drawing.Icon Checked {
             get {
-                object obj = ResourceManager.GetObject("battery", resourceCulture);
+                object obj = ResourceManager.GetObject("Checked", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -83,9 +83,9 @@ namespace APMOk.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon error {
+        internal static System.Drawing.Icon Error {
             get {
-                object obj = ResourceManager.GetObject("error", resourceCulture);
+                object obj = ResourceManager.GetObject("Error", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

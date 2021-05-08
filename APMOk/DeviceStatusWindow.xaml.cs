@@ -58,6 +58,11 @@ namespace APMOk
                     LoadBatteryStatus(_data.PowerState);
                     break;
                 case "ConnectFailure":
+                    if (!_data.ConnectFailure)
+                    {
+                        LoadDisksInfo(_data.SystemDiskInfo);
+                        LoadBatteryStatus(_data.PowerState);
+                    }
                     break;
                 default:
                     throw new NotImplementedException();
@@ -69,11 +74,8 @@ namespace APMOk
             Dispatcher.Invoke(() =>
             {
                 DiskInfo.Clear();
-                if (reply == null)
-                    _data.ConnectFailure = true;
-                else
+                if (reply != null)
                 {
-                    _data.ConnectFailure = false;
                     if (reply.ReplyResult != 0)
                     {
                         foreach (var entry in reply.DiskInfoEntries.Where(item => item.InfoValid))
@@ -83,7 +85,6 @@ namespace APMOk
                             SelectDiskCombo.SelectedIndex = 0;
                         else
                             SelectDiskCombo.SelectedIndex = -1;
-                        _data.ConnectFailure = true;
                     }
                 }
             });
@@ -92,15 +93,9 @@ namespace APMOk
         private void LoadBatteryStatus(PowerStateReply reply)
         {
             if (reply == null)
-            {
-                _data.ConnectFailure = true;
                 _data.PowerState = PowerStateReply.FailureReply;
-            }
             else
-            {
-                _data.ConnectFailure = false;
                 _data.PowerState = reply;
-            }
         }
 
         private void SelectDiskComboSelectionChanged(object sender, SelectionChangedEventArgs e)

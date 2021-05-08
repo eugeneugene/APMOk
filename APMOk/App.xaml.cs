@@ -36,10 +36,11 @@ namespace APMOk
                 hostBuilder.ConfigureServices((context, services) =>
                 {
                     services.AddSingleton(notifyIcon);
-                    services.AddTransient<DeviceStatusWindow>();
                     services.AddSingleton<APMOkData>();
                     services.AddTransient<DiskInfoService>();
                     services.AddTransient<PowerStateService>();
+                    services.AddTransient<DeviceStatusWindow>();
+                    services.AddHostedService<NotificationIconUpdaterTask>();
 
                     TasksStartupConfiguration tasksStartupConfiguration = new(context.Configuration);
                     services.AddTask<BatteryStatusReaderTask>(task => task.AutoStart(tasksStartupConfiguration.BatteryStatusReader.Value));
