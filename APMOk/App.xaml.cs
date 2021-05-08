@@ -1,15 +1,15 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
-using System;
-using System.Windows;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using System.Globalization;
-using System.Windows.Markup;
-using RecurrentTasks;
+﻿using APMOk.Services;
 using APMOk.Tasks;
 using CustomConfiguration;
-using APMOk.Services;
+using Hardcodet.Wpf.TaskbarNotification;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using RecurrentTasks;
+using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Markup;
 
 namespace APMOk
 {
