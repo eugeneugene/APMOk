@@ -74,7 +74,7 @@ namespace APMOk
                 else
                 {
                     _data.ConnectFailure = false;
-                    if (reply.ReplyResult == 0)
+                    if (reply.ReplyResult != 0)
                     {
                         foreach (var entry in reply.DiskInfoEntries.Where(item => item.InfoValid))
                             DiskInfo.Add(entry);

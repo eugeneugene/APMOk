@@ -17,19 +17,38 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="Red.ico" />
-		<Resource Include="Red.ico" />
+		<None Remove="Checked.ico" />
+		<Resource Include="Properties\checked.ico" />
+		<None Remove="Error.ico" />
+		<Resource Include="Properties\error.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Hardcodet.Wpf.TaskbarNotification.Core" Version="2.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
-	</ItemGroup>		
+	</ItemGroup>
 
 
 	<ItemGroup>
-	  <ProjectReference Include="..\APMOkLib\APMOkLib.csproj" />
+		<ProjectReference Include="..\APMOkLib\APMOkLib.csproj" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 	</ItemGroup>
 
 </Project>

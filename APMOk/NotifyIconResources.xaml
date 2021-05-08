@@ -13,6 +13,6 @@
         x:Key="NotifyIcon"
         ContextMenu="{StaticResource SysTrayMenu}"
         DoubleClickCommand="{Binding ShowWindowCommand}"
-        IconSource="/Red.ico"
+        IconSource="checked.ico"
         ToolTipText="Double-click for window, right-click for menu" />
 </ResourceDictionary>

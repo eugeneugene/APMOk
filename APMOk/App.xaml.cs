@@ -9,6 +9,7 @@ using RecurrentTasks;
 using APMOk.Tasks;
 using CustomConfiguration;
 using APMOk.Services;
+using System.Diagnostics;
 
 namespace APMOk
 {
@@ -19,41 +20,49 @@ namespace APMOk
 
         protected override async void OnStartup(StartupEventArgs e)
         {
-            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentUICulture;
-            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CurrentUICulture;
-
-            FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement),
-                new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
-
-            notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
-
-            var args = Environment.GetCommandLineArgs();
-            var hostBuilder = Host.CreateDefaultBuilder(args);
-            hostBuilder.ConfigureAppConfiguration((context, builder) => { });
-            hostBuilder.ConfigureServices((context, services) =>
+            try
             {
-                services.AddSingleton(notifyIcon);
-                services.AddTransient<DeviceStatusWindow>();
-                services.AddSingleton<APMOkData>();
-                services.AddTransient<DiskInfoService>();
-                services.AddTransient<PowerStateService>();
+                CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentUICulture;
+                CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CurrentUICulture;
 
-                TasksStartupConfiguration tasksStartupConfiguration = new(context.Configuration);
-                services.AddTask<BatteryStatusReaderTask>(task => task.AutoStart(tasksStartupConfiguration.BatteryStatusReader.Value));
-                services.AddTask<DiskInfoReaderTask>(task => task.AutoStart(tasksStartupConfiguration.DiskStatusReader.Value));
-            });
-            host = hostBuilder.Build();
-            notifyIcon.DataContext = new NotifyIconViewModel(host.Services);
+                FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement),
+                    new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
 
-            await host.StartAsync();
+                notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
 
-            var _batteryStatusReaderTask= host.Services.GetRequiredService<ITask<BatteryStatusReaderTask>>();
-            _batteryStatusReaderTask.TryRunImmediately();
+                var args = Environment.GetCommandLineArgs();
+                var hostBuilder = Host.CreateDefaultBuilder(args);
+                hostBuilder.ConfigureAppConfiguration((context, builder) => { });
+                hostBuilder.ConfigureServices((context, services) =>
+                {
+                    services.AddSingleton(notifyIcon);
+                    services.AddTransient<DeviceStatusWindow>();
+                    services.AddSingleton<APMOkData>();
+                    services.AddTransient<DiskInfoService>();
+                    services.AddTransient<PowerStateService>();
 
-            var _diskInfoReaderTask = host.Services.GetRequiredService<ITask<DiskInfoReaderTask>>();
-            _diskInfoReaderTask.TryRunImmediately();
+                    TasksStartupConfiguration tasksStartupConfiguration = new(context.Configuration);
+                    services.AddTask<BatteryStatusReaderTask>(task => task.AutoStart(tasksStartupConfiguration.BatteryStatusReader.Value));
+                    services.AddTask<DiskInfoReaderTask>(task => task.AutoStart(tasksStartupConfiguration.DiskStatusReader.Value));
+                });
+                host = hostBuilder.Build();
+                notifyIcon.DataContext = new NotifyIconViewModel(host.Services);
 
-            base.OnStartup(e);
+                await host.StartAsync();
+
+                var _batteryStatusReaderTask = host.Services.GetRequiredService<ITask<BatteryStatusReaderTask>>();
+                _batteryStatusReaderTask.TryRunImmediately();
+
+                var _diskInfoReaderTask = host.Services.GetRequiredService<ITask<DiskInfoReaderTask>>();
+                _diskInfoReaderTask.TryRunImmediately();
+
+                base.OnStartup(e);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                throw;
+            }
         }
 
         protected override async void OnExit(ExitEventArgs e)

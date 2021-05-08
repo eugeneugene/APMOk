@@ -119,9 +119,15 @@ namespace APMOkSvc.Services
                 bool disable = request.APMValue > 254;
                 if (HW.SetAPM(request.DiskId, val, disable))
                 {
-                    _logger.LogTrace("SetAPM returned false");
+                    var newReply = GetAPM(new GetAPMRequest { DiskId = request.DiskId });
+                    if (newReply.ReplyResult != 0)
+                        _logger.LogTrace("New APM Value: {0}", newReply.APMValue);
+                    else
+                        _logger.LogTrace("New APM Value is not known");
                     reply.ReplyResult = 1;
                 }
+                else
+                    _logger.LogTrace("SetAPM returned false");
             }
             catch (Exception ex)
             {
