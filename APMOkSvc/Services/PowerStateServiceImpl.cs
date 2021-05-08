@@ -18,35 +18,39 @@ namespace APMOkSvc.Services
 
         public PowerStateReply GetPowerState()
         {
+            var reply = new PowerStateReply()
+            {
+                ReplyResult = 0,
+                ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow),
+            };
             try
             {
                 var powerState = PowerState.GetPowerState();
-                _logger.LogTrace("PowerState:");
-                _logger.LogTrace("ACLineStatus : {0}", powerState.ACLineStatus);
-                _logger.LogTrace("BatteryFlag : {0}", powerState.BatteryFlag);
-                _logger.LogTrace("BatteryFullLifeTime : {0}", powerState.BatteryFullLifeTime);
-                _logger.LogTrace("BatteryLifePercent : {0}", powerState.BatteryLifePercent);
-                _logger.LogTrace("BatteryLifeTime : {0}", powerState.BatteryLifeTime);
-
-                return new PowerStateReply()
+                if (powerState != null)
                 {
-                    ReplyResult = 1,
-                    ReplyTimeStamp = Timestamp.FromDateTime(DateTime.Now),
-                    ACLineStatus = (EACLineStatus)powerState.ACLineStatus,
-                    BatteryFlag = (EBatteryFlag)powerState.BatteryFlag,
-                    BatteryFullLifeTime = powerState.BatteryFullLifeTime,
-                    BatteryLifePercent = powerState.BatteryLifePercent,
-                    BatteryLifeTime = powerState.BatteryLifeTime,
-                };
+                    _logger.LogTrace("PowerState:");
+                    _logger.LogTrace("ACLineStatus : {0}", powerState.ACLineStatus);
+                    _logger.LogTrace("BatteryFlag : {0}", powerState.BatteryFlag);
+                    _logger.LogTrace("BatteryFullLifeTime : {0}", powerState.BatteryFullLifeTime);
+                    _logger.LogTrace("BatteryLifePercent : {0}", powerState.BatteryLifePercent);
+                    _logger.LogTrace("BatteryLifeTime : {0}", powerState.BatteryLifeTime);
+
+                    reply.ReplyResult = 1;
+                    reply.ACLineStatus = (EACLineStatus)powerState.ACLineStatus;
+                    reply.BatteryFlag = (EBatteryFlag)powerState.BatteryFlag;
+                    reply.BatteryFullLifeTime = powerState.BatteryFullLifeTime;
+                    reply.BatteryLifePercent = powerState.BatteryLifePercent;
+                    reply.BatteryLifeTime = powerState.BatteryLifeTime;
+                }
+                else
+                    _logger.LogTrace("GetPowerState returned null");
             }
             catch (Exception ex)
             {
                 _logger.LogError("Exception: {0}", ex);
-                return new PowerStateReply()
-                {
-                    ReplyResult = 0,
-                };
             }
+            _logger.LogTrace("Reply: {0}", reply);
+            return reply;
         }
     }
 }

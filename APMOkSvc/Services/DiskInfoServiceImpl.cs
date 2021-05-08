@@ -21,9 +21,10 @@ namespace APMOkSvc.Services
 
         public SystemDiskInfoReply EnumerateDisks()
         {
-            SystemDiskInfoReply reply = new()
+            var reply = new SystemDiskInfoReply
             {
                 ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow),
+                ReplyResult = 0
             };
 
             try
@@ -42,11 +43,10 @@ namespace APMOkSvc.Services
                         var ex = new Win32Exception(HW.LastWin32Error);
                         _logger.LogError(ex.Message);
                     }
-                    reply.ReplyResult = res;
                 }
                 else
                 {
-                    var diskInfos = diskInfoEnum.Select(item => new DiskInfoEntry()
+                    var diskInfos = diskInfoEnum.Select(item => new DiskInfoEntry
                     {
                         InfoValid = item.InfoValid != 0,
                         Index = item.Index,
@@ -65,6 +65,7 @@ namespace APMOkSvc.Services
                     });
 
                     reply.DiskInfoEntries.AddRange(diskInfos);
+                    reply.ReplyResult = 1;
 
                     foreach (var di in diskInfos)
                     {
@@ -75,23 +76,64 @@ namespace APMOkSvc.Services
             catch (Exception ex)
             {
                 _logger.LogError("Exception: {0}", ex);
-                reply.ReplyResult = 0;
             }
+
+            _logger.LogTrace("Reply: {0}", reply);
             return reply;
         }
 
         public GetAPMReply GetAPM(GetAPMRequest request)
         {
+            _logger.LogTrace("Request: {0}", request);
+            var reply = new GetAPMReply { APMValue = 0, ReplyResult = 0, ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow) };
             try
             {
                 if (HW.GetAPM(request.DiskId, out int apmValue))
-                    return new GetAPMReply() { APMValue = apmValue, ReplyResult = 1, ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), };
+                {
+                    reply.APMValue = apmValue;
+                    reply.ReplyResult = 1;
+                }
+                else
+                    _logger.LogTrace("GetAPM returned false");
             }
             catch (Exception ex)
             {
                 _logger.LogError("Exception: {0}", ex);
+                if (HW.LastWin32Error != 0)
+                {
+                    ex = new Win32Exception(HW.LastWin32Error);
+                    _logger.LogError(ex.Message);
+                }
             }
-            return new GetAPMReply() { APMValue = 0, ReplyResult = 0, ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow), };
+            _logger.LogTrace("Reply: {0}", reply);
+            return reply;
+        }
+
+        public SetAPMReply SetAPM(SetAPMRequest request)
+        {
+            _logger.LogTrace("Request: {0}", request);
+            var reply = new SetAPMReply { ReplyResult = 0, ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow) };
+            try
+            {
+                byte val = request.APMValue > 254 ? (byte)0 : (byte)request.APMValue;
+                bool disable = request.APMValue > 254;
+                if (HW.SetAPM(request.DiskId, val, disable))
+                {
+                    _logger.LogTrace("SetAPM returned false");
+                    reply.ReplyResult = 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Exception: {0}", ex);
+                if (HW.LastWin32Error != 0)
+                {
+                    ex = new Win32Exception(HW.LastWin32Error);
+                    _logger.LogError(ex.Message);
+                }
+            }
+            _logger.LogTrace("Reply: {0}", reply);
+            return reply;
         }
     }
 }

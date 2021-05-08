@@ -7,7 +7,6 @@ namespace APMOkSvc.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
-#error Check if path exists
             Database.EnsureCreated();
         }
 

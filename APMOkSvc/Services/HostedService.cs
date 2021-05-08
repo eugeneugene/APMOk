@@ -28,7 +28,7 @@ namespace APMOkSvc.Services
                 using var serviceScope = _serviceScopeFactory.CreateScope();
                 var db = serviceScope.ServiceProvider.GetService<DataContext>();
 
-                foreach (var disk in reply.DiskInfoEntries)
+                foreach (var disk in reply.DiskInfoEntries.Where(item => item.InfoValid))
                 {
                     if (db.ConfigDataSet.Any(item => item.Caption == disk.Caption))
                     {

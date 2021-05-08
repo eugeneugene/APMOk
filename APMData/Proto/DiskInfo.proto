@@ -10,6 +10,7 @@ import "google/protobuf/Empty.proto";
 service DiskInfoService {
 	rpc EnumerateDisks (google.protobuf.Empty) returns (SystemDiskInfoReply);
 	rpc GetAPM (GetAPMRequest) returns (GetAPMReply);
+	rpc SetAPM (SetAPMRequest) returns (SetAPMReply);
 }
 
 service PowerStateService {
@@ -18,7 +19,6 @@ service PowerStateService {
 
 service ConfigurationService {
 	rpc GetDriveAPMConfiguration (google.protobuf.Empty) returns (DriveAPMConfigurationReply);
-	rpc SetDriveAPMConfiguration (DriveAPMConfigurationRequest) returns (google.protobuf.Empty);
 }
 
 message DiskInfoEntry {
@@ -54,6 +54,16 @@ message GetAPMReply {
 	int32 APMValue = 3;
 }
 
+message SetAPMRequest {
+	int32 DiskId = 1;
+	uint32 APMValue = 2;
+}
+
+message SetAPMReply {
+	int32 ReplyResult = 1;
+	google.protobuf.Timestamp ReplyTimeStamp = 2;
+}
+
 enum EACLineStatus {
 	Offline = 0;
 	Online = 1;
@@ -80,11 +90,7 @@ message PowerStateReply {
 	int32 BatteryFullLifeTime = 7;
 }
 
-message DriveAPMConfigurationRequest {
-	repeated DriveAPMConfigurationEntry DriveAPMConfigurationEntries = 1;
-}
-
-message DriveAPMConfigurationEntry {
+message DriveAPMConfigurationReplyEntry {
 	string Caption = 1;
 	uint32 DefaultValue = 2;
 	uint32 CurrentValue = 3;
@@ -93,5 +99,5 @@ message DriveAPMConfigurationEntry {
 message DriveAPMConfigurationReply {
 	int32 ReplyResult = 1;
 	google.protobuf.Timestamp ReplyTimeStamp = 2;
-	repeated DriveAPMConfigurationEntry DriveAPMConfigurationEntries = 3;
+	repeated DriveAPMConfigurationReplyEntry DriveAPMConfigurationReplyEntries = 3;
 }

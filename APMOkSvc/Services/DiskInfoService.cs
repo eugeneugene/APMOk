@@ -28,5 +28,10 @@ namespace APMOkSvc.Services
         {
             return Task.FromResult(_diskInfoServiceImpl.GetAPM(request));
         }
+
+        public override Task<SetAPMReply> SetAPM(SetAPMRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(_diskInfoServiceImpl.SetAPM(request));
+        }
     }
 }
