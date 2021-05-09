@@ -69,7 +69,7 @@ namespace APMOk
             Dispatcher.Invoke(() =>
             {
                 var selectedItem = SelectDiskCombo.SelectedItem as DiskInfoEntry;
-                var selectedDevice = selectedItem.DeviceID;
+                string selectedDevice = selectedItem?.DeviceID;
                 DiskInfo.Clear();
                 if (reply != null)
                 {
