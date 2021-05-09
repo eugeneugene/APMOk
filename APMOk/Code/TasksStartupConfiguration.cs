@@ -16,7 +16,7 @@ namespace APMOk
         {
             Configuration = configuration;
             BatteryStatusReader = ConfigurationParameterFactory.CreateParameter(Configuration, nameof(BatteryStatusReader), SectionName + ":" + nameof(BatteryStatusReader),
-                new TaskStartupParameterDecorator<ITaskStartup>(new DefaultTaskStartup(TimeSpan.FromSeconds(3))), "Периодичность чтения статуса батареи");
+                new TaskStartupParameterDecorator<ITaskStartup>(new DefaultTaskStartup(TimeSpan.FromSeconds(1))), "Периодичность чтения статуса батареи");
             DiskStatusReader = ConfigurationParameterFactory.CreateParameter(Configuration, nameof(DiskStatusReader), SectionName + ":" + nameof(DiskStatusReader),
                 new TaskStartupParameterDecorator<ITaskStartup>(new DefaultTaskStartup(TimeSpan.FromMinutes(1))), "Периодичность чтения информации о жёстких дисках");        
         }

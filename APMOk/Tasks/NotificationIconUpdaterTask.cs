@@ -1,6 +1,7 @@
 ﻿using APMData.Proto;
 using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Extensions.Hosting;
+using RecurrentTasks;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,13 +12,17 @@ namespace APMOk.Tasks
     {
         private readonly APMOkData _data;
         private readonly TaskbarIcon _taskbarIcon;
+        private readonly ITask<DiskInfoReaderTask> _diskInfoReaderTask;
+        private readonly ITask<BatteryStatusReaderTask> _batteryStatusReaderTask;
 
         //private bool IgnoreUpdate = false;
 
-        public NotificationIconUpdaterTask(APMOkData data, TaskbarIcon taskbarIcon)
+        public NotificationIconUpdaterTask(APMOkData data, TaskbarIcon taskbarIcon, ITask<DiskInfoReaderTask> diskInfoReaderTask, ITask<BatteryStatusReaderTask> batteryStatusReaderTask)
         {
             _data = data;
             _taskbarIcon = taskbarIcon;
+            _diskInfoReaderTask = diskInfoReaderTask;
+            _batteryStatusReaderTask = batteryStatusReaderTask;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -35,6 +40,13 @@ namespace APMOk.Tasks
 
         private void APMOkDataPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (e.PropertyName == "ConnectFailure" && _data.ConnectFailure == false)
+            {
+                if (_data.SystemDiskInfo == null && _diskInfoReaderTask.IsStarted)
+                    _diskInfoReaderTask.TryRunImmediately();
+                if (_data.PowerState == null && _batteryStatusReaderTask.IsStarted)
+                    _batteryStatusReaderTask.TryRunImmediately();
+            }
             UpdateIcon();
         }
 

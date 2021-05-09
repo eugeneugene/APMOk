@@ -29,8 +29,6 @@ namespace APMOk.Tasks
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                _apmOkData.PowerState = null;
-                _apmOkData.SystemDiskInfo = null;
                 _apmOkData.ConnectFailure = true;
             }
         }

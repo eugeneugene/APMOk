@@ -58,11 +58,6 @@ namespace APMOk
                     LoadBatteryStatus(_data.PowerState);
                     break;
                 case "ConnectFailure":
-                    if (!_data.ConnectFailure)
-                    {
-                        LoadDisksInfo(_data.SystemDiskInfo);
-                        LoadBatteryStatus(_data.PowerState);
-                    }
                     break;
                 default:
                     throw new NotImplementedException();
@@ -73,6 +68,8 @@ namespace APMOk
         {
             Dispatcher.Invoke(() =>
             {
+                var selectedItem = SelectDiskCombo.SelectedItem as DiskInfoEntry;
+                var selectedDevice = selectedItem.DeviceID;
                 DiskInfo.Clear();
                 if (reply != null)
                 {
@@ -82,7 +79,12 @@ namespace APMOk
                             DiskInfo.Add(entry);
 
                         if (DiskInfo.Any())
-                            SelectDiskCombo.SelectedIndex = 0;
+                        {
+                            if (!string.IsNullOrEmpty(selectedDevice))
+                                SelectDiskCombo.SelectedItem = DiskInfo.SingleOrDefault(item => item.DeviceID == selectedDevice);
+                            else
+                                SelectDiskCombo.SelectedIndex = 0;
+                        }
                         else
                             SelectDiskCombo.SelectedIndex = -1;
                     }
