@@ -1,4 +1,5 @@
-﻿using APMOkSvc.Data;
+﻿using APMData.Proto;
+using APMOkSvc.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
@@ -30,17 +31,19 @@ namespace APMOkSvc.Services
 
                 foreach (var disk in reply.DiskInfoEntries.Where(item => item.InfoValid))
                 {
+                    var APMValueReply = _diskInfoServiceImpl.GetAPM(new GetAPMRequest { DiskName = disk.DeviceID });
                     if (db.ConfigDataSet.Any(item => item.Caption == disk.Caption))
                     {
                         var item = db.ConfigDataSet.Single(item => item.Caption == disk.Caption);
-                        item.DefaultValue = disk.APMValue;
+                        item.DefaultValue = APMValueReply.APMValue;
+                        //db.ConfigDataSet.Update(item);
                     }
                     else
                     {
                         var item = new ConfigData
                         {
                             Caption = disk.Caption,
-                            DefaultValue = disk.APMValue
+                            DefaultValue = APMValueReply.APMValue
                         };
                         db.ConfigDataSet.Add(item);
                     }

@@ -25,17 +25,13 @@ message DiskInfoEntry {
 	bool InfoValid = 1;
 	uint32 Index = 2;
 	uint32 Availability = 3;
-	uint32 APMValue = 4;
 	string Caption = 5;
-	uint32 ConfigManagerErrorCode = 6;
 	string Description = 7;
 	string DeviceID = 8;
 	string InterfaceType = 9;
 	string Manufacturer = 10;
 	string Model = 11;
-	string Name = 12;
 	string SerialNumber = 13;
-	string Status = 14;
 }
 
 message SystemDiskInfoReply {
@@ -45,17 +41,17 @@ message SystemDiskInfoReply {
 }
 
 message GetAPMRequest {
-	int32 DiskId = 1;
+	string DiskName = 1;
 }
 
 message GetAPMReply {
 	int32 ReplyResult = 1;
 	google.protobuf.Timestamp ReplyTimeStamp = 2;
-	int32 APMValue = 3;
+	uint32 APMValue = 3;
 }
 
 message SetAPMRequest {
-	int32 DiskId = 1;
+	string DiskName = 1;
 	uint32 APMValue = 2;
 }
 

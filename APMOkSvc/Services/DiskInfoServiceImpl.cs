@@ -51,17 +51,13 @@ namespace APMOkSvc.Services
                         InfoValid = item.InfoValid != 0,
                         Index = item.Index,
                         Availability = item.Availability,
-                        APMValue = item.APMValue,
                         Caption = item.Caption,
-                        ConfigManagerErrorCode = item.ConfigManagerErrorCode,
                         Description = item.Description,
                         DeviceID = item.DeviceID,
                         InterfaceType = item.InterfaceType,
                         Manufacturer = item.Manufacturer,
                         Model = item.Model,
-                        Name = item.Name,
                         SerialNumber = item.SerialNumber,
-                        Status = item.Status,
                     });
 
                     reply.DiskInfoEntries.AddRange(diskInfos);
@@ -88,7 +84,7 @@ namespace APMOkSvc.Services
             var reply = new GetAPMReply { APMValue = 0, ReplyResult = 0, ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow) };
             try
             {
-                if (HW.GetAPM(request.DiskId, out int apmValue))
+                if (HW.GetAPM(request.DiskName, out uint apmValue))
                 {
                     reply.APMValue = apmValue;
                     reply.ReplyResult = 1;
@@ -117,9 +113,9 @@ namespace APMOkSvc.Services
             {
                 byte val = request.APMValue > 254 ? (byte)0 : (byte)request.APMValue;
                 bool disable = request.APMValue > 254;
-                if (HW.SetAPM(request.DiskId, val, disable))
+                if (HW.SetAPM(request.DiskName, val, disable))
                 {
-                    var newReply = GetAPM(new GetAPMRequest { DiskId = request.DiskId });
+                    var newReply = GetAPM(new GetAPMRequest { DiskName = request.DiskName });
                     if (newReply.ReplyResult != 0)
                         _logger.LogTrace("New APM Value: {0}", newReply.APMValue);
                     else

@@ -79,7 +79,7 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 						for (UINT16 index = 0U; index < 16U; index++)
 						{
 							EnumDiskInfo* info = &diskInfo[index];
-							info->InfoValid = FALSE;
+							*info = { 0 };
 							if (pEnumerator)
 							{
 								CComPtr<IWbemClassObject> pclsObj;
@@ -106,10 +106,6 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 									wcscpy_s(info->Caption, var.bstrVal);
 									WriteLog(L"Caption: %s\r\n", info->Caption);
 
-									hr = pclsObj->Get(L"ConfigManagerErrorCode", 0, &var, &cType, 0);
-									info->ConfigManagerErrorCode = var.uintVal;
-									WriteLog(L"ConfigManagerErrorCode: %u\r\n", info->ConfigManagerErrorCode);
-
 									hr = pclsObj->Get(L"Description", 0, &var, &cType, 0);
 									wcscpy_s(info->Description, var.bstrVal);
 									WriteLog(L"Description: %s\r\n", info->Description);
@@ -117,9 +113,6 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 									hr = pclsObj->Get(L"DeviceID", 0, &var, &cType, 0);
 									wcscpy_s(info->DeviceID, var.bstrVal);
 									WriteLog(L"DeviceID: %s\r\n", info->DeviceID);
-
-									info->APMValue = (uint16_t)GetAPM(info->DeviceID);
-									WriteLog(L"APMValue: %hu\r\n", info->APMValue);
 
 									hr = pclsObj->Get(L"InterfaceType", 0, &var, &cType, 0);
 									wcscpy_s(info->InterfaceType, var.bstrVal);
@@ -133,17 +126,9 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 									wcscpy_s(info->Model, var.bstrVal);
 									WriteLog(L"Model: %s\r\n", info->Model);
 
-									hr = pclsObj->Get(L"Name", 0, &var, &cType, 0);
-									wcscpy_s(info->Name, var.bstrVal);
-									WriteLog(L"Name: %s\r\n", info->Name);
-
 									hr = pclsObj->Get(L"SerialNumber", 0, &var, &cType, 0);
 									wcscpy_s(info->SerialNumber, var.bstrVal);
 									WriteLog(L"SerialNumber: %s\r\n", info->SerialNumber);
-
-									hr = pclsObj->Get(L"Status", 0, &var, &cType, 0);
-									wcscpy_s(info->Status, var.bstrVal);
-									WriteLog(L"Status: %s\r\n", info->Status);
 								}
 							}
 						}

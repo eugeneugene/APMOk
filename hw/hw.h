@@ -14,22 +14,18 @@ constexpr auto WIN_SETFEATURES = 0xEF;
 constexpr auto SETFEATURES_EN_APM = 0x05;
 constexpr auto SETFEATURES_DIS_APM = 0x85;
 
-struct EnumDiskInfo		// 2128
+struct EnumDiskInfo
 {
 	uint32_t InfoValid;					// 4
 	uint32_t Index;						// 4
 	uint16_t Availability;				// 2
-	uint16_t APMValue;					// 2
 	wchar_t Caption[256];				// 512
-	uint32_t ConfigManagerErrorCode;	// 4
 	wchar_t Description[256];			// 512
 	wchar_t DeviceID[256];				// 512
 	wchar_t InterfaceType[16];			// 32
 	wchar_t Manufacturer[64];			// 128
 	wchar_t Model[64];					// 128
-	wchar_t Name[64];					// 128
 	wchar_t SerialNumber[64];			// 128
-	wchar_t Status[16];					// 32
 };
 
 const int DataBufSize = 512;

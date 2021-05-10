@@ -43,7 +43,7 @@ namespace APMOk
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             LoadDisksInfo(_data.SystemDiskInfo);
-            LoadBatteryStatus(_data.PowerState);
+            LoadPowerStatus(_data.PowerState);
             _data.PropertyChanged += APMOkDataPropertyChanged;
         }
 
@@ -55,7 +55,7 @@ namespace APMOk
                     LoadDisksInfo(_data.SystemDiskInfo);
                     break;
                 case "PowerState":
-                    LoadBatteryStatus(_data.PowerState);
+                    LoadPowerStatus(_data.PowerState);
                     break;
                 case "ConnectFailure":
                     break;
@@ -92,7 +92,7 @@ namespace APMOk
             });
         }
 
-        private void LoadBatteryStatus(PowerStateReply reply)
+        private void LoadPowerStatus(PowerStateReply reply)
         {
             if (reply == null)
                 _data.PowerState = PowerStateReply.FailureReply;
@@ -109,17 +109,13 @@ namespace APMOk
                 if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry Item)
                 {
                     var availability = Availability.FromValue((ushort)Item.Availability).Name;
-                    var apmValue = ((short)Item.APMValue < 0) ? "Unavailable" : Item.APMValue.ToString();
                     DiskInfoItems.Add(new(nameof(Item.Availability), availability));
                     DiskInfoItems.Add(new(nameof(Item.Caption), Item.Caption));
                     DiskInfoItems.Add(new(nameof(Item.Description), Item.Description));
                     DiskInfoItems.Add(new(nameof(Item.DeviceID), Item.DeviceID));
-                    DiskInfoItems.Add(new(nameof(Item.APMValue), apmValue));
                     DiskInfoItems.Add(new(nameof(Item.Manufacturer), Item.Manufacturer));
                     DiskInfoItems.Add(new(nameof(Item.Model), Item.Model));
-                    DiskInfoItems.Add(new(nameof(Item.Name), Item.Name));
                     DiskInfoItems.Add(new(nameof(Item.SerialNumber), Item.SerialNumber));
-                    DiskInfoItems.Add(new(nameof(Item.Status), Item.Status));
                 }
             });
         }
@@ -141,6 +137,10 @@ namespace APMOk
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        private void SelectDiskComboDropDownOpened(object sender, EventArgs e)
+        {
         }
     }
 }
