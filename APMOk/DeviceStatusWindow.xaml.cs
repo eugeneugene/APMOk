@@ -16,18 +16,18 @@ namespace APMOk
     /// </summary>
     internal partial class DeviceStatusWindow : Window, IDisposable
     {
-        private readonly APMOkData _data;
+        private readonly APMOkData _apmOkData;
         private bool disposedValue;
 
         public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
 
         public ObservableCollection<KeyValuePair<string, object>> DiskInfoItems { get; } = new();
 
-        public DeviceStatusWindow(APMOkData data)
+        public DeviceStatusWindow(APMOkData apmOkData)
         {
             InitializeComponent();
 
-            _data = data;
+            _apmOkData = apmOkData;
 
             // DeviceStatusDataSource
             CollectionViewSource deviceStatusDataSource = FindResource("DeviceStatusDataSource") as CollectionViewSource;
@@ -37,14 +37,14 @@ namespace APMOk
             CollectionViewSource diskInfoItemsSource = FindResource("DiskInfoItemsSource") as CollectionViewSource;
             diskInfoItemsSource.Source = DiskInfoItems;
 
-            DataContext = _data;
+            DataContext = _apmOkData;
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
-            LoadDisksInfo(_data.SystemDiskInfo);
-            LoadPowerStatus(_data.PowerState);
-            _data.PropertyChanged += APMOkDataPropertyChanged;
+            LoadDisksInfo(_apmOkData.SystemDiskInfo);
+            LoadPowerStatus(_apmOkData.PowerState);
+            _apmOkData.PropertyChanged += APMOkDataPropertyChanged;
         }
 
         private void APMOkDataPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -52,10 +52,10 @@ namespace APMOk
             switch (e.PropertyName)
             {
                 case "SystemDiskInfo":
-                    LoadDisksInfo(_data.SystemDiskInfo);
+                    LoadDisksInfo(_apmOkData.SystemDiskInfo);
                     break;
                 case "PowerState":
-                    LoadPowerStatus(_data.PowerState);
+                    LoadPowerStatus(_apmOkData.PowerState);
                     break;
                 case "ConnectFailure":
                     break;
@@ -95,9 +95,9 @@ namespace APMOk
         private void LoadPowerStatus(PowerStateReply reply)
         {
             if (reply == null)
-                _data.PowerState = PowerStateReply.FailureReply;
+                _apmOkData.PowerState = PowerStateReply.FailureReply;
             else
-                _data.PowerState = reply;
+                _apmOkData.PowerState = reply;
         }
 
         private void SelectDiskComboSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -126,7 +126,7 @@ namespace APMOk
             {
                 if (disposing)
                 {
-                    _data.PropertyChanged -= APMOkDataPropertyChanged;
+                    _apmOkData.PropertyChanged -= APMOkDataPropertyChanged;
                 }
                 disposedValue = true;
             }
