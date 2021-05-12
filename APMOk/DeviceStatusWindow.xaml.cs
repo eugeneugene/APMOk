@@ -42,8 +42,7 @@ namespace APMOk
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
-            LoadDisksInfo(_apmOkData.SystemDiskInfo);
-            LoadPowerStatus(_apmOkData.PowerState);
+            LoadDisksInfo();
             _apmOkData.PropertyChanged += APMOkDataPropertyChanged;
         }
 
@@ -52,10 +51,9 @@ namespace APMOk
             switch (e.PropertyName)
             {
                 case "SystemDiskInfo":
-                    LoadDisksInfo(_apmOkData.SystemDiskInfo);
+                    LoadDisksInfo();
                     break;
                 case "PowerState":
-                    LoadPowerStatus(_apmOkData.PowerState);
                     break;
                 case "ConnectFailure":
                     break;
@@ -64,45 +62,30 @@ namespace APMOk
             }
         }
 
-        private void LoadDisksInfo(SystemDiskInfoReply reply)
+        private void LoadDisksInfo()
         {
+            if (_apmOkData.SystemDiskInfo == null || _apmOkData.SystemDiskInfo.ReplyResult == 0)
+                return;
+
             Dispatcher.Invoke(() =>
             {
-                var selectedItem = SelectDiskCombo.SelectedItem as DiskInfoEntry;
-                string selectedDevice = selectedItem?.DeviceID;
-                DiskInfo.Clear();
-                if (reply != null)
-                {
-                    if (reply.ReplyResult != 0)
-                    {
-                        foreach (var entry in reply.DiskInfoEntries.Where(item => item.InfoValid))
-                            DiskInfo.Add(entry);
+                if (DiskInfo.Any())
+                    return;
 
-                        if (DiskInfo.Any())
-                        {
-                            if (!string.IsNullOrEmpty(selectedDevice))
-                                SelectDiskCombo.SelectedItem = DiskInfo.SingleOrDefault(item => item.DeviceID == selectedDevice);
-                            else
-                                SelectDiskCombo.SelectedIndex = 0;
-                        }
-                        else
-                            SelectDiskCombo.SelectedIndex = -1;
-                    }
-                }
+                foreach (var entry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.DeviceID))
+                    DiskInfo.Add(entry);
+
+                if (DiskInfo.Any())
+                    SelectDiskCombo.SelectedIndex = 0;
+                else
+                    SelectDiskCombo.SelectedIndex = -1;
             });
-        }
-
-        private void LoadPowerStatus(PowerStateReply reply)
-        {
-            if (reply == null)
-                _apmOkData.PowerState = PowerStateReply.FailureReply;
-            else
-                _apmOkData.PowerState = reply;
         }
 
         private void SelectDiskComboSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             e.Handled = true;
+
             Dispatcher.Invoke(() =>
             {
                 DiskInfoItems.Clear();
@@ -141,6 +124,43 @@ namespace APMOk
 
         private void SelectDiskComboDropDownOpened(object sender, EventArgs e)
         {
+            if (_apmOkData.SystemDiskInfo == null || _apmOkData.SystemDiskInfo.ReplyResult == 0)
+                return;
+
+            Dispatcher.Invoke(() =>
+            {
+                string selectedSerial = null;
+                if (SelectDiskCombo.SelectedItem is DiskInfoEntry selectedItem)
+                    selectedSerial = selectedItem.SerialNumber;
+
+                // Items to delete from combobox
+                var deleteItems = DiskInfo.Where(item => !_apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).Any(item1 => item1.Equals(item)));
+                foreach (var item in deleteItems)
+                    DiskInfo.Remove(item);
+
+                // Items to add to combobox
+                var addItems = _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid && !DiskInfo.Any(item1 => item1.Equals(item)));
+                foreach (var item in addItems)
+                    DiskInfo.Add(item);
+
+                List<DiskInfoEntry> DiskInfoTmp = new();
+                DiskInfoTmp.AddRange(DiskInfo);
+
+                DiskInfo.Clear();
+                foreach (var item in DiskInfoTmp.OrderBy(item => item.DeviceID))
+                    DiskInfo.Add(item);
+
+                var selectItem = DiskInfo.SingleOrDefault(item => item.SerialNumber == selectedSerial);
+                if (selectItem != null)
+                    SelectDiskCombo.SelectedItem = selectItem;
+                else
+                {
+                    if (_apmOkData.SystemDiskInfo.DiskInfoEntries.Any())
+                        SelectDiskCombo.SelectedIndex = 0;
+                    else
+                        SelectDiskCombo.SelectedIndex = -1;
+                }
+            });
         }
     }
 }

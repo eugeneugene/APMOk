@@ -30,7 +30,7 @@ namespace APMOkSvc.Services
             {
                 reply.DriveAPMConfigurationReplyEntries.AddRange(_dataContext.ConfigDataSet.Select(item => new DriveAPMConfigurationReplyEntry
                 {
-                    Caption = item.Caption,
+                    DeviceID = item.DeviceID,
                     CurrentValue = item.CurrentValue,
                     DefaultValue = item.DefaultValue
                 }));

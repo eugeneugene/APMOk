@@ -84,7 +84,7 @@ namespace APMOkSvc.Services
             var reply = new GetAPMReply { APMValue = 0, ReplyResult = 0, ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow) };
             try
             {
-                if (HW.GetAPM(request.DiskName, out uint apmValue))
+                if (HW.GetAPM(request.DeviceID, out uint apmValue))
                 {
                     reply.APMValue = apmValue;
                     reply.ReplyResult = 1;
@@ -113,9 +113,9 @@ namespace APMOkSvc.Services
             {
                 byte val = request.APMValue > 254 ? (byte)0 : (byte)request.APMValue;
                 bool disable = request.APMValue > 254;
-                if (HW.SetAPM(request.DiskName, val, disable))
+                if (HW.SetAPM(request.DeviceID, val, disable))
                 {
-                    var newReply = GetAPM(new GetAPMRequest { DiskName = request.DiskName });
+                    var newReply = GetAPM(new GetAPMRequest { DeviceID = request.DeviceID });
                     if (newReply.ReplyResult != 0)
                         _logger.LogTrace("New APM Value: {0}", newReply.APMValue);
                     else

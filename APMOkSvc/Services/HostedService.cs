@@ -31,10 +31,10 @@ namespace APMOkSvc.Services
 
                 foreach (var disk in reply.DiskInfoEntries.Where(item => item.InfoValid))
                 {
-                    var APMValueReply = _diskInfoServiceImpl.GetAPM(new GetAPMRequest { DiskName = disk.DeviceID });
-                    if (db.ConfigDataSet.Any(item => item.Caption == disk.Caption))
+                    var APMValueReply = _diskInfoServiceImpl.GetAPM(new GetAPMRequest { DeviceID = disk.DeviceID });
+                    if (db.ConfigDataSet.Any(item => item.DeviceID == disk.DeviceID))
                     {
-                        var item = db.ConfigDataSet.Single(item => item.Caption == disk.Caption);
+                        var item = db.ConfigDataSet.Single(item => item.DeviceID == disk.DeviceID);
                         item.DefaultValue = APMValueReply.APMValue;
                         //db.ConfigDataSet.Update(item);
                     }
@@ -42,7 +42,7 @@ namespace APMOkSvc.Services
                     {
                         var item = new ConfigData
                         {
-                            Caption = disk.Caption,
+                            DeviceID = disk.DeviceID,
                             DefaultValue = APMValueReply.APMValue
                         };
                         db.ConfigDataSet.Add(item);

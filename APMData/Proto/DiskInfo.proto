@@ -41,7 +41,7 @@ message SystemDiskInfoReply {
 }
 
 message GetAPMRequest {
-	string DiskName = 1;
+	string DeviceID = 1;
 }
 
 message GetAPMReply {
@@ -51,7 +51,7 @@ message GetAPMReply {
 }
 
 message SetAPMRequest {
-	string DiskName = 1;
+	string DeviceID = 1;
 	uint32 APMValue = 2;
 }
 
@@ -87,7 +87,7 @@ message PowerStateReply {
 }
 
 message DriveAPMConfigurationReplyEntry {
-	string Caption = 1;
+	string DeviceID = 1;
 	uint32 DefaultValue = 2;
 	uint32 CurrentValue = 3;
 }

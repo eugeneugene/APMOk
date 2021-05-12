@@ -15,9 +15,11 @@ namespace APMOkSvc.Data
         public Guid Id { get; set; }
 
         [Required]
-        public string Caption { get; set; }
+        public string DeviceID { get; set; }
+
         [Required]
         public uint DefaultValue { get; set; }
+
         [Required]
         public uint CurrentValue { get; set; }
 
