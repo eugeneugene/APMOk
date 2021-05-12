@@ -1,6 +1,6 @@
 ﻿using APMData;
 using APMData.Proto;
-using APMOkLib;
+using APMOk.Code;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -47,14 +47,13 @@ namespace APMOk
             }
         }
 
-        private readonly ObservableDictionary<string, ushort> _APMValueDictionary = new();
-        public ObservableDictionary<string, ushort> APMValueDictionary
+        private readonly ObservableDictionary<string, APMValueProperty> _APMValueDictionary = new();
+        public ObservableDictionary<string, APMValueProperty> APMValueDictionary
         {
             get => _APMValueDictionary;
         }
 
         private bool _connectFailure;
-        private bool disposedValue;
 
         public bool ConnectFailure
         {
@@ -78,6 +77,7 @@ namespace APMOk
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        private bool disposedValue;
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)

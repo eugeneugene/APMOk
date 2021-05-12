@@ -1,5 +1,5 @@
-﻿using APMData.Proto;
-using APMOkLib;
+﻿using APMData;
+using APMData.Proto;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,17 +17,19 @@ namespace APMOk
     internal partial class DeviceStatusWindow : Window, IDisposable
     {
         private readonly APMOkData _apmOkData;
+        private readonly Services.ConfigurationService _configurationService;
         private bool disposedValue;
 
         public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
 
         public ObservableCollection<KeyValuePair<string, object>> DiskInfoItems { get; } = new();
 
-        public DeviceStatusWindow(APMOkData apmOkData)
+        public DeviceStatusWindow(APMOkData apmOkData, Services.ConfigurationService configurationService)
         {
             InitializeComponent();
 
             _apmOkData = apmOkData;
+            _configurationService = configurationService;
 
             // DeviceStatusDataSource
             CollectionViewSource deviceStatusDataSource = FindResource("DeviceStatusDataSource") as CollectionViewSource;
@@ -86,7 +88,7 @@ namespace APMOk
         {
             e.Handled = true;
 
-            Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(async () =>
             {
                 DiskInfoItems.Clear();
                 if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry Item)
@@ -99,6 +101,12 @@ namespace APMOk
                     DiskInfoItems.Add(new(nameof(Item.Manufacturer), Item.Manufacturer));
                     DiskInfoItems.Add(new(nameof(Item.Model), Item.Model));
                     DiskInfoItems.Add(new(nameof(Item.SerialNumber), Item.SerialNumber));
+                }
+
+                var configReply = await _configurationService.GetDriveAPMConfiguration();
+                if (configReply!= null && configReply.ReplyResult!=0)
+                {
+                    _apmOkData.APMValueProperty = new(configReply.DriveAPMConfigurationReplyEntries.)
                 }
             });
         }

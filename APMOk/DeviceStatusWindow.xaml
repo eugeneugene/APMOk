@@ -191,7 +191,7 @@
                     Margin="5"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Text="0" />
+                    Text="{Binding APMValueProperty.DefaultValue}" />
                 <TextBox
                     Width="50"
                     Height="22"
@@ -207,7 +207,7 @@
                     Margin="5"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Text="0" />
+                    Text="{Binding APMValueProperty.CurrentValue}" />
             </StackPanel>
         </GroupBox>
     </Grid>

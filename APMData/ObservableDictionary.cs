@@ -3,8 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-
-namespace APMOkLib
+namespace APMData
 {
     public class ObservableDictionary<T1, T2> : IDictionary<T1, T2>, INotifyPropertyChanged
     {
