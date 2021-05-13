@@ -15,7 +15,6 @@
     mc:Ignorable="d">
     <Window.Resources>
         <CollectionViewSource x:Key="DeviceStatusDataSource" CollectionViewType="ListCollectionView" />
-        <CollectionViewSource x:Key="DiskInfoItemsSource" CollectionViewType="ListCollectionView" />
         <CollectionViewSource x:Key="PowerStateItemsSource" CollectionViewType="ListCollectionView" />
         <localcode:APMValueProperty
             x:Key="APMValue"
@@ -121,7 +120,6 @@
                 CanUserResizeColumns="False"
                 CanUserResizeRows="False"
                 CanUserSortColumns="False"
-                DataContext="{StaticResource DiskInfoItemsSource}"
                 ItemsSource="{Binding}"
                 ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                 Style="{StaticResource DataGridEnabler}">

@@ -24,7 +24,7 @@ namespace APMOk
 
         public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
 
-        public ObservableCollection<KeyValuePair<string, object>> DiskInfoItems { get; } = new();
+        public ObservableDictionary<string, object> DiskInfoItems { get; } = new();
 
         public ObservableCollection<KeyValuePair<string, object>> PowerStateItems { get; } = new();
 
@@ -41,9 +41,7 @@ namespace APMOk
             CollectionViewSource deviceStatusDataSource = FindResource("DeviceStatusDataSource") as CollectionViewSource;
             deviceStatusDataSource.Source = DiskInfo;
 
-            // DiskInfoItemsSource
-            CollectionViewSource diskInfoItemsSource = FindResource("DiskInfoItemsSource") as CollectionViewSource;
-            diskInfoItemsSource.Source = DiskInfoItems;
+            DriveStatusGrid.DataContext = DiskInfoItems;
 
             // PowerStateItemsSource
             CollectionViewSource PowerStateItemsSource = FindResource("PowerStateItemsSource") as CollectionViewSource;
@@ -133,17 +131,16 @@ namespace APMOk
 
             Dispatcher.InvokeAsync(async () =>
             {
-                DiskInfoItems.Clear();
                 if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry Item)
                 {
                     var availability = Availability.FromValue((ushort)Item.Availability).Name;
-                    DiskInfoItems.Add(new(nameof(Item.Availability), availability));
-                    DiskInfoItems.Add(new(nameof(Item.Caption), Item.Caption));
-                    DiskInfoItems.Add(new(nameof(Item.Description), Item.Description));
-                    DiskInfoItems.Add(new(nameof(Item.DeviceID), Item.DeviceID));
-                    DiskInfoItems.Add(new(nameof(Item.Manufacturer), Item.Manufacturer));
-                    DiskInfoItems.Add(new(nameof(Item.Model), Item.Model));
-                    DiskInfoItems.Add(new(nameof(Item.SerialNumber), Item.SerialNumber));
+                    DiskInfoItems[nameof(Item.Availability)] = availability;
+                    DiskInfoItems[nameof(Item.Caption)] = Item.Caption;
+                    DiskInfoItems[nameof(Item.Description)] = Item.Description;
+                    DiskInfoItems[nameof(Item.DeviceID)] = Item.DeviceID;
+                    DiskInfoItems[nameof(Item.Manufacturer)] = Item.Manufacturer;
+                    DiskInfoItems[nameof(Item.Model)] = Item.Model;
+                    DiskInfoItems[nameof(Item.SerialNumber)] = Item.SerialNumber;
                 }
 
                 try

@@ -24,7 +24,6 @@ namespace APMOk.Tasks
                 var reply = await diskInfoService.GetPowerStateAsync();
                 _apmOkData.PowerState = reply ?? throw new Exception("Service is offline");
                 _apmOkData.ConnectFailure = false;
-                Debug.WriteLine(_apmOkData.PowerState);
             }
             catch (Exception ex)
             {

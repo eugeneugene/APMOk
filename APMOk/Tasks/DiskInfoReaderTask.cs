@@ -24,7 +24,6 @@ namespace APMOk.Tasks
                 var reply = await diskInfoService.EnumerateDisksAsync();
                 _apmOkData.SystemDiskInfo = reply ?? throw new Exception("Service is offline");
                 _apmOkData.ConnectFailure = false;
-                Debug.WriteLine(_apmOkData.SystemDiskInfo);
             }
             catch (Exception ex)
             {

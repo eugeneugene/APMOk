@@ -8,6 +8,7 @@ using RecurrentTasks;
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Markup;
 
@@ -77,6 +78,13 @@ namespace APMOk
             notifyIcon.Dispose();
 
             base.OnExit(e);
+        }
+
+        private void AppDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            Debug.WriteLine("Unhandled exception: {0}", e.Exception);
+            if (e.Exception is COMException comException && comException.ErrorCode == -2147221040)
+                e.Handled = true;
         }
     }
 }

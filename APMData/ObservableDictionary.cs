@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 
 namespace APMData
 {
-    public class ObservableDictionary<T1, T2> : IDictionary<T1, T2>, INotifyPropertyChanged
+    public class ObservableDictionary<T1, T2> : IDictionary<T1, T2>, INotifyPropertyChanged, INotifyCollectionChanged
     {
         /// <summary>
         /// Constructor initializes internal data
@@ -29,7 +32,11 @@ namespace APMData
                 throw new ArgumentNullException(key == null ? "key" : "val");
 
             _nameValues.Add(key, val);
-            FireDictionaryChanged();
+            var index = _nameValues.Keys.ToList().IndexOf(key);
+
+            OnCountPropertyChanged();
+            OnIndexerPropertyChanged();
+            OnCollectionChanged(NotifyCollectionChangedAction.Add, val, index);
         }
 
         /// <summary>
@@ -43,8 +50,9 @@ namespace APMData
             {
                 _nameValues.Clear();
 
-                // Only fire changed event if the dictionary actually changed
-                FireDictionaryChanged();
+                OnCountPropertyChanged();
+                OnIndexerPropertyChanged();
+                OnCollectionReset();
             }
         }
 
@@ -65,13 +73,16 @@ namespace APMData
         /// <returns>true - the key was found in the ContentLocatorPart, false o- it wasn't</returns>
         public bool Remove(T1 key)
         {
-            bool exists = _nameValues.Remove(key);
+            if (_nameValues.TryGetValue(key, out var value))
+            {
+                var index = _nameValues.Keys.ToList().IndexOf(key);
+                OnCountPropertyChanged();
+                OnIndexerPropertyChanged();
+                OnCollectionChanged(NotifyCollectionChangedAction.Remove, value, index);
 
-            // Only fire changed event if the key was actually removed
-            if (exists)
-                FireDictionaryChanged();
-
-            return exists;
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -84,7 +95,7 @@ namespace APMData
         }
 
         /// <summary>
-        ///     Returns an enumerator forthe key/value pairs in this ContentLocatorPart.
+        ///     Returns an enumerator for the key/value pairs in this ContentLocatorPart.
         /// </summary>
         /// <returns>an enumerator for the key/value pairs; never returns null</returns>
         public IEnumerator<KeyValuePair<T1, T2>> GetEnumerator()
@@ -163,10 +174,16 @@ namespace APMData
 
                 // If the new value is actually different, then we add it and fire
                 // a change notification
-                if ((oldValue == null) || (!oldValue.Equals(value)))
+                if (oldValue == null || !oldValue.Equals(value))
                 {
                     _nameValues[key] = value;
-                    FireDictionaryChanged();
+                    var index = _nameValues.Keys.ToList().IndexOf(key);
+
+                    OnIndexerPropertyChanged();
+                    if (oldValue == null)
+                        OnCollectionChanged(NotifyCollectionChangedAction.Add, value, index);
+                    else
+                        OnCollectionChanged(NotifyCollectionChangedAction.Replace, oldValue, value, index);
                 }
             }
         }
@@ -194,19 +211,109 @@ namespace APMData
             get => _nameValues.Values;
         }
 
+        /// <summary>
+        /// PropertyChanged event (per <see cref="INotifyPropertyChanged" />).
+        /// </summary>
+        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+        {
+            add => PropertyChanged += value;
+            remove => PropertyChanged -= value;
+        }
+
+        /// <summary>
+        /// Occurs when the collection changes, either by adding or removing an item.
+        /// </summary>
+        /// <remarks>
+        /// see <seealso cref="INotifyCollectionChanged"/>
+        /// </remarks>
+        [field: NonSerialized]
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        /// <summary>
+        /// Raises a PropertyChanged event (per <see cref="INotifyPropertyChanged" />).
+        /// </summary>
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
+
+        /// <summary>
+        /// PropertyChanged event (per <see cref="INotifyPropertyChanged" />).
+        /// </summary>
+        [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         ///     Notify the owner this ContentLocatorPart has changed.
         /// </summary>
-        private void FireDictionaryChanged()
+        //private void FireDictionaryChanged()
+        //{
+        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+        //}
+
+        /// <summary>
+        /// Raise CollectionChanged event to any listeners.
+        /// Properties/methods modifying this ObservableCollection will raise
+        /// a collection changed event through this virtual method.
+        /// </summary>
+        /// <remarks>
+        /// When overriding this method, either call its base implementation
+        /// or call <see cref="BlockReentrancy"/> to guard against reentrant collection changes.
+        /// </remarks>
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+            CollectionChanged?.Invoke(this, e);
         }
+
+        /// <summary>
+        /// Helper to raise a PropertyChanged event for the Count property
+        /// </summary>
+        private void OnCountPropertyChanged() => OnPropertyChanged(EventArgsCache.CountPropertyChanged);
+
+        /// <summary>
+        /// Helper to raise a PropertyChanged event for the Indexer property
+        /// </summary>
+        private void OnIndexerPropertyChanged() => OnPropertyChanged(EventArgsCache.IndexerPropertyChanged);
+
+        /// <summary>
+        /// Helper to raise CollectionChanged event to any listeners
+        /// </summary>
+        private void OnCollectionChanged(NotifyCollectionChangedAction action, object item, int index)
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, item, index));
+        }
+
+        /// <summary>
+        /// Helper to raise CollectionChanged event to any listeners
+        /// </summary>
+        //private void OnCollectionChanged(NotifyCollectionChangedAction action, object item, int index, int oldIndex)
+        //{
+        //    OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, item, index, oldIndex));
+        //}
+
+        /// <summary>
+        /// Helper to raise CollectionChanged event to any listeners
+        /// </summary>
+        private void OnCollectionChanged(NotifyCollectionChangedAction action, object oldItem, object newItem, int index)
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItem, oldItem, index));
+        }
+
+        /// <summary>
+        /// Helper to raise CollectionChanged event with action == Reset to any listeners
+        /// </summary>
+        private void OnCollectionReset() => OnCollectionChanged(EventArgsCache.ResetCollectionChanged);
 
         /// <summary>
         ///     The internal data structure.
         /// </summary>
         private readonly Dictionary<T1, T2> _nameValues;
+
+        internal static class EventArgsCache
+        {
+            internal static readonly PropertyChangedEventArgs CountPropertyChanged = new("Count");
+            internal static readonly PropertyChangedEventArgs IndexerPropertyChanged = new("Item[]");
+            internal static readonly NotifyCollectionChangedEventArgs ResetCollectionChanged = new(NotifyCollectionChangedAction.Reset);
+        }
     }
 }

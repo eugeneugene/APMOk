@@ -6,6 +6,7 @@
 		<UseWPF>true</UseWPF>
 		<Platforms>x64</Platforms>
 		<StartupObject>APMOk.App</StartupObject>
+		<NeutralLanguage>en</NeutralLanguage>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
