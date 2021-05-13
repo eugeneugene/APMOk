@@ -37,6 +37,7 @@ namespace APMOk
                 {
                     services.AddSingleton(notifyIcon);
                     services.AddSingleton<APMOkData>();
+                    services.AddSingleton<NotifyIconViewModel>();
                     services.AddTransient<DiskInfoService>();
                     services.AddTransient<PowerStateService>();
                     services.AddTransient<ConfigurationService>();
@@ -48,8 +49,6 @@ namespace APMOk
                     services.AddTask<DiskInfoReaderTask>(task => task.AutoStart(tasksStartupConfiguration.DiskStatusReader.Value));
                 });
                 host = hostBuilder.Build();
-                notifyIcon.DataContext = new NotifyIconViewModel(host.Services);
-
                 await host.StartAsync();
 
                 var _batteryStatusReaderTask = host.Services.GetRequiredService<ITask<BatteryStatusReaderTask>>();
@@ -57,6 +56,9 @@ namespace APMOk
 
                 var _diskInfoReaderTask = host.Services.GetRequiredService<ITask<DiskInfoReaderTask>>();
                 _diskInfoReaderTask.TryRunImmediately();
+
+                var _notifyIconViewModel = host.Services.GetRequiredService<NotifyIconViewModel>();
+                notifyIcon.DataContext = _notifyIconViewModel;
 
                 base.OnStartup(e);
             }

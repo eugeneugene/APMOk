@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "hw.h"
 
+HRESULT hrInit = HRESULT_CODE(-1);
+HRESULT hrInitSec = HRESULT_CODE(-1);
+
 /// <summary>
 /// Вернуть массив из 16 элементов типа EnumDiskInfo в аргументе diskInfo
 /// Вызывающая сторона резервирует память под diskInfo
@@ -19,29 +22,34 @@
 /// </returns>
 extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 {
-	HRESULT hrInit = CoInitializeEx(0, COINIT_MULTITHREADED);
+	if (FAILED(hrInit))
+		hrInit = CoInitializeEx(0, COINIT_MULTITHREADED);
 	if (FAILED(hrInit))
 	{
 		WriteLog(L"Failed to initialize COM. Error code = %x\r\n", hrInit);
 		return 6;
 	}
 
-	HRESULT	hrInitSec = CoInitializeSecurity(
-		NULL,
-		-1,                          // COM authentication
-		NULL,                        // Authentication services
-		NULL,                        // Reserved
-		RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
-		RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
-		NULL,                        // Authentication info
-		EOAC_NONE,                   // Additional capabilities 
-		NULL                         // Reserved
-	);
 	if (FAILED(hrInitSec))
 	{
-		WriteLog(L"Failed to set COM Security. Error code = %x\r\n", hrInitSec);
-		CoUninitialize();
-		return 5;
+		HRESULT	hrInitSec = CoInitializeSecurity(
+			NULL,
+			-1,                          // COM authentication
+			NULL,                        // Authentication services
+			NULL,                        // Reserved
+			RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
+			RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
+			NULL,                        // Authentication info
+			EOAC_NONE,                   // Additional capabilities 
+			NULL                         // Reserved
+		);
+		if (FAILED(hrInitSec))
+		{
+			WriteLog(L"Failed to set COM Security. Error code = %x\r\n", hrInitSec);
+			CoUninitialize();
+			hrInit = HRESULT_CODE(-1);
+			return 5;
+		}
 	}
 
 	HRESULT hr;
@@ -51,6 +59,7 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 	{
 		WriteLog(L"Failed to create IWbemLocator object. Error code = %x\r\n", hr);
 		CoUninitialize();
+		hrInit = HRESULT_CODE(-1);
 		return 4;
 	}
 
@@ -79,6 +88,7 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 	{
 		WriteLog(L"Failed to set proxy blanket. Error code = %x\r\n", hr);
 		CoUninitialize();
+		hrInit = HRESULT_CODE(-1);
 		return 2;
 	}
 
@@ -88,6 +98,7 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 	{
 		WriteLog(L"Failed to get Disk Drive information. Error code = %x\r\n", hr);
 		CoUninitialize();
+		hrInit = HRESULT_CODE(-1);
 		return 1;
 	}
 
@@ -149,6 +160,7 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 	}
 
 	CoUninitialize();
+	hrInit = HRESULT_CODE(-1);
 	return 0;
 }
 

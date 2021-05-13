@@ -8,6 +8,8 @@
 #include <stdarg.h>
 #include <tchar.h>
 #include <atlbase.h>
+#include <sys/timeb.h>
+#include <time.h>
 
 #include <Wbemidl.h>
 #include <winioctl.h>
