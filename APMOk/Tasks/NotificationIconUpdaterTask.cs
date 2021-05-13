@@ -27,7 +27,7 @@ namespace APMOk.Tasks
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            UpdateIcon();
+            //UpdateIcon();
             _data.PropertyChanged += APMOkDataPropertyChanged;
             return Task.CompletedTask;
         }

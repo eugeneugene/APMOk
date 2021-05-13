@@ -1,9 +1,11 @@
 ﻿using APMData;
 using APMData.Proto;
+using APMOk.Code;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,6 +26,10 @@ namespace APMOk
 
         public ObservableCollection<KeyValuePair<string, object>> DiskInfoItems { get; } = new();
 
+        public ObservableCollection<KeyValuePair<string, object>> PowerStateItems { get; } = new();
+
+        public APMValueProperty APMValue { get; }
+
         public DeviceStatusWindow(APMOkData apmOkData, Services.ConfigurationService configurationService)
         {
             InitializeComponent();
@@ -39,12 +45,19 @@ namespace APMOk
             CollectionViewSource diskInfoItemsSource = FindResource("DiskInfoItemsSource") as CollectionViewSource;
             diskInfoItemsSource.Source = DiskInfoItems;
 
+            // PowerStateItemsSource
+            CollectionViewSource PowerStateItemsSource = FindResource("PowerStateItemsSource") as CollectionViewSource;
+            PowerStateItemsSource.Source = PowerStateItems;
+
             DataContext = _apmOkData;
+
+            APMValue = FindResource("APMValue") as APMValueProperty;
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             LoadDisksInfo();
+            LoadPowerState();
             _apmOkData.PropertyChanged += APMOkDataPropertyChanged;
         }
 
@@ -56,11 +69,41 @@ namespace APMOk
                     LoadDisksInfo();
                     break;
                 case "PowerState":
+                    LoadPowerState();
                     break;
                 case "ConnectFailure":
                     break;
+                case "APMValueDictionary":
+                    SetAPMValue();
+                    break;
                 default:
                     throw new NotImplementedException();
+            }
+        }
+
+        private void LoadPowerState()
+        {
+            if (_apmOkData.PowerState.ReplyResult != 0)
+            {
+                PowerStateItems.Clear();
+                PowerStateItems.Add(new(nameof(_apmOkData.PowerState.ACLineStatus), _apmOkData.PowerState.BatteryFlag));
+                PowerStateItems.Add(new(nameof(_apmOkData.PowerState.BatteryFlag), _apmOkData.PowerState.ACLineStatus));
+                PowerStateItems.Add(new(nameof(_apmOkData.PowerState.BatteryFullLifeTime), _apmOkData.PowerState.BatteryFullLifeTime));
+                PowerStateItems.Add(new(nameof(_apmOkData.PowerState.BatteryLifePercent), _apmOkData.PowerState.BatteryLifePercent));
+                PowerStateItems.Add(new(nameof(_apmOkData.PowerState.BatteryLifeTime), _apmOkData.PowerState.BatteryLifeTime));
+            }
+        }
+
+        private void SetAPMValue()
+        {
+            if (SelectDiskCombo.SelectedItem is DiskInfoEntry selectedItem)
+            {
+                if (_apmOkData.APMValueDictionary.Any(item => item.Key == selectedItem.DeviceID))
+                {
+                    var device = _apmOkData.APMValueDictionary.Single(item => item.Key == selectedItem.DeviceID);
+                    APMValue.CurrentValue = device.Value.CurrentValue;
+                    APMValue.DefaultValue = device.Value.DefaultValue;
+                }
             }
         }
 
@@ -88,7 +131,7 @@ namespace APMOk
         {
             e.Handled = true;
 
-            Dispatcher.Invoke(async () =>
+            Dispatcher.InvokeAsync(async () =>
             {
                 DiskInfoItems.Clear();
                 if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry Item)
@@ -103,10 +146,18 @@ namespace APMOk
                     DiskInfoItems.Add(new(nameof(Item.SerialNumber), Item.SerialNumber));
                 }
 
-                var configReply = await _configurationService.GetDriveAPMConfiguration();
-                if (configReply!= null && configReply.ReplyResult!=0)
+                try
                 {
-                    _apmOkData.APMValueProperty = new(configReply.DriveAPMConfigurationReplyEntries.)
+                    var APMConfigurationReply = await _configurationService.GetDriveAPMConfigurationAsync();
+                    if (APMConfigurationReply != null && APMConfigurationReply.ReplyResult != 0)
+                    {
+                        foreach (var entry in APMConfigurationReply.DriveAPMConfigurationReplyEntries)
+                            _apmOkData.APMValueDictionary[entry.DeviceID] = new APMValueProperty(entry.DefaultValue, entry.CurrentValue);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
                 }
             });
         }

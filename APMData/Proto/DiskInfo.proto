@@ -4,7 +4,6 @@ option csharp_namespace = "APMData.Proto";
 
 package APMData;
 
-import "google/protobuf/timestamp.proto";
 import "google/protobuf/Empty.proto";
 
 service DiskInfoService {
@@ -36,8 +35,7 @@ message DiskInfoEntry {
 
 message SystemDiskInfoReply {
 	int32 ReplyResult = 1;
-	google.protobuf.Timestamp ReplyTimeStamp = 2;
-	repeated DiskInfoEntry DiskInfoEntries = 3;
+	repeated DiskInfoEntry DiskInfoEntries = 2;
 }
 
 message GetAPMRequest {
@@ -46,8 +44,7 @@ message GetAPMRequest {
 
 message GetAPMReply {
 	int32 ReplyResult = 1;
-	google.protobuf.Timestamp ReplyTimeStamp = 2;
-	uint32 APMValue = 3;
+	uint32 APMValue = 2;
 }
 
 message SetAPMRequest {
@@ -57,7 +54,6 @@ message SetAPMRequest {
 
 message SetAPMReply {
 	int32 ReplyResult = 1;
-	google.protobuf.Timestamp ReplyTimeStamp = 2;
 }
 
 enum EACLineStatus {
@@ -78,12 +74,11 @@ enum EBatteryFlag {
 
 message PowerStateReply {
 	int32 ReplyResult = 1;
-	google.protobuf.Timestamp ReplyTimeStamp = 2;
-	EACLineStatus ACLineStatus = 3;
-	EBatteryFlag BatteryFlag = 4;
-	int32 BatteryLifePercent = 5;
-	int32 BatteryLifeTime = 6;
-	int32 BatteryFullLifeTime = 7;
+	EACLineStatus ACLineStatus = 2;
+	EBatteryFlag BatteryFlag = 3;
+	int32 BatteryLifePercent = 4;
+	int32 BatteryLifeTime = 5;
+	int32 BatteryFullLifeTime = 6;
 }
 
 message DriveAPMConfigurationReplyEntry {
@@ -94,6 +89,5 @@ message DriveAPMConfigurationReplyEntry {
 
 message DriveAPMConfigurationReply {
 	int32 ReplyResult = 1;
-	google.protobuf.Timestamp ReplyTimeStamp = 2;
-	repeated DriveAPMConfigurationReplyEntry DriveAPMConfigurationReplyEntries = 3;
+	repeated DriveAPMConfigurationReplyEntry DriveAPMConfigurationReplyEntries = 2;
 }

@@ -21,7 +21,6 @@ namespace APMOkSvc.Services
             var reply = new PowerStateReply()
             {
                 ReplyResult = 0,
-                ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow),
             };
             try
             {

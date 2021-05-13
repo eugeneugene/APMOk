@@ -25,7 +25,7 @@ namespace APMOk
             get => _systemDiskInfo;
             set
             {
-                if (_systemDiskInfo != value)
+                if (_systemDiskInfo == null || !_systemDiskInfo.Equals(value))
                 {
                     _systemDiskInfo = value;
                     NotifyPropertyChanged(nameof(SystemDiskInfo));
@@ -39,7 +39,7 @@ namespace APMOk
             get => _powerState;
             set
             {
-                if (_powerState != value)
+                if (_powerState == null || !_powerState.Equals(value))
                 {
                     _powerState = value;
                     NotifyPropertyChanged(nameof(PowerState));
@@ -47,14 +47,7 @@ namespace APMOk
             }
         }
 
-        private readonly ObservableDictionary<string, APMValueProperty> _APMValueDictionary = new();
-        public ObservableDictionary<string, APMValueProperty> APMValueDictionary
-        {
-            get => _APMValueDictionary;
-        }
-
         private bool _connectFailure;
-
         public bool ConnectFailure
         {
             get => _connectFailure;
@@ -66,6 +59,12 @@ namespace APMOk
                     NotifyPropertyChanged(nameof(ConnectFailure));
                 }
             }
+        }
+
+        private readonly ObservableDictionary<string, APMValueProperty> _APMValueDictionary = new();
+        public ObservableDictionary<string, APMValueProperty> APMValueDictionary
+        {
+            get => _APMValueDictionary;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

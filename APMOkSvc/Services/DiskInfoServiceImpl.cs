@@ -23,7 +23,6 @@ namespace APMOkSvc.Services
         {
             var reply = new SystemDiskInfoReply
             {
-                ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow),
                 ReplyResult = 0
             };
 
@@ -37,12 +36,6 @@ namespace APMOkSvc.Services
                         _logger.LogError("Hardware error: {0}", EnumerateDisksErrors.Errors[res]);
                     else
                         _logger.LogError("Hardware error: {0}", res);
-
-                    if (HW.LastWin32Error != 0)
-                    {
-                        var ex = new Win32Exception(HW.LastWin32Error);
-                        _logger.LogError(ex.Message);
-                    }
                 }
                 else
                 {
@@ -81,7 +74,7 @@ namespace APMOkSvc.Services
         public GetAPMReply GetAPM(GetAPMRequest request)
         {
             _logger.LogTrace("Request: {0}", request);
-            var reply = new GetAPMReply { APMValue = 0, ReplyResult = 0, ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow) };
+            var reply = new GetAPMReply { APMValue = 0, ReplyResult = 0, };
             try
             {
                 if (HW.GetAPM(request.DeviceID, out uint apmValue))
@@ -95,11 +88,6 @@ namespace APMOkSvc.Services
             catch (Exception ex)
             {
                 _logger.LogError("Exception: {0}", ex);
-                if (HW.LastWin32Error != 0)
-                {
-                    ex = new Win32Exception(HW.LastWin32Error);
-                    _logger.LogError(ex.Message);
-                }
             }
             _logger.LogTrace("Reply: {0}", reply);
             return reply;
@@ -108,7 +96,7 @@ namespace APMOkSvc.Services
         public SetAPMReply SetAPM(SetAPMRequest request)
         {
             _logger.LogTrace("Request: {0}", request);
-            var reply = new SetAPMReply { ReplyResult = 0, ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow) };
+            var reply = new SetAPMReply { ReplyResult = 0, };
             try
             {
                 byte val = request.APMValue > 254 ? (byte)0 : (byte)request.APMValue;
@@ -128,11 +116,6 @@ namespace APMOkSvc.Services
             catch (Exception ex)
             {
                 _logger.LogError("Exception: {0}", ex);
-                if (HW.LastWin32Error != 0)
-                {
-                    ex = new Win32Exception(HW.LastWin32Error);
-                    _logger.LogError(ex.Message);
-                }
             }
             _logger.LogTrace("Reply: {0}", reply);
             return reply;

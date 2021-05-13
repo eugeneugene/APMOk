@@ -20,7 +20,7 @@ namespace APMOk.Tasks
         {
             try
             {
-                using var diskInfoService = scopeServiceProvider.GetRequiredService<Services.PowerStateService>();
+                var diskInfoService = scopeServiceProvider.GetRequiredService<Services.PowerStateService>();
                 var reply = await diskInfoService.GetPowerStateAsync();
                 _apmOkData.PowerState = reply ?? throw new Exception("Service is offline");
                 _apmOkData.ConnectFailure = false;

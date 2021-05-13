@@ -24,7 +24,7 @@ namespace APMOkSvc.Services
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             var reply = _diskInfoServiceImpl.EnumerateDisks();
-            if (reply.ReplyResult == 0)
+            if (reply.ReplyResult != 0)
             {
                 using var serviceScope = _serviceScopeFactory.CreateScope();
                 var db = serviceScope.ServiceProvider.GetService<DataContext>();

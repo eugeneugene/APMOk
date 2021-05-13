@@ -41,7 +41,7 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<DriveAPMConfigurationReply> GetDriveAPMConfiguration()
+        public async Task<DriveAPMConfigurationReply> GetDriveAPMConfigurationAsync()
         {
             var client = new APMData.Proto.ConfigurationService.ConfigurationServiceClient(_channel);
             var reply = await client.GetDriveAPMConfigurationAsync(new Empty());

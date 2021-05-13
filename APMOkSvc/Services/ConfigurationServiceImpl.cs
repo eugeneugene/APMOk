@@ -23,7 +23,6 @@ namespace APMOkSvc.Services
         {
             var reply = new DriveAPMConfigurationReply
             {
-                ReplyTimeStamp = Timestamp.FromDateTime(DateTime.UtcNow),
                 ReplyResult = 0
             };
             try

@@ -7,8 +7,6 @@ namespace APMOkSvc.Types
 {
     public static class HW
     {
-        public static int LastWin32Error { get; private set; } = 0;
-
         [DllImport("hw.dll", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "EnumerateDisks")]
         private static extern int EnumerateDisksPriv([In, Out] IntPtr diskInfo);
 
@@ -31,13 +29,9 @@ namespace APMOkSvc.Types
                     for (int i = 0; i < 16; i++)
                         result[i] = (HWDiskInfo)Marshal.PtrToStructure(new IntPtr(ptr.ToInt64() + (i * EnumDiskInfoSize)), typeof(HWDiskInfo));
                     diskInfo = result;
-                    LastWin32Error = 0;
                 }
                 else
-                {
                     diskInfo = null;
-                    LastWin32Error = Marshal.GetLastWin32Error();
-                }
                 return res;
             }
             finally
@@ -56,8 +50,10 @@ namespace APMOkSvc.Types
         public static bool GetAPM(string dskName, out uint apm)
         {
             var result = GetAPMPriv(dskName);
-            if (result == ushort.MaxValue || result == ushort.MaxValue - 1)
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+            if (result == ushort.MaxValue)
+                throw new Win32Exception("Invalid handle");
+            if (result == ushort.MaxValue - 1)
+                throw new Win32Exception("Invalid HDD Id");
             if (result == ushort.MaxValue - 2)
             {
                 apm = 0;
@@ -78,14 +74,7 @@ namespace APMOkSvc.Types
         {
             var result = SetAPMPriv(dskName, val, disable);
             if (result == -1)
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-            if (result == 0)
-            {
-                var win32error = Marshal.GetLastWin32Error();
-                if (win32error != 0)
-                    throw new Win32Exception(win32error);
-                return false;
-            }
+                throw new Win32Exception("Invalid handle");
             return true;
         }
     }

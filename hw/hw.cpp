@@ -1,14 +1,11 @@
 #include "pch.h"
 #include "hw.h"
 
-HRESULT hrInit = HRESULT_CODE(-1);
-HRESULT hrInitSec = HRESULT_CODE(-1);
-
 /// <summary>
 /// Вернуть массив из 16 элементов типа EnumDiskInfo в аргументе diskInfo
 /// Вызывающая сторона резервирует память под diskInfo
-/// Возврат:     0 - Успех
-///	         Иначе - Ошибка
+/// Возврат:	0 - Успех
+///				Иначе - Ошибка
 /// </summary>
 /// <param name="diskInfo">Массив из 16 элементов типа EnumDiskInfo</param>
 /// <returns>
@@ -22,162 +19,137 @@ HRESULT hrInitSec = HRESULT_CODE(-1);
 /// </returns>
 extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 {
-	int retVal = 0;
-
-	if (FAILED(hrInit))
-		hrInit = CoInitializeEx(0, COINIT_MULTITHREADED);
-
+	HRESULT hrInit = CoInitializeEx(0, COINIT_MULTITHREADED);
 	if (FAILED(hrInit))
 	{
 		WriteLog(L"Failed to initialize COM. Error code = %x\r\n", hrInit);
 		return 6;
 	}
 
+	HRESULT	hrInitSec = CoInitializeSecurity(
+		NULL,
+		-1,                          // COM authentication
+		NULL,                        // Authentication services
+		NULL,                        // Reserved
+		RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
+		RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
+		NULL,                        // Authentication info
+		EOAC_NONE,                   // Additional capabilities 
+		NULL                         // Reserved
+	);
 	if (FAILED(hrInitSec))
-	{
-		hrInitSec = CoInitializeSecurity(
-			NULL,
-			-1,                          // COM authentication
-			NULL,                        // Authentication services
-			NULL,                        // Reserved
-			RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
-			RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
-			NULL,                        // Authentication info
-			EOAC_NONE,                   // Additional capabilities 
-			NULL                         // Reserved
-		);
-	}
-
-	if (SUCCEEDED(hrInitSec))
-	{
-		HRESULT hr;
-		CComPtr<IWbemLocator> pLoc;
-		hr = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID*)&pLoc);
-		if (SUCCEEDED(hr))
-		{
-			CComPtr<IWbemServices> pSvc;
-			hr = pLoc->ConnectServer(CComBSTR(L"ROOT\\CIMV2"), nullptr, nullptr, nullptr, 0, nullptr, nullptr, &pSvc);
-			if (SUCCEEDED(hr))
-			{
-				CComPtr<IEnumWbemClassObject> pEnumerator;
-				hr = CoSetProxyBlanket(
-					pSvc,                        // Indicates the proxy to set
-					RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
-					RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
-					NULL,                        // Server principal name 
-					RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx 
-					RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
-					NULL,                        // client identity
-					EOAC_NONE                    // proxy capabilities 
-				);
-				if (SUCCEEDED(hr))
-				{
-					hr = pSvc->ExecQuery(CComBSTR(L"WQL"), CComBSTR(L"SELECT * FROM Win32_DiskDrive"),
-						WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
-					if (SUCCEEDED(hr))
-					{
-						for (UINT16 index = 0U; index < 16U; index++)
-						{
-							EnumDiskInfo* info = &diskInfo[index];
-							*info = { 0 };
-							if (pEnumerator)
-							{
-								CComPtr<IWbemClassObject> pclsObj;
-								CComVariant var;
-								ULONG uReturn;
-								CIMTYPE cType;
-
-								hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
-
-								if (uReturn)
-								{
-									info->InfoValid = TRUE;
-									WriteLog(L"InfoValid: %i\r\n", TRUE);
-
-									hr = pclsObj->Get(L"Index", 0, &var, &cType, 0);
-									info->Index = var.uintVal;
-									WriteLog(L"Index: %u\r\n", info->Index);
-
-									hr = pclsObj->Get(L"Availability", 0, &var, &cType, 0);
-									info->Availability = var.uiVal;
-									WriteLog(L"Availability: %hu\r\n", info->Availability);
-
-									hr = pclsObj->Get(L"Caption", 0, &var, &cType, 0);
-									wcscpy_s(info->Caption, var.bstrVal);
-									WriteLog(L"Caption: %s\r\n", info->Caption);
-
-									hr = pclsObj->Get(L"Description", 0, &var, &cType, 0);
-									wcscpy_s(info->Description, var.bstrVal);
-									WriteLog(L"Description: %s\r\n", info->Description);
-
-									hr = pclsObj->Get(L"DeviceID", 0, &var, &cType, 0);
-									wcscpy_s(info->DeviceID, var.bstrVal);
-									WriteLog(L"DeviceID: %s\r\n", info->DeviceID);
-
-									hr = pclsObj->Get(L"InterfaceType", 0, &var, &cType, 0);
-									wcscpy_s(info->InterfaceType, var.bstrVal);
-									WriteLog(L"InterfaceType: %s\r\n", info->InterfaceType);
-
-									hr = pclsObj->Get(L"Manufacturer", 0, &var, &cType, 0);
-									wcscpy_s(info->Manufacturer, var.bstrVal);
-									WriteLog(L"Manufacturer: %s\r\n", info->Manufacturer);
-
-									hr = pclsObj->Get(L"Model", 0, &var, &cType, 0);
-									wcscpy_s(info->Model, var.bstrVal);
-									WriteLog(L"Model: %s\r\n", info->Model);
-
-									hr = pclsObj->Get(L"SerialNumber", 0, &var, &cType, 0);
-									wcscpy_s(info->SerialNumber, var.bstrVal);
-									WriteLog(L"SerialNumber: %s\r\n", info->SerialNumber);
-								}
-							}
-						}
-						retVal = 0;
-					}
-					else
-					{
-						WriteLog(L"Failed to get Disk Drive information. Error code = %x\r\n", hr);
-						CoUninitialize();
-						hrInit = HRESULT_CODE(-1);
-						retVal = 1;
-					}
-				}
-				else
-				{
-					WriteLog(L"Failed to set proxy blanket. Error code = %x\r\n", hr);
-					CoUninitialize();
-					hrInit = HRESULT_CODE(-1);
-					retVal = 2;
-				}
-			}
-			else
-			{
-				WriteLog(L"Failed to connect to root namespace. Error code = %x\r\n", hr);
-				CoUninitialize();
-				hrInit = HRESULT_CODE(-1);
-				retVal = 3;
-			}
-		}
-		else
-		{
-			WriteLog(L"Failed to create IWbemLocator object. Error code = %x\r\n", hr);
-			CoUninitialize();
-			hrInit = HRESULT_CODE(-1);
-			retVal = 4;
-		}
-	}
-	else
 	{
 		WriteLog(L"Failed to set COM Security. Error code = %x\r\n", hrInitSec);
 		CoUninitialize();
+		return 5;
+	}
+
+	HRESULT hr;
+	CComPtr<IWbemLocator> pLoc;
+	hr = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID*)&pLoc);
+	if (FAILED(hr))
+	{
+		WriteLog(L"Failed to create IWbemLocator object. Error code = %x\r\n", hr);
+		CoUninitialize();
+		return 4;
+	}
+
+	CComPtr<IWbemServices> pSvc;
+	hr = pLoc->ConnectServer(CComBSTR(L"ROOT\\CIMV2"), nullptr, nullptr, nullptr, 0, nullptr, nullptr, &pSvc);
+	if (FAILED(hr))
+	{
+		WriteLog(L"Failed to connect to root namespace. Error code = %x\r\n", hr);
+		CoUninitialize();
 		hrInit = HRESULT_CODE(-1);
-		retVal = 5;
+		return 3;
+	}
+
+	CComPtr<IEnumWbemClassObject> pEnumerator;
+	hr = CoSetProxyBlanket(
+		pSvc,                        // Indicates the proxy to set
+		RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
+		RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
+		NULL,                        // Server principal name 
+		RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx 
+		RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
+		NULL,                        // client identity
+		EOAC_NONE                    // proxy capabilities 
+	);
+	if (FAILED(hr))
+	{
+		WriteLog(L"Failed to set proxy blanket. Error code = %x\r\n", hr);
+		CoUninitialize();
+		return 2;
+	}
+
+	hr = pSvc->ExecQuery(CComBSTR(L"WQL"), CComBSTR(L"SELECT * FROM Win32_DiskDrive"),
+		WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
+	if (FAILED(hr))
+	{
+		WriteLog(L"Failed to get Disk Drive information. Error code = %x\r\n", hr);
+		CoUninitialize();
+		return 1;
+	}
+
+	for (UINT16 index = 0U; index < 16U; index++)
+	{
+		EnumDiskInfo* info = &diskInfo[index];
+		*info = { 0 };
+		if (pEnumerator)
+		{
+			CComPtr<IWbemClassObject> pclsObj;
+			CComVariant var;
+			ULONG uReturn;
+			CIMTYPE cType;
+
+			hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+
+			if (uReturn)
+			{
+				info->InfoValid = TRUE;
+				WriteLog(L"InfoValid: %i\r\n", TRUE);
+
+				hr = pclsObj->Get(L"Index", 0, &var, &cType, 0);
+				info->Index = var.uintVal;
+				WriteLog(L"Index: %u\r\n", info->Index);
+
+				hr = pclsObj->Get(L"Availability", 0, &var, &cType, 0);
+				info->Availability = var.uiVal;
+				WriteLog(L"Availability: %hu\r\n", info->Availability);
+
+				hr = pclsObj->Get(L"Caption", 0, &var, &cType, 0);
+				wcscpy_s(info->Caption, var.bstrVal);
+				WriteLog(L"Caption: %s\r\n", info->Caption);
+
+				hr = pclsObj->Get(L"Description", 0, &var, &cType, 0);
+				wcscpy_s(info->Description, var.bstrVal);
+				WriteLog(L"Description: %s\r\n", info->Description);
+
+				hr = pclsObj->Get(L"DeviceID", 0, &var, &cType, 0);
+				wcscpy_s(info->DeviceID, var.bstrVal);
+				WriteLog(L"DeviceID: %s\r\n", info->DeviceID);
+
+				hr = pclsObj->Get(L"InterfaceType", 0, &var, &cType, 0);
+				wcscpy_s(info->InterfaceType, var.bstrVal);
+				WriteLog(L"InterfaceType: %s\r\n", info->InterfaceType);
+
+				hr = pclsObj->Get(L"Manufacturer", 0, &var, &cType, 0);
+				wcscpy_s(info->Manufacturer, var.bstrVal);
+				WriteLog(L"Manufacturer: %s\r\n", info->Manufacturer);
+
+				hr = pclsObj->Get(L"Model", 0, &var, &cType, 0);
+				wcscpy_s(info->Model, var.bstrVal);
+				WriteLog(L"Model: %s\r\n", info->Model);
+
+				hr = pclsObj->Get(L"SerialNumber", 0, &var, &cType, 0);
+				wcscpy_s(info->SerialNumber, var.bstrVal);
+				WriteLog(L"SerialNumber: %s\r\n", info->SerialNumber);
+			}
+		}
 	}
 
 	CoUninitialize();
-	hrInit = HRESULT_CODE(-1);
-
-	return retVal;
+	return 0;
 }
 
 extern "C" HWLIBRARY_API uint16_t GetAPM(wchar_t* dskName)
@@ -213,7 +185,7 @@ extern "C" HWLIBRARY_API int SetAPM(wchar_t* dskName, byte val, bool disable)
 {
 	HANDLE hDrive = CreateFile(dskName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
 	if (hDrive == INVALID_HANDLE_VALUE)
-		return 0;
+		return -1;
 
 	BOOL rez = SetAPM(hDrive, val, disable);
 	return rez;
