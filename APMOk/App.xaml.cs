@@ -86,7 +86,18 @@ namespace APMOk
                         int j = 0;
                         foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
                         {
-                            items.Insert(i + j + 1, new MenuItem { Name = $"ID{j}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}" });
+                            _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
+                            var newMenuItem = new MenuItem { Name = $"ID{j}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
+                            if (apmValueProperty != null && apmValueProperty.DefaultValue == 0)
+                                newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
+                            else
+                            {
+                                newMenuItem.Items.Add(new MenuItem { Header = $"Default value: {apmValueProperty.DefaultValue}" });
+                                newMenuItem.Items.Add(new MenuItem { Header = $"Current value: {apmValueProperty.CurrentValue}" });
+                            }
+
+
+                            items.Insert(i + j + 1, newMenuItem);
                             j++;
                         }
                         i += j;

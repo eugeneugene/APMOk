@@ -6,9 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -21,7 +19,6 @@ namespace APMOk
     internal partial class DeviceStatusWindow : Window, IDisposable
     {
         private readonly APMOkData _apmOkData;
-        private readonly Services.ConfigurationService _configurationService;
         private bool disposedValue;
 
         public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
@@ -32,12 +29,11 @@ namespace APMOk
 
         public APMValueProperty APMValue { get; }
 
-        public DeviceStatusWindow(APMOkData apmOkData, Services.ConfigurationService configurationService)
+        public DeviceStatusWindow(APMOkData apmOkData)
         {
             InitializeComponent();
 
             _apmOkData = apmOkData;
-            _configurationService = configurationService;
 
             // DeviceStatusDataSource
             CollectionViewSource deviceStatusDataSource = FindResource("DeviceStatusDataSource") as CollectionViewSource;
@@ -137,29 +133,8 @@ namespace APMOk
                 DiskInfoItems[nameof(Item.Manufacturer)] = Item.Manufacturer;
                 DiskInfoItems[nameof(Item.Model)] = Item.Model;
                 DiskInfoItems[nameof(Item.SerialNumber)] = Item.SerialNumber;
+                LoadAPMValue();
             }
-
-            GetDriveAPMConfiguration();
-        }
-
-        private void GetDriveAPMConfiguration()
-        {
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var APMConfigurationReply = await _configurationService.GetDriveAPMConfigurationAsync();
-                    if (APMConfigurationReply != null && APMConfigurationReply.ReplyResult != 0)
-                    {
-                        foreach (var entry in APMConfigurationReply.DriveAPMConfigurationReplyEntries)
-                            _apmOkData.APMValueDictionary[entry.DeviceID] = new APMValueProperty(entry.DefaultValue, entry.CurrentValue);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                }
-            });
         }
 
         protected virtual void Dispose(bool disposing)

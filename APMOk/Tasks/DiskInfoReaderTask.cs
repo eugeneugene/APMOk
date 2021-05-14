@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using APMOk.Code;
+using Microsoft.Extensions.DependencyInjection;
 using RecurrentTasks;
 using System;
 using System.Diagnostics;
@@ -21,8 +22,21 @@ namespace APMOk.Tasks
             try
             {
                 var diskInfoService = scopeServiceProvider.GetRequiredService<Services.DiskInfoService>();
-                var reply = await diskInfoService.EnumerateDisksAsync();
-                _apmOkData.SystemDiskInfo = reply ?? throw new Exception("Service is offline");
+                var configurationService = scopeServiceProvider.GetRequiredService<Services.ConfigurationService>();
+
+                var systemDiskInfoReply = await diskInfoService.EnumerateDisksAsync();
+                _apmOkData.SystemDiskInfo = systemDiskInfoReply ?? throw new Exception("Service is offline");
+           
+                var driveAPMConfigurationReply = await configurationService.GetDriveAPMConfigurationAsync();
+                if (driveAPMConfigurationReply == null)
+                    throw new Exception("Service is offline");
+
+                if (driveAPMConfigurationReply.ReplyResult != 0)
+                {
+                    foreach (var entry in driveAPMConfigurationReply.DriveAPMConfigurationReplyEntries)
+                        _apmOkData.APMValueDictionary[entry.DeviceID] = new APMValueProperty(entry.DefaultValue, entry.CurrentValue);
+                }
+
                 _apmOkData.ConnectFailure = false;
             }
             catch (Exception ex)
