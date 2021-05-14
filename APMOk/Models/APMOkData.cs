@@ -15,11 +15,6 @@ namespace APMOk
             _APMValueDictionary.PropertyChanged += APMValueDictionaryPropertyChanged;
         }
 
-        private void APMValueDictionaryPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            NotifyPropertyChanged(nameof(APMValueDictionary));
-        }
-
         private SystemDiskInfoReply _systemDiskInfo;
         public SystemDiskInfoReply SystemDiskInfo
         {
@@ -66,6 +61,11 @@ namespace APMOk
         public ObservableConcurrentDictionary<string, APMValueProperty> APMValueDictionary
         {
             get => _APMValueDictionary;
+        }
+
+        private void APMValueDictionaryPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            NotifyPropertyChanged(nameof(APMValueDictionary));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -70,7 +71,7 @@ namespace APMOk
                 case "ConnectFailure":
                     break;
                 case "APMValueDictionary":
-                    SetAPMValue();
+                    LoadAPMValue();
                     break;
                 default:
                     throw new NotImplementedException();
@@ -89,7 +90,7 @@ namespace APMOk
             }
         }
 
-        private void SetAPMValue()
+        private void LoadAPMValue()
         {
             if (SelectDiskCombo.SelectedItem is DiskInfoEntry selectedItem)
             {
@@ -126,20 +127,25 @@ namespace APMOk
         {
             e.Handled = true;
 
-            Dispatcher.InvokeAsync(async () =>
+            if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry Item)
             {
-                if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry Item)
-                {
-                    var availability = Availability.FromValue((ushort)Item.Availability).Name;
-                    DiskInfoItems[nameof(Item.Availability)] = availability;
-                    DiskInfoItems[nameof(Item.Caption)] = Item.Caption;
-                    DiskInfoItems[nameof(Item.Description)] = Item.Description;
-                    DiskInfoItems[nameof(Item.DeviceID)] = Item.DeviceID;
-                    DiskInfoItems[nameof(Item.Manufacturer)] = Item.Manufacturer;
-                    DiskInfoItems[nameof(Item.Model)] = Item.Model;
-                    DiskInfoItems[nameof(Item.SerialNumber)] = Item.SerialNumber;
-                }
+                var availability = Availability.FromValue((ushort)Item.Availability).Name;
+                DiskInfoItems[nameof(Item.Availability)] = availability;
+                DiskInfoItems[nameof(Item.Caption)] = Item.Caption;
+                DiskInfoItems[nameof(Item.Description)] = Item.Description;
+                DiskInfoItems[nameof(Item.DeviceID)] = Item.DeviceID;
+                DiskInfoItems[nameof(Item.Manufacturer)] = Item.Manufacturer;
+                DiskInfoItems[nameof(Item.Model)] = Item.Model;
+                DiskInfoItems[nameof(Item.SerialNumber)] = Item.SerialNumber;
+            }
 
+            GetDriveAPMConfiguration();
+        }
+
+        private void GetDriveAPMConfiguration()
+        {
+            Task.Run(async () =>
+            {
                 try
                 {
                     var APMConfigurationReply = await _configurationService.GetDriveAPMConfigurationAsync();
@@ -180,40 +186,37 @@ namespace APMOk
             if (_apmOkData.SystemDiskInfo == null || _apmOkData.SystemDiskInfo.ReplyResult == 0)
                 return;
 
-            Dispatcher.Invoke(() =>
+            string selectedSerial = null;
+            if (SelectDiskCombo.SelectedItem is DiskInfoEntry selectedItem)
+                selectedSerial = selectedItem.SerialNumber;
+
+            // Items to delete from combobox
+            var deleteItems = DiskInfo.Where(item => !_apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).Any(item1 => item1.Equals(item)));
+            foreach (var item in deleteItems)
+                DiskInfo.Remove(item);
+
+            // Items to add to combobox
+            var addItems = _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid && !DiskInfo.Any(item1 => item1.Equals(item)));
+            foreach (var item in addItems)
+                DiskInfo.Add(item);
+
+            List<DiskInfoEntry> DiskInfoTmp = new();
+            DiskInfoTmp.AddRange(DiskInfo);
+
+            DiskInfo.Clear();
+            foreach (var item in DiskInfoTmp.OrderBy(item => item.DeviceID))
+                DiskInfo.Add(item);
+
+            var selectItem = DiskInfo.SingleOrDefault(item => item.SerialNumber == selectedSerial);
+            if (selectItem != null)
+                SelectDiskCombo.SelectedItem = selectItem;
+            else
             {
-                string selectedSerial = null;
-                if (SelectDiskCombo.SelectedItem is DiskInfoEntry selectedItem)
-                    selectedSerial = selectedItem.SerialNumber;
-
-                // Items to delete from combobox
-                var deleteItems = DiskInfo.Where(item => !_apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).Any(item1 => item1.Equals(item)));
-                foreach (var item in deleteItems)
-                    DiskInfo.Remove(item);
-
-                // Items to add to combobox
-                var addItems = _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid && !DiskInfo.Any(item1 => item1.Equals(item)));
-                foreach (var item in addItems)
-                    DiskInfo.Add(item);
-
-                List<DiskInfoEntry> DiskInfoTmp = new();
-                DiskInfoTmp.AddRange(DiskInfo);
-
-                DiskInfo.Clear();
-                foreach (var item in DiskInfoTmp.OrderBy(item => item.DeviceID))
-                    DiskInfo.Add(item);
-
-                var selectItem = DiskInfo.SingleOrDefault(item => item.SerialNumber == selectedSerial);
-                if (selectItem != null)
-                    SelectDiskCombo.SelectedItem = selectItem;
+                if (_apmOkData.SystemDiskInfo.DiskInfoEntries.Any())
+                    SelectDiskCombo.SelectedIndex = 0;
                 else
-                {
-                    if (_apmOkData.SystemDiskInfo.DiskInfoEntries.Any())
-                        SelectDiskCombo.SelectedIndex = 0;
-                    else
-                        SelectDiskCombo.SelectedIndex = -1;
-                }
-            });
+                    SelectDiskCombo.SelectedIndex = -1;
+            }
         }
     }
 }
