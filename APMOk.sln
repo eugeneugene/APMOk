@@ -17,8 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7A0FEE2C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APMTest", "Tests\APMTest\APMTest.csproj", "{49AF2366-2E9E-4382-8217-9545E31791EB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotifyIconWpf", "NotifyIconWpf\NotifyIconWpf.csproj", "{75C199EF-C74E-42B8-8573-A9E5FE0EAF0A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -49,10 +47,6 @@ Global
 		{49AF2366-2E9E-4382-8217-9545E31791EB}.Debug|x64.Build.0 = Debug|x64
 		{49AF2366-2E9E-4382-8217-9545E31791EB}.Release|x64.ActiveCfg = Release|x64
 		{49AF2366-2E9E-4382-8217-9545E31791EB}.Release|x64.Build.0 = Release|x64
-		{75C199EF-C74E-42B8-8573-A9E5FE0EAF0A}.Debug|x64.ActiveCfg = Debug|x64
-		{75C199EF-C74E-42B8-8573-A9E5FE0EAF0A}.Debug|x64.Build.0 = Debug|x64
-		{75C199EF-C74E-42B8-8573-A9E5FE0EAF0A}.Release|x64.ActiveCfg = Release|x64
-		{75C199EF-C74E-42B8-8573-A9E5FE0EAF0A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
