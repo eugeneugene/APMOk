@@ -5,9 +5,9 @@ namespace APMOk
 {
     public static class WindowHelpers
     {
-        public static bool IsOpen(this Window window)
+        public static bool IsClosed(this Window window)
         {
-            return Application.Current.Windows.Cast<Window>().Any(x => x == window);
+            return !Application.Current.Windows.Cast<Window>().Any(x => x == window);
         }
     }
 }

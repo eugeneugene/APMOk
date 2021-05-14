@@ -27,7 +27,7 @@ namespace APMOk.Tasks
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            //UpdateIcon();
+            UpdateIcon();
             _data.PropertyChanged += APMOkDataPropertyChanged;
             return Task.CompletedTask;
         }
@@ -57,12 +57,24 @@ namespace APMOk.Tasks
             else
             {
                 var ACLineStatus = _data.PowerState?.ACLineStatus ?? EACLineStatus.LineStatusUnknown;
-                _taskbarIcon.Icon = ACLineStatus switch
+                _taskbarIcon.Dispatcher.Invoke(() =>
                 {
-                    EACLineStatus.Online => Properties.Resources.Checked,
-                    EACLineStatus.Offline => Properties.Resources.Battery,
-                    _ => Properties.Resources.Error
-                };
+                    switch (ACLineStatus)
+                    {
+                        case EACLineStatus.Online:
+                            _taskbarIcon.Icon = Properties.Resources.Checked;
+                            _taskbarIcon.ToolTipText = "Online";
+                            break;
+                        case EACLineStatus.Offline:
+                            _taskbarIcon.Icon = Properties.Resources.Battery;
+                            _taskbarIcon.ToolTipText = "Offline";
+                            break;
+                        default:
+                            _taskbarIcon.Icon = Properties.Resources.Error;
+                            _taskbarIcon.ToolTipText = "Error";
+                            break;
+                    }
+                });
             }
         }
     }

@@ -24,30 +24,22 @@ namespace APMOk
         /// </summary>
         public ICommand ShowWindowCommand => new DelegateCommand
         {
-            CanExecuteFunc = () => deviceStatusWindow == null || !deviceStatusWindow.IsOpen(),
             CommandAction = () =>
             {
-                if (deviceStatusWindow == null || !deviceStatusWindow.IsActive)
-                {
+                if (deviceStatusWindow == null || deviceStatusWindow.IsClosed())
                     deviceStatusWindow = _services.GetService(typeof(DeviceStatusWindow)) as DeviceStatusWindow;
-                    deviceStatusWindow?.Show();
-                }
-                else
-                    deviceStatusWindow.Activate();
-            },
-        };
 
-        /// <summary>
-        /// Hides the main window. This command is only enabled if a window is open.
-        /// </summary>
-        public ICommand HideWindowCommand => new DelegateCommand
-        {
-            CanExecuteFunc = () => deviceStatusWindow != null && deviceStatusWindow.IsOpen(),
-            CommandAction = () =>
-            {
-                deviceStatusWindow?.Close();
-                deviceStatusWindow = null;
-            },
+                if (!deviceStatusWindow.IsVisible)
+                    deviceStatusWindow.Show();
+
+                if (deviceStatusWindow.WindowState == WindowState.Minimized)
+                    deviceStatusWindow.WindowState = WindowState.Normal;
+
+                deviceStatusWindow.Activate();
+                deviceStatusWindow.Topmost = true;  // important
+                deviceStatusWindow.Topmost = false; // important
+                deviceStatusWindow.Focus();         // important
+            }
         };
 
         /// <summary>

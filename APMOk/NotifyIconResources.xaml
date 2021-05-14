@@ -4,7 +4,6 @@
     xmlns:tb="http://www.hardcodet.net/taskbar">
     <ContextMenu x:Key="SysTrayMenu" x:Shared="false">
         <MenuItem Command="{Binding ShowWindowCommand}" Header="Show Window" />
-        <MenuItem Command="{Binding HideWindowCommand}" Header="Hide Window" />
         <Separator />
         <MenuItem Command="{Binding ExitApplicationCommand}" Header="Exit" />
     </ContextMenu>
@@ -12,6 +11,5 @@
         x:Key="NotifyIcon"
         ContextMenu="{StaticResource SysTrayMenu}"
         DoubleClickCommand="{Binding ShowWindowCommand}"
-        IconSource="Properties\checked.ico"
-        ToolTipText="Double-click for window, right-click for menu" />
+        IconSource="Properties\error.ico" />
 </ResourceDictionary>

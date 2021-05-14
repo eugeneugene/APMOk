@@ -8,8 +8,10 @@ using RecurrentTasks;
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Markup;
 
 namespace APMOk
@@ -60,13 +62,42 @@ namespace APMOk
 
                 var _notifyIconViewModel = host.Services.GetRequiredService<NotifyIconViewModel>();
                 notifyIcon.DataContext = _notifyIconViewModel;
-
+                notifyIcon.TrayContextMenuOpen += NotifyIconTrayContextMenuOpen;
                 base.OnStartup(e);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.ToString());
+                Debug.WriteLine(ex);
                 throw;
+            }
+        }
+
+        private void NotifyIconTrayContextMenuOpen(object sender, RoutedEventArgs e)
+        {
+            var _apmOkData = host.Services.GetRequiredService<APMOkData>();
+            if (e.Source is TaskbarIcon taskbarIcon)
+            {
+                var items = taskbarIcon.ContextMenu.Items;
+                for (int i = 0; i < items.Count; i++)
+                {
+                    var item = items[i];
+                    if (item is Separator)
+                    {
+                        int j = 0;
+                        foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
+                        {
+                            items.Insert(i + j + 1, new MenuItem { Name = $"ID{j}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}" });
+                            j++;
+                        }
+                        i += j;
+                        continue;
+                    }
+                    if (item is MenuItem menuItem && menuItem.Name.StartsWith("ID"))
+                    {
+                        items.RemoveAt(i);
+                        --i;
+                    }
+                }
             }
         }
 
