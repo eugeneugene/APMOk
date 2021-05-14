@@ -2,6 +2,7 @@
 using APMData.Proto;
 using APMOk.Code;
 using System;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -61,8 +62,8 @@ namespace APMOk
             }
         }
 
-        private readonly ObservableDictionary<string, APMValueProperty> _APMValueDictionary = new();
-        public ObservableDictionary<string, APMValueProperty> APMValueDictionary
+        private readonly ObservableConcurrentDictionary<string, APMValueProperty> _APMValueDictionary = new();
+        public ObservableConcurrentDictionary<string, APMValueProperty> APMValueDictionary
         {
             get => _APMValueDictionary;
         }

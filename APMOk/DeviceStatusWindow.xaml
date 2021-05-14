@@ -15,7 +15,6 @@
     mc:Ignorable="d">
     <Window.Resources>
         <CollectionViewSource x:Key="DeviceStatusDataSource" CollectionViewType="ListCollectionView" />
-        <CollectionViewSource x:Key="PowerStateItemsSource" CollectionViewType="ListCollectionView" />
         <localcode:APMValueProperty
             x:Key="APMValue"
             CurrentValue="0"
@@ -153,7 +152,6 @@
                 CanUserResizeColumns="False"
                 CanUserResizeRows="False"
                 CanUserSortColumns="False"
-                DataContext="{StaticResource PowerStateItemsSource}"
                 ItemsSource="{Binding}"
                 ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                 Style="{StaticResource DataGridEnabler}">

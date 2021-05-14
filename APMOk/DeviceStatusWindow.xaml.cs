@@ -2,6 +2,7 @@
 using APMData.Proto;
 using APMOk.Code;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -24,9 +25,9 @@ namespace APMOk
 
         public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
 
-        public ObservableDictionary<string, object> DiskInfoItems { get; } = new();
+        public ObservableConcurrentDictionary<string, object> DiskInfoItems { get; } = new();
 
-        public ObservableCollection<KeyValuePair<string, object>> PowerStateItems { get; } = new();
+        public ObservableConcurrentDictionary<string, object> PowerStateItems { get; } = new();
 
         public APMValueProperty APMValue { get; }
 
@@ -42,10 +43,7 @@ namespace APMOk
             deviceStatusDataSource.Source = DiskInfo;
 
             DriveStatusGrid.DataContext = DiskInfoItems;
-
-            // PowerStateItemsSource
-            CollectionViewSource PowerStateItemsSource = FindResource("PowerStateItemsSource") as CollectionViewSource;
-            PowerStateItemsSource.Source = PowerStateItems;
+            BatteryStatusGrid.DataContext = PowerStateItems;
 
             DataContext = _apmOkData;
 
@@ -83,12 +81,11 @@ namespace APMOk
         {
             if (_apmOkData.PowerState.ReplyResult != 0)
             {
-                PowerStateItems.Clear();
-                PowerStateItems.Add(new(nameof(_apmOkData.PowerState.ACLineStatus), _apmOkData.PowerState.BatteryFlag));
-                PowerStateItems.Add(new(nameof(_apmOkData.PowerState.BatteryFlag), _apmOkData.PowerState.ACLineStatus));
-                PowerStateItems.Add(new(nameof(_apmOkData.PowerState.BatteryFullLifeTime), _apmOkData.PowerState.BatteryFullLifeTime));
-                PowerStateItems.Add(new(nameof(_apmOkData.PowerState.BatteryLifePercent), _apmOkData.PowerState.BatteryLifePercent));
-                PowerStateItems.Add(new(nameof(_apmOkData.PowerState.BatteryLifeTime), _apmOkData.PowerState.BatteryLifeTime));
+                PowerStateItems[nameof(_apmOkData.PowerState.ACLineStatus)] = _apmOkData.PowerState.BatteryFlag;
+                PowerStateItems[nameof(_apmOkData.PowerState.BatteryFlag)] = _apmOkData.PowerState.ACLineStatus;
+                PowerStateItems[nameof(_apmOkData.PowerState.BatteryFullLifeTime)] = _apmOkData.PowerState.BatteryFullLifeTime;
+                PowerStateItems[nameof(_apmOkData.PowerState.BatteryLifePercent)] = _apmOkData.PowerState.BatteryLifePercent;
+                PowerStateItems[nameof(_apmOkData.PowerState.BatteryLifeTime)] = _apmOkData.PowerState.BatteryLifeTime;
             }
         }
 
