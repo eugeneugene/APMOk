@@ -1,6 +1,6 @@
 ﻿using Ardalis.SmartEnum;
 
-namespace APMData
+namespace APMOkLib
 {
     public sealed class Availability : SmartEnum<Availability, ushort>
     {

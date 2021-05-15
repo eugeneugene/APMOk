@@ -1,10 +1,8 @@
 ﻿using APMData.Proto;
 using APMOkSvc.Code;
 using APMOkSvc.Types;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 using System;
-using System.ComponentModel;
 using System.Linq;
 
 namespace APMOkSvc.Services
