@@ -127,7 +127,7 @@ namespace APMOk
 
             foreach (APMLevel level in Enum.GetValues(typeof(APMLevel)))
             {
-                if (level != APMLevel.LevelNone)
+                if (!level.NotMapped())
                     items.Add(new MenuItem { Header = level.DisplayEnum() });
             }
             items.Add(new Separator());

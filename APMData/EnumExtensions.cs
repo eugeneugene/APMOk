@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
@@ -58,6 +59,15 @@ namespace APMData
 
             var attribute = value.GetAttribute<DisplayAttribute>();
             return attribute == null ? value.ToString() : attribute.Name;
+        }
+
+        public static bool NotMapped(this Enum value)
+        {
+            if (value == null)
+                return false;
+
+            var attribute = value.GetAttribute<NotMappedAttribute>();
+            return attribute != null;
         }
     }
 }
