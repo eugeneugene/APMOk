@@ -11,5 +11,5 @@
         x:Key="NotifyIcon"
         ContextMenu="{StaticResource SysTrayMenu}"
         DoubleClickCommand="{Binding ShowWindowCommand}"
-        IconSource="Properties\error.ico" />
+        IconSource="\Properties\error.ico" />
 </ResourceDictionary>

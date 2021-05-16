@@ -8,15 +8,15 @@ namespace APMData
         [Display(Name = "n/a")]
         [NotMapped]
         LevelNone = 0,
-        [Display(Name = "Minimum with Standby enabled")]
+        [Display(Name = "Minimum power consumption with Standby")]
         MinimumWithStandby = 1,
-        [Display(Name = "Intermediate with Standby enabled")]
+        [Display(Name = "Intermediate power management with Standby")]
         IntermediateWithStandby = 2,
-        [Display(Name = "Minimum with Standby disabled")]
+        [Display(Name = "Minimum power consumption without Standby")]
         MinimumWithoutStandby = 128,
-        [Display(Name = "Intermediate with Standby disabled")]
+        [Display(Name = "Intermediate power management without Standby")]
         IntermediateWithoutStandby = 129,
-        [Display(Name = "Maximum")]
+        [Display(Name = "Maximum performance")]
         Maximum = 254,
     }
 }
