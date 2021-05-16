@@ -26,7 +26,7 @@ namespace APMOk.Tasks
 
                 var systemDiskInfoReply = await diskInfoService.EnumerateDisksAsync();
                 _apmOkData.SystemDiskInfo = systemDiskInfoReply ?? throw new Exception("Service is offline");
-           
+
                 var driveAPMConfigurationReply = await configurationService.GetDriveAPMConfigurationAsync();
                 if (driveAPMConfigurationReply == null)
                     throw new Exception("Service is offline");
@@ -34,7 +34,9 @@ namespace APMOk.Tasks
                 if (driveAPMConfigurationReply.ReplyResult != 0)
                 {
                     foreach (var entry in driveAPMConfigurationReply.DriveAPMConfigurationReplyEntries)
-                        _apmOkData.APMValueDictionary[entry.DeviceID] = new APMValueProperty(entry.DefaultValue, entry.CurrentValue);
+                        _apmOkData.APMValueDictionary[entry.DeviceID] = new APMValueProperty(defaultValue: (int)entry.DefaultValue,
+                                                                                             userValue: (int)entry.UserValue,
+                                                                                             currentValue: 0);
                 }
 
                 _apmOkData.ConnectFailure = false;

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +20,7 @@ namespace APMOk
     internal partial class DeviceStatusWindow : Window, IDisposable
     {
         private readonly APMOkData _apmOkData;
+        private readonly Services.DiskInfoService _diskInfoService;
         private bool disposedValue;
 
         public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
@@ -29,11 +31,12 @@ namespace APMOk
 
         public APMValueProperty APMValue { get; }
 
-        public DeviceStatusWindow(APMOkData apmOkData)
+        public DeviceStatusWindow(APMOkData apmOkData, Services.DiskInfoService diskInfoService)
         {
             InitializeComponent();
 
             _apmOkData = apmOkData;
+            _diskInfoService = diskInfoService;
 
             // DeviceStatusDataSource
             CollectionViewSource deviceStatusDataSource = FindResource("DeviceStatusDataSource") as CollectionViewSource;
@@ -76,26 +79,13 @@ namespace APMOk
 
         private void LoadPowerState()
         {
-            if (_apmOkData.PowerState.ReplyResult != 0)
+            if (_apmOkData.PowerState != null && _apmOkData.PowerState.ReplyResult != 0)
             {
                 PowerStateItems[nameof(_apmOkData.PowerState.ACLineStatus)] = _apmOkData.PowerState.BatteryFlag;
                 PowerStateItems[nameof(_apmOkData.PowerState.BatteryFlag)] = _apmOkData.PowerState.ACLineStatus;
                 PowerStateItems[nameof(_apmOkData.PowerState.BatteryFullLifeTime)] = _apmOkData.PowerState.BatteryFullLifeTime;
                 PowerStateItems[nameof(_apmOkData.PowerState.BatteryLifePercent)] = _apmOkData.PowerState.BatteryLifePercent;
                 PowerStateItems[nameof(_apmOkData.PowerState.BatteryLifeTime)] = _apmOkData.PowerState.BatteryLifeTime;
-            }
-        }
-
-        private void LoadAPMValue()
-        {
-            if (SelectDiskCombo.SelectedItem is DiskInfoEntry selectedItem)
-            {
-                if (_apmOkData.APMValueDictionary.Any(item => item.Key == selectedItem.DeviceID))
-                {
-                    var device = _apmOkData.APMValueDictionary.Single(item => item.Key == selectedItem.DeviceID);
-                    APMValue.CurrentValue = device.Value.CurrentValue;
-                    APMValue.DefaultValue = device.Value.DefaultValue;
-                }
             }
         }
 
@@ -123,17 +113,36 @@ namespace APMOk
         {
             e.Handled = true;
 
-            if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry Item)
+            if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry selectedItem)
             {
-                var availability = Availability.FromValue((ushort)Item.Availability).Name;
-                DiskInfoItems[nameof(Item.Availability)] = availability;
-                DiskInfoItems[nameof(Item.Caption)] = Item.Caption;
-                DiskInfoItems[nameof(Item.Description)] = Item.Description;
-                DiskInfoItems[nameof(Item.DeviceID)] = Item.DeviceID;
-                DiskInfoItems[nameof(Item.Manufacturer)] = Item.Manufacturer;
-                DiskInfoItems[nameof(Item.Model)] = Item.Model;
-                DiskInfoItems[nameof(Item.SerialNumber)] = Item.SerialNumber;
+                var availability = Availability.FromValue((ushort)selectedItem.Availability).Name;
+                DiskInfoItems[nameof(selectedItem.Availability)] = availability;
+                DiskInfoItems[nameof(selectedItem.Caption)] = selectedItem.Caption;
+                DiskInfoItems[nameof(selectedItem.Description)] = selectedItem.Description;
+                DiskInfoItems[nameof(selectedItem.DeviceID)] = selectedItem.DeviceID;
+                DiskInfoItems[nameof(selectedItem.Manufacturer)] = selectedItem.Manufacturer;
+                DiskInfoItems[nameof(selectedItem.Model)] = selectedItem.Model;
+                DiskInfoItems[nameof(selectedItem.SerialNumber)] = selectedItem.SerialNumber;
                 LoadAPMValue();
+            }
+        }
+
+        private void LoadAPMValue()
+        {
+            if (SelectDiskCombo.SelectedItem is DiskInfoEntry selectedItem)
+            {
+                if (_apmOkData.APMValueDictionary.Any(item => item.Key == selectedItem.DeviceID))
+                {
+                    var device = _apmOkData.APMValueDictionary.Single(item => item.Key == selectedItem.DeviceID);
+                    APMValue.UserValue = device.Value.UserValue;
+                    APMValue.DefaultValue = device.Value.DefaultValue;
+
+                    Task.Run(async () =>
+                    {
+                        var apmReply = await _diskInfoService.GetAPMAsync(new GetAPMRequest { DeviceID = device.Key });
+                        APMValue.CurrentValue = apmReply.ReplyResult != 0 ? (int)apmReply.APMValue : -1;
+                    });
+                }
             }
         }
 

@@ -1,4 +1,6 @@
-﻿using APMOk.Services;
+﻿using APMData;
+using APMOk.Code;
+using APMOk.Services;
 using APMOk.Tasks;
 using CustomConfiguration;
 using Hardcodet.Wpf.TaskbarNotification;
@@ -6,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RecurrentTasks;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -81,27 +84,33 @@ namespace APMOk
                 for (int i = 0; i < items.Count; i++)
                 {
                     var item = items[i];
-                    if (item is Separator)
+                    if (_apmOkData.SystemDiskInfo != null)
                     {
-                        int j = 0;
-                        foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
+                        if (item is Separator)
                         {
-                            _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
-                            var newMenuItem = new MenuItem { Name = $"ID{j}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
-                            if (apmValueProperty != null && apmValueProperty.DefaultValue == 0)
-                                newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
-                            else
+                            int j = 0;
+                            foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
                             {
-                                newMenuItem.Items.Add(new MenuItem { Header = $"Default value: {apmValueProperty.DefaultValue}" });
-                                newMenuItem.Items.Add(new MenuItem { Header = $"Current value: {apmValueProperty.CurrentValue}" });
+                                _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
+                                var newMenuItem1 = new MenuItem { Name = $"ID{j}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
+                                if (apmValueProperty == null || apmValueProperty.DefaultValue == 0)
+                                    newMenuItem1.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
+                                else
+                                {
+                                    newMenuItem1.Items.Add(new MenuItem { Header = "Default value: " + apmValueProperty.DefaultValue });
+                                    newMenuItem1.Items.Add(new MenuItem { Header = "User value: " + ((apmValueProperty.UserValue == 0) ? "n/a" : apmValueProperty.UserValue.ToString()) });
+                                    newMenuItem1.Items.Add(new Separator());
+                                    var newMenuItem2 = new MenuItem { Header = "Set" };
+                                    newMenuItem2.Items.AddRange(GetSetMenuItems());
+                                    newMenuItem1.Items.Add(newMenuItem2);
+                                }
+
+                                items.Insert(i + j + 1, newMenuItem1);
+                                j++;
                             }
-
-
-                            items.Insert(i + j + 1, newMenuItem);
-                            j++;
+                            i += j;
+                            continue;
                         }
-                        i += j;
-                        continue;
                     }
                     if (item is MenuItem menuItem && menuItem.Name.StartsWith("ID"))
                     {
@@ -110,6 +119,21 @@ namespace APMOk
                     }
                 }
             }
+        }
+
+        private static IEnumerable<Control> GetSetMenuItems()
+        {
+            List<Control> items = new();
+
+            foreach (APMLevel level in Enum.GetValues(typeof(APMLevel)))
+            {
+                if (level != APMLevel.LevelNone)
+                    items.Add(new MenuItem { Header = level.DisplayEnum() });
+            }
+            items.Add(new Separator());
+            items.Add(new MenuItem { Header = "Set custom value" });
+
+            return items;
         }
 
         protected override async void OnExit(ExitEventArgs e)

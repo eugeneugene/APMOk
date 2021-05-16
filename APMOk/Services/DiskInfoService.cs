@@ -48,6 +48,13 @@ namespace APMOk.Services
             return reply;
         }
 
+        public async Task<GetAPMReply> GetAPMAsync(GetAPMRequest request)
+        {
+            var client = new APMData.Proto.DiskInfoService.DiskInfoServiceClient(_channel);
+            var reply = await client.GetAPMAsync(request);
+            return reply;
+        }
+
         private static bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             return true;

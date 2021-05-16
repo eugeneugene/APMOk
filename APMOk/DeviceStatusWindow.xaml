@@ -15,10 +15,8 @@
     mc:Ignorable="d">
     <Window.Resources>
         <CollectionViewSource x:Key="DeviceStatusDataSource" CollectionViewType="ListCollectionView" />
-        <localcode:APMValueProperty
-            x:Key="APMValue"
-            CurrentValue="0"
-            DefaultValue="0" />
+        <localcode:APMValueProperty x:Key="APMValue" />
+        <localcode:APMValueConverter x:Key="APMValueConverter" />
         <localcode:ACLineStatusConverter x:Key="ACLineStatusConverter" />
         <Style x:Key="PowerStatus" TargetType="TextBlock">
             <Style.Triggers>
@@ -183,16 +181,32 @@
                     Margin="5"
                     VerticalAlignment="Center"
                     BorderThickness="0">
-                    Defalut:
+                    Default:
                 </TextBox>
                 <TextBlock
                     x:Name="DefaultAPMValue"
-                    Width="150"
+                    Width="82"
                     Height="22"
                     Margin="5"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.DefaultValue}" />
+                    Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.DefaultValue, Converter={StaticResource APMValueConverter}}" />
+                <TextBox
+                    Width="50"
+                    Height="22"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    BorderThickness="0">
+                    User:
+                </TextBox>
+                <TextBlock
+                    x:Name="UserAPMValue"
+                    Width="82"
+                    Height="22"
+                    Margin="5"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.UserValue, Converter={StaticResource APMValueConverter}}" />
                 <TextBox
                     Width="50"
                     Height="22"
@@ -203,12 +217,12 @@
                 </TextBox>
                 <TextBlock
                     x:Name="CurrentAPMValue"
-                    Width="150"
+                    Width="82"
                     Height="22"
                     Margin="5"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.CurrentValue}" />
+                    Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.CurrentValue, Converter={StaticResource APMValueConverter}}" />
             </StackPanel>
         </GroupBox>
     </Grid>

@@ -21,7 +21,7 @@ namespace APMOkSvc.Data
         public uint DefaultValue { get; set; }
 
         [Required]
-        public uint CurrentValue { get; set; }
+        public uint UserValue { get; set; }
 
         public ConfigData()
         { }

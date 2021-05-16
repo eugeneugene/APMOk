@@ -29,7 +29,7 @@ namespace APMOkSvc.Services
                 reply.DriveAPMConfigurationReplyEntries.AddRange(_dataContext.ConfigDataSet.Select(item => new DriveAPMConfigurationReplyEntry
                 {
                     DeviceID = item.DeviceID,
-                    CurrentValue = item.CurrentValue,
+                    UserValue = item.UserValue,
                     DefaultValue = item.DefaultValue
                 }));
                 reply.ReplyResult = 1;
