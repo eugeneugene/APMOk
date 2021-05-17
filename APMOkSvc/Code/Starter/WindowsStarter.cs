@@ -26,6 +26,7 @@ namespace APMOkSvc.Code
         private bool stop;
         private bool restart;
         private bool status;
+        private bool debug;
 
         private readonly string servicename = Properties.Resources.ServiceName;
         private readonly string description = Properties.Resources.Description;
@@ -77,6 +78,14 @@ namespace APMOkSvc.Code
                     case "/CONSOLE":
                     case "--CONSOLE":
                         console = true;
+                        bExpectInstallArg = false;
+                        break;
+                    case "-D":
+                    case "/D":
+                    case "-DEBUG":
+                    case "/DEBUG":
+                    case "--DEBUG":
+                        debug = true;
                         bExpectInstallArg = false;
                         break;
                     case "-I":
@@ -353,6 +362,9 @@ namespace APMOkSvc.Code
             {
                 builder.AddCommandLine(args);
             });
+
+            if (debug)
+                hostbuilder.UseEnvironment(Environments.Development);
 
             logger.Info("Running {0}", Environment.OSVersion.VersionString);
             hostbuilder = hostbuilder.UseWindowsService();
