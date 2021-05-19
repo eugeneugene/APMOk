@@ -21,13 +21,15 @@ namespace APMOk.Tasks
         {
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 var diskInfoService = scopeServiceProvider.GetRequiredService<Services.DiskInfoService>();
                 var configurationService = scopeServiceProvider.GetRequiredService<Services.ConfigurationService>();
 
-                var systemDiskInfoReply = await diskInfoService.EnumerateDisksAsync();
+                var systemDiskInfoReply = await diskInfoService.EnumerateDisksAsync(cancellationToken);
                 _apmOkData.SystemDiskInfo = systemDiskInfoReply ?? throw new Exception("Service is offline");
 
-                var driveAPMConfigurationReply = await configurationService.GetDriveAPMConfigurationAsync();
+                var driveAPMConfigurationReply = await configurationService.GetDriveAPMConfigurationAsync(cancellationToken);
                 if (driveAPMConfigurationReply == null)
                     throw new Exception("Service is offline");
 

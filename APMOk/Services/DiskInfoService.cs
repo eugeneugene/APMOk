@@ -1,6 +1,7 @@
 ﻿using APMData;
 using APMData.Proto;
 using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
 using Grpc.Net.Client;
 using System;
 using System.Net;
@@ -8,6 +9,7 @@ using System.Net.Http;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace APMOk.Services
@@ -41,17 +43,17 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<SystemDiskInfoReply> EnumerateDisksAsync()
+        public async Task<SystemDiskInfoReply> EnumerateDisksAsync(CancellationToken cancellationToken = default)
         {
             var client = new APMData.Proto.DiskInfoService.DiskInfoServiceClient(_channel);
-            var reply = await client.EnumerateDisksAsync(new Empty());
+            var reply = await client.EnumerateDisksAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }
 
-        public async Task<GetAPMReply> GetAPMAsync(GetAPMRequest request)
+        public async Task<GetAPMReply> GetAPMAsync(GetAPMRequest request, CancellationToken cancellationToken = default)
         {
             var client = new APMData.Proto.DiskInfoService.DiskInfoServiceClient(_channel);
-            var reply = await client.GetAPMAsync(request);
+            var reply = await client.GetAPMAsync(request, new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }
 

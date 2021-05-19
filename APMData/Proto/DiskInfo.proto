@@ -8,7 +8,7 @@ import "google/protobuf/Empty.proto";
 
 service DiskInfoService {
 	rpc EnumerateDisks (google.protobuf.Empty) returns (SystemDiskInfoReply);
-	rpc GetAPM (GetAPMRequest) returns (GetAPMReply);
+	rpc GetCurrentAPM (GetCurrentAPMRequest) returns (GetAPMReply);
 	rpc SetAPM (SetAPMRequest) returns (SetAPMReply);
 }
 
@@ -38,7 +38,7 @@ message SystemDiskInfoReply {
 	repeated DiskInfoEntry DiskInfoEntries = 2;
 }
 
-message GetAPMRequest {
+message GetCurrentAPMRequest {
 	string DeviceID = 1;
 }
 
@@ -50,16 +50,11 @@ message GetAPMReply {
 message SetAPMRequest {
 	string DeviceID = 1;
 	uint32 APMValue = 2;
+	EPowerSource PowerSource = 3;
 }
 
 message SetAPMReply {
 	int32 ReplyResult = 1;
-}
-
-enum EACLineStatus {
-	Offline = 0;
-	Online = 1;
-	LineStatusUnknown = 255;
 }
 
 enum EBatteryFlag {
@@ -72,9 +67,15 @@ enum EBatteryFlag {
 	BatteryFlagUnknown = 255;
 }
 
+enum EPowerSource {
+	Unknown = 0;
+	Mains = 1;
+	Battery = 2;
+}
+
 message PowerStateReply {
 	int32 ReplyResult = 1;
-	EACLineStatus ACLineStatus = 2;
+	EPowerSource PowerSource = 2;
 	EBatteryFlag BatteryFlag = 3;
 	int32 BatteryLifePercent = 4;
 	int32 BatteryLifeTime = 5;

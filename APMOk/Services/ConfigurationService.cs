@@ -1,6 +1,7 @@
 ﻿using APMData;
 using APMData.Proto;
 using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
 using Grpc.Net.Client;
 using System;
 using System.Net;
@@ -8,6 +9,7 @@ using System.Net.Http;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace APMOk.Services
@@ -41,10 +43,10 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<DriveAPMConfigurationReply> GetDriveAPMConfigurationAsync()
+        public async Task<DriveAPMConfigurationReply> GetDriveAPMConfigurationAsync(CancellationToken cancellationToken = default)
         {
             var client = new APMData.Proto.ConfigurationService.ConfigurationServiceClient(_channel);
-            var reply = await client.GetDriveAPMConfigurationAsync(new Empty());
+            var reply = await client.GetDriveAPMConfigurationAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }
 

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -139,7 +140,7 @@ namespace APMOk
 
                     Task.Run(async () =>
                     {
-                        var apmReply = await _diskInfoService.GetAPMAsync(new GetAPMRequest { DeviceID = device.Key });
+                        var apmReply = await _diskInfoService.GetAPMAsync(new GetAPMRequest { DeviceID = device.Key }, CancellationToken.None);
                         APMValue.CurrentValue = apmReply.ReplyResult != 0 ? (int)apmReply.APMValue : -1;
                     });
                 }

@@ -69,7 +69,7 @@ namespace APMOkSvc.Services
             return reply;
         }
 
-        public GetAPMReply GetAPM(GetAPMRequest request)
+        public GetAPMReply GetCurrentAPM(GetCurrentAPMRequest request)
         {
             _logger.LogTrace("Request: {0}", request);
             var reply = new GetAPMReply { APMValue = 0, ReplyResult = 0, };
