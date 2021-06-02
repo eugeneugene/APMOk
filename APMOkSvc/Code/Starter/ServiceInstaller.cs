@@ -315,7 +315,6 @@ namespace APMOkSvc.Code
             {
                 CloseServiceHandle(scm);
             }
-
         }
 
         private static ServiceState GetServiceStatus(IntPtr service)

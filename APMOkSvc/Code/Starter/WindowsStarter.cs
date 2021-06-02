@@ -157,13 +157,20 @@ namespace APMOkSvc.Code
             }
 
             int i = 0;
-            if (console) ++i;
-            if (install) ++i;
-            if (uninstall) ++i;
-            if (start) ++i;
-            if (stop) ++i;
-            if (restart) ++i;
-            if (status) ++i;
+            if (console) 
+                ++i;
+            if (install)                
+                ++i;
+            if (uninstall)
+                ++i;
+            if (start)
+                ++i;
+            if (stop)
+                ++i;
+            if (restart)
+                ++i;
+            if (status) 
+                ++i;
             if (i > 1)
             {
                 Console.Error.WriteLine("Использованы взаимоисключающие опции");

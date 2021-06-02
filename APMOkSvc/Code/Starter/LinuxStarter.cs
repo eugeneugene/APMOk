@@ -14,7 +14,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-
 namespace APMOkSvc.Code
 {
     public class LinuxStarter<TStartup> : IStarter where TStartup : class
