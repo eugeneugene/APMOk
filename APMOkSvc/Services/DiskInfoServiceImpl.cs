@@ -17,9 +17,9 @@ namespace APMOkSvc.Services
             _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
         }
 
-        public SystemDiskInfoReply EnumerateDisks()
+        public DisksReply EnumerateDisks()
         {
-            var reply = new SystemDiskInfoReply
+            var reply = new DisksReply
             {
                 ReplyResult = 0
             };
@@ -55,9 +55,7 @@ namespace APMOkSvc.Services
                     reply.ReplyResult = 1;
 
                     foreach (var di in diskInfos)
-                    {
                         _logger.LogTrace(di.InfoValid ? di.Caption : "<Invalid>");
-                    }
                 }
             }
             catch (Exception ex)
@@ -69,10 +67,10 @@ namespace APMOkSvc.Services
             return reply;
         }
 
-        public GetAPMReply GetCurrentAPM(GetCurrentAPMRequest request)
+        public CurrentAPMReply GetCurrentAPM(CurrentAPMRequest request)
         {
             _logger.LogTrace("Request: {0}", request);
-            var reply = new GetAPMReply { APMValue = 0, ReplyResult = 0, };
+            var reply = new CurrentAPMReply { APMValue = 0, ReplyResult = 0, };
             try
             {
                 if (HW.GetAPM(request.DeviceID, out uint apmValue))
@@ -91,17 +89,17 @@ namespace APMOkSvc.Services
             return reply;
         }
 
-        public SetAPMReply SetAPM(SetAPMRequest request)
+        public APMReply SetAPM(APMRequest request)
         {
             _logger.LogTrace("Request: {0}", request);
-            var reply = new SetAPMReply { ReplyResult = 0, };
+            var reply = new APMReply { ReplyResult = 0, };
             try
             {
                 byte val = request.APMValue > 254 ? (byte)0 : (byte)request.APMValue;
                 bool disable = request.APMValue > 254;
                 if (HW.SetAPM(request.DeviceID, val, disable))
                 {
-                    var newReply = GetAPM(new GetAPMRequest { DeviceID = request.DeviceID });
+                    var newReply = GetCurrentAPM(new CurrentAPMRequest { DeviceID = request.DeviceID });
                     if (newReply.ReplyResult != 0)
                         _logger.LogTrace("New APM Value: {0}", newReply.APMValue);
                     else

@@ -17,18 +17,18 @@
         <CollectionViewSource x:Key="DeviceStatusDataSource" CollectionViewType="ListCollectionView" />
         <localcode:APMValueProperty x:Key="APMValue" />
         <localcode:APMValueConverter x:Key="APMValueConverter" />
-        <localcode:ACLineStatusConverter x:Key="ACLineStatusConverter" />
+        <localcode:PowerSourceConverter x:Key="PowerSourceConverter" />
         <Style x:Key="PowerStatus" TargetType="TextBlock">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding PowerState, Converter={StaticResource ACLineStatusConverter}}" Value="0">
+                <DataTrigger Binding="{Binding PowerState, Converter={StaticResource PowerSourceConverter}}" Value="0">
                     <Setter Property="Foreground" Value="Salmon" />
                     <Setter Property="Text" Value="Battery" />
                 </DataTrigger>
-                <DataTrigger Binding="{Binding PowerState, Converter={StaticResource ACLineStatusConverter}}" Value="1">
+                <DataTrigger Binding="{Binding PowerState, Converter={StaticResource PowerSourceConverter}}" Value="1">
                     <Setter Property="Foreground" Value="MediumSpringGreen" />
                     <Setter Property="Text" Value="Power" />
                 </DataTrigger>
-                <DataTrigger Binding="{Binding PowerState, Converter={StaticResource ACLineStatusConverter}}" Value="-1">
+                <DataTrigger Binding="{Binding PowerState, Converter={StaticResource PowerSourceConverter}}" Value="-1">
                     <Setter Property="Foreground" Value="DimGray" />
                     <Setter Property="Text" Value="Unknown" />
                 </DataTrigger>

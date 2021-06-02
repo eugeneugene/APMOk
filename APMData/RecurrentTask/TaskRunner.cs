@@ -57,13 +57,7 @@ namespace RecurrentTasks
             {
                 runImmediately?.Dispose();
                 cancellationTokenSource?.Dispose();
-                if (mainTask != null)
-                {
-                    if (mainTask.Status == TaskStatus.RanToCompletion ||
-                        mainTask.Status == TaskStatus.Faulted ||
-                        mainTask.Status == TaskStatus.Canceled)
-                        mainTask.Dispose();
-                }
+                mainTask?.Dispose();
             }
 
             disposed = true;
@@ -114,6 +108,8 @@ namespace RecurrentTasks
 
         public void Start(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (Options.FirstRunDelay < TimeSpan.Zero)
                 throw new ArgumentOutOfRangeException(nameof(Options.FirstRunDelay), "First run delay can't be negative");
 
@@ -126,7 +122,7 @@ namespace RecurrentTasks
 
             cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            mainTask = Task.Run(() => MainLoop(Options.FirstRunDelay, cancellationTokenSource.Token), cancellationToken);
+            mainTask = Task.Run(() => MainLoop(Options.FirstRunDelay, cancellationTokenSource.Token), cancellationTokenSource.Token);
         }
 
         public void Stop()
@@ -168,9 +164,7 @@ namespace RecurrentTasks
                 {
                     // must stop and quit
                     logger.LogWarning("CancellationToken signaled, stopping...");
-                    mainTask = null;
-                    cancellationTokenSource = null;
-                    break;
+                    return;
                 }
 
                 logger.LogDebug("<{0}> Creating scope...", RunnableType.Name);
@@ -239,8 +233,6 @@ namespace RecurrentTasks
                 else
                     sleepInterval = Options.Interval; // return to normal (important after first run only)
             }
-
-            logger.LogInformation("<{0}>.Run() finished.", RunnableType.Name);
         }
 
         /// <summary>

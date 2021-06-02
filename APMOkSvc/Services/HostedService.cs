@@ -31,7 +31,7 @@ namespace APMOkSvc.Services
 
                 foreach (var disk in reply.DiskInfoEntries.Where(item => item.InfoValid))
                 {
-                    var APMValueReply = _diskInfoServiceImpl.GetAPM(new GetAPMRequest { DeviceID = disk.DeviceID });
+                    var APMValueReply = _diskInfoServiceImpl.GetCurrentAPM(new CurrentAPMRequest { DeviceID = disk.DeviceID });
                     if (db.ConfigDataSet.Any(item => item.DeviceID == disk.DeviceID))
                     {
                         var item = db.ConfigDataSet.Single(item => item.DeviceID == disk.DeviceID);

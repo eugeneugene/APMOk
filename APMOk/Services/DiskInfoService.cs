@@ -43,17 +43,17 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<SystemDiskInfoReply> EnumerateDisksAsync(CancellationToken cancellationToken = default)
+        public async Task<DisksReply> EnumerateDisksAsync(CancellationToken cancellationToken = default)
         {
             var client = new APMData.Proto.DiskInfoService.DiskInfoServiceClient(_channel);
             var reply = await client.EnumerateDisksAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }
 
-        public async Task<GetAPMReply> GetAPMAsync(GetAPMRequest request, CancellationToken cancellationToken = default)
+        public async Task<CurrentAPMReply> GetCurrentAPMAsync(CurrentAPMRequest request, CancellationToken cancellationToken = default)
         {
             var client = new APMData.Proto.DiskInfoService.DiskInfoServiceClient(_channel);
-            var reply = await client.GetAPMAsync(request, new CallOptions(cancellationToken: cancellationToken));
+            var reply = await client.GetCurrentAPMAsync(request, new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }
 

@@ -5,17 +5,17 @@ using System.Windows.Data;
 
 namespace APMOk.Code
 {
-    internal class ACLineStatusConverter : IValueConverter
+    internal class PowerSourceConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is PowerStateReply reply)
             {
-                return reply.ACLineStatus switch
+                return reply.PowerSource switch
                 {
-                    EACLineStatus.Online => 1,
-                    EACLineStatus.Offline => 0,
-                    EACLineStatus.LineStatusUnknown => -1,
+                    EPowerSource.Battery => 0,
+                    EPowerSource.Mains => 1,
+                    EPowerSource.Unknown => -1,
                     _ => throw new NotImplementedException(),
                 };
             }

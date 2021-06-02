@@ -10,9 +10,9 @@ namespace APMOk.Tasks
 {
     public class DiskInfoReaderTask : IRunnable
     {
-        private readonly APMOkData _apmOkData;
+        private readonly APMOkModel _apmOkData;
 
-        public DiskInfoReaderTask(APMOkData apmOkData)
+        public DiskInfoReaderTask(APMOkModel apmOkData)
         {
             _apmOkData = apmOkData;
         }

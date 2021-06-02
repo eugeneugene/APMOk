@@ -19,10 +19,11 @@ using System.Windows.Markup;
 
 namespace APMOk
 {
-    public partial class App : Application
+    public partial class App : Application, IDisposable
     {
-        private IHost host;
-        private TaskbarIcon notifyIcon;
+        private IHost host = null;
+        private TaskbarIcon notifyIcon = null;
+        private bool disposedValue = false;
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -42,7 +43,7 @@ namespace APMOk
                 hostBuilder.ConfigureServices((context, services) =>
                 {
                     services.AddSingleton(notifyIcon);
-                    services.AddSingleton<APMOkData>();
+                    services.AddSingleton<APMOkModel>();
                     services.AddSingleton<NotifyIconViewModel>();
                     services.AddTransient<DiskInfoService>();
                     services.AddTransient<PowerStateService>();
@@ -77,7 +78,7 @@ namespace APMOk
 
         private void NotifyIconTrayContextMenuOpen(object sender, RoutedEventArgs e)
         {
-            var _apmOkData = host.Services.GetRequiredService<APMOkData>();
+            var _apmOkData = host.Services.GetRequiredService<APMOkModel>();
             if (e.Source is TaskbarIcon taskbarIcon)
             {
                 var items = taskbarIcon.ContextMenu.Items;
@@ -139,10 +140,6 @@ namespace APMOk
         protected override async void OnExit(ExitEventArgs e)
         {
             await host.StopAsync(TimeSpan.FromSeconds(5));
-            host.Dispose();
-
-            notifyIcon.Dispose();
-
             base.OnExit(e);
         }
 
@@ -151,6 +148,27 @@ namespace APMOk
             Debug.WriteLine("Unhandled exception: {0}", e.Exception);
             if (e.Exception is COMException comException && comException.ErrorCode == -2147221040)
                 e.Handled = true;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    notifyIcon?.Dispose();
+                    host?.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

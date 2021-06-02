@@ -8,15 +8,15 @@ using System.Runtime.CompilerServices;
 
 namespace APMOk
 {
-    public class APMOkData : JsonToString, INotifyPropertyChanged, IDisposable
+    public class APMOkModel : JsonToString, INotifyPropertyChanged, IDisposable
     {
-        public APMOkData()
+        public APMOkModel()
         {
             _APMValueDictionary.PropertyChanged += APMValueDictionaryPropertyChanged;
         }
 
-        private SystemDiskInfoReply _systemDiskInfo;
-        public SystemDiskInfoReply SystemDiskInfo
+        private DisksReply _systemDiskInfo;
+        public DisksReply SystemDiskInfo
         {
             get => _systemDiskInfo;
             set

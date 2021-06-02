@@ -1,4 +1,5 @@
 ﻿using APMData.Proto;
+using APMOk.Tasks;
 using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Extensions.Hosting;
 using RecurrentTasks;
@@ -6,18 +7,18 @@ using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace APMOk.Tasks
+namespace APMOk.Services
 {
     public class NotificationIconUpdaterTask : IHostedService
     {
-        private readonly APMOkData _data;
+        private readonly APMOkModel _data;
         private readonly TaskbarIcon _taskbarIcon;
         private readonly ITask<DiskInfoReaderTask> _diskInfoReaderTask;
         private readonly ITask<BatteryStatusReaderTask> _batteryStatusReaderTask;
 
         //private bool IgnoreUpdate = false;
 
-        public NotificationIconUpdaterTask(APMOkData data, TaskbarIcon taskbarIcon, ITask<DiskInfoReaderTask> diskInfoReaderTask, ITask<BatteryStatusReaderTask> batteryStatusReaderTask)
+        public NotificationIconUpdaterTask(APMOkModel data, TaskbarIcon taskbarIcon, ITask<DiskInfoReaderTask> diskInfoReaderTask, ITask<BatteryStatusReaderTask> batteryStatusReaderTask)
         {
             _data = data;
             _taskbarIcon = taskbarIcon;
@@ -56,16 +57,16 @@ namespace APMOk.Tasks
                 _taskbarIcon.Icon = Properties.Resources.Error;
             else
             {
-                var ACLineStatus = _data.PowerState?.ACLineStatus ?? EACLineStatus.LineStatusUnknown;
+                var PowerSource = _data.PowerState?.PowerSource ?? EPowerSource.Unknown;
                 _taskbarIcon.Dispatcher.Invoke(() =>
                 {
-                    switch (ACLineStatus)
+                    switch (PowerSource)
                     {
-                        case EACLineStatus.Online:
+                        case EPowerSource.Mains:
                             _taskbarIcon.Icon = Properties.Resources.Checked;
                             _taskbarIcon.ToolTipText = "Online";
                             break;
-                        case EACLineStatus.Offline:
+                        case EPowerSource.Battery:
                             _taskbarIcon.Icon = Properties.Resources.Battery;
                             _taskbarIcon.ToolTipText = "Offline";
                             break;

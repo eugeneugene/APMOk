@@ -7,9 +7,9 @@ package APMData;
 import "google/protobuf/Empty.proto";
 
 service DiskInfoService {
-	rpc EnumerateDisks (google.protobuf.Empty) returns (SystemDiskInfoReply);
-	rpc GetCurrentAPM (GetCurrentAPMRequest) returns (GetAPMReply);
-	rpc SetAPM (SetAPMRequest) returns (SetAPMReply);
+	rpc EnumerateDisks (google.protobuf.Empty) returns (DisksReply);
+	rpc GetCurrentAPM (CurrentAPMRequest) returns (CurrentAPMReply);
+	rpc SetAPM (APMRequest) returns (APMReply);
 }
 
 service PowerStateService {
@@ -33,27 +33,27 @@ message DiskInfoEntry {
 	string SerialNumber = 13;
 }
 
-message SystemDiskInfoReply {
+message DisksReply {
 	int32 ReplyResult = 1;
 	repeated DiskInfoEntry DiskInfoEntries = 2;
 }
 
-message GetCurrentAPMRequest {
+message CurrentAPMRequest {
 	string DeviceID = 1;
 }
 
-message GetAPMReply {
+message CurrentAPMReply {
 	int32 ReplyResult = 1;
 	uint32 APMValue = 2;
 }
 
-message SetAPMRequest {
+message APMRequest {
 	string DeviceID = 1;
 	uint32 APMValue = 2;
 	EPowerSource PowerSource = 3;
 }
 
-message SetAPMReply {
+message APMReply {
 	int32 ReplyResult = 1;
 }
 

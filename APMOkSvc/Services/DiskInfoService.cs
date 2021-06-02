@@ -18,18 +18,18 @@ namespace APMOkSvc.Services
             _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
         }
 
-        public override Task<SystemDiskInfoReply> EnumerateDisks(Empty request, ServerCallContext context)
+        public override Task<DisksReply> EnumerateDisks(Empty request, ServerCallContext context)
         {
             var reply = _diskInfoServiceImpl.EnumerateDisks();
             return Task.FromResult(reply);
         }
 
-        public override Task<GetAPMReply> GetAPM(GetAPMRequest request, ServerCallContext context)
+        public override Task<CurrentAPMReply> GetCurrentAPM(CurrentAPMRequest request, ServerCallContext context)
         {
-            return Task.FromResult(_diskInfoServiceImpl.GetAPM(request));
+            return Task.FromResult(_diskInfoServiceImpl.GetCurrentAPM(request));
         }
 
-        public override Task<SetAPMReply> SetAPM(SetAPMRequest request, ServerCallContext context)
+        public override Task<APMReply> SetAPM(APMRequest request, ServerCallContext context)
         {
             return Task.FromResult(_diskInfoServiceImpl.SetAPM(request));
         }

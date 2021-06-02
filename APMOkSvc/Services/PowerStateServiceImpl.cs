@@ -33,12 +33,17 @@ namespace APMOkSvc.Services
                     _logger.LogTrace("BatteryLifePercent : {0}", powerState.BatteryLifePercent);
                     _logger.LogTrace("BatteryLifeTime : {0}", powerState.BatteryLifeTime);
 
-                    reply.ReplyResult = 1;
-                    reply.ACLineStatus = (EACLineStatus)powerState.ACLineStatus;
+                    reply.PowerSource = powerState.ACLineStatus switch
+                    {
+                        ACLineStatus.Offline => EPowerSource.Battery,
+                        ACLineStatus.Online => EPowerSource.Mains,
+                        _ => EPowerSource.Unknown,
+                    };
                     reply.BatteryFlag = (EBatteryFlag)powerState.BatteryFlag;
                     reply.BatteryFullLifeTime = powerState.BatteryFullLifeTime;
                     reply.BatteryLifePercent = powerState.BatteryLifePercent;
                     reply.BatteryLifeTime = powerState.BatteryLifeTime;
+                    reply.ReplyResult = 1;
                 }
                 else
                     _logger.LogTrace("GetPowerState returned null");

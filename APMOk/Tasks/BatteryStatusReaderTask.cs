@@ -9,9 +9,9 @@ namespace APMOk.Tasks
 {
     public class BatteryStatusReaderTask : IRunnable
     {
-        private readonly APMOkData _apmOkData;
+        private readonly APMOkModel _apmOkData;
 
-        public BatteryStatusReaderTask(APMOkData apmOkData)
+        public BatteryStatusReaderTask(APMOkModel apmOkData)
         {
             _apmOkData = apmOkData;
         }

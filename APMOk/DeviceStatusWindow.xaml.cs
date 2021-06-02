@@ -20,7 +20,7 @@ namespace APMOk
     /// </summary>
     internal partial class DeviceStatusWindow : Window, IDisposable
     {
-        private readonly APMOkData _apmOkData;
+        private readonly APMOkModel _apmOkData;
         private readonly Services.DiskInfoService _diskInfoService;
         private bool disposedValue;
 
@@ -32,7 +32,7 @@ namespace APMOk
 
         public APMValueProperty APMValue { get; }
 
-        public DeviceStatusWindow(APMOkData apmOkData, Services.DiskInfoService diskInfoService)
+        public DeviceStatusWindow(APMOkModel apmOkData, Services.DiskInfoService diskInfoService)
         {
             InitializeComponent();
 
@@ -82,8 +82,8 @@ namespace APMOk
         {
             if (_apmOkData.PowerState != null && _apmOkData.PowerState.ReplyResult != 0)
             {
-                PowerStateItems[nameof(_apmOkData.PowerState.ACLineStatus)] = _apmOkData.PowerState.BatteryFlag;
-                PowerStateItems[nameof(_apmOkData.PowerState.BatteryFlag)] = _apmOkData.PowerState.ACLineStatus;
+                PowerStateItems[nameof(_apmOkData.PowerState.PowerSource)] = _apmOkData.PowerState.PowerSource;
+                PowerStateItems[nameof(_apmOkData.PowerState.BatteryFlag)] = _apmOkData.PowerState.BatteryFlag;
                 PowerStateItems[nameof(_apmOkData.PowerState.BatteryFullLifeTime)] = _apmOkData.PowerState.BatteryFullLifeTime;
                 PowerStateItems[nameof(_apmOkData.PowerState.BatteryLifePercent)] = _apmOkData.PowerState.BatteryLifePercent;
                 PowerStateItems[nameof(_apmOkData.PowerState.BatteryLifeTime)] = _apmOkData.PowerState.BatteryLifeTime;
@@ -140,7 +140,7 @@ namespace APMOk
 
                     Task.Run(async () =>
                     {
-                        var apmReply = await _diskInfoService.GetAPMAsync(new GetAPMRequest { DeviceID = device.Key }, CancellationToken.None);
+                        var apmReply = await _diskInfoService.GetCurrentAPMAsync(new CurrentAPMRequest { DeviceID = device.Key }, CancellationToken.None);
                         APMValue.CurrentValue = apmReply.ReplyResult != 0 ? (int)apmReply.APMValue : -1;
                     });
                 }
