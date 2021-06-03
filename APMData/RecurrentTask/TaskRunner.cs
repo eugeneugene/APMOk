@@ -57,7 +57,13 @@ namespace RecurrentTasks
             {
                 runImmediately?.Dispose();
                 cancellationTokenSource?.Dispose();
-                mainTask?.Dispose();
+                if (mainTask != null)
+                {
+                    if (mainTask.Status == TaskStatus.RanToCompletion ||
+                        mainTask.Status == TaskStatus.Faulted ||
+                        mainTask.Status == TaskStatus.Canceled)
+                        mainTask.Dispose();
+                }
             }
 
             disposed = true;

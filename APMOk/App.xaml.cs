@@ -140,6 +140,8 @@ namespace APMOk
         protected override async void OnExit(ExitEventArgs e)
         {
             await host.StopAsync(TimeSpan.FromSeconds(5));
+            host.Dispose();
+            host = null;
             base.OnExit(e);
         }
 
