@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:tb="http://www.hardcodet.net/taskbar">
     <ContextMenu x:Key="SysTrayMenu" x:Shared="false">
-        <MenuItem Command="{Binding ShowWindowCommand}" Header="Show Window" />
+        <MenuItem Command="{Binding ShowWindowCommand}" Header="APM Status" />
         <Separator />
         <MenuItem Command="{Binding ExitApplicationCommand}" Header="Exit" />
     </ContextMenu>
