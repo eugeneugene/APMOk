@@ -9,25 +9,10 @@ namespace APMOk.Code
         public APMValueProperty()
         { }
 
-        public APMValueProperty(int defaultValue, int userValue, int currentValue)
+        public APMValueProperty(int userValue, int currentValue)
         {
-            _defaultValue = defaultValue;
             _userValue = userValue;
             _currentValue = currentValue;
-        }
-
-        private int _defaultValue;
-        public int DefaultValue
-        {
-            get => _defaultValue;
-            set
-            {
-                if (value != _defaultValue)
-                {
-                    _defaultValue = value;
-                    NotifyPropertyChanged(nameof(DefaultValue));
-                }
-            }
         }
 
         private int _userValue;
@@ -71,7 +56,7 @@ namespace APMOk.Code
         {
             if (ReferenceEquals(this, other))
                 return true;
-            return _defaultValue == other._defaultValue && _userValue == other.UserValue;
+            return _userValue == other.UserValue;
         }
 
         public override bool Equals(object obj)
@@ -81,7 +66,7 @@ namespace APMOk.Code
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(_defaultValue, _userValue);
+            return _userValue.GetHashCode();
         }
     }
 }

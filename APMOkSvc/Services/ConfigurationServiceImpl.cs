@@ -30,7 +30,6 @@ namespace APMOkSvc.Services
                 {
                     DeviceID = item.DeviceID,
                     UserValue = item.UserValue,
-                    DefaultValue = item.DefaultValue
                 }));
                 reply.ReplyResult = 1;
             }

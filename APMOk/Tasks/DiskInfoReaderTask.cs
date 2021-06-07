@@ -36,8 +36,7 @@ namespace APMOk.Tasks
                 if (driveAPMConfigurationReply.ReplyResult != 0)
                 {
                     foreach (var entry in driveAPMConfigurationReply.DriveAPMConfigurationReplyEntries)
-                        _apmOkData.APMValueDictionary[entry.DeviceID] = new APMValueProperty(defaultValue: (int)entry.DefaultValue,
-                                                                                             userValue: (int)entry.UserValue,
+                        _apmOkData.APMValueDictionary[entry.DeviceID] = new APMValueProperty(userValue: (int)entry.UserValue,
                                                                                              currentValue: 0);
                 }
 

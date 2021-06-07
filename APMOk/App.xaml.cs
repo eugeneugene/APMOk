@@ -94,11 +94,10 @@ namespace APMOk
                             {
                                 _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
                                 var newMenuItem1 = new MenuItem { Name = $"ID{j}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
-                                if (apmValueProperty == null || apmValueProperty.DefaultValue == 0)
+                                if (apmValueProperty == null)
                                     newMenuItem1.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
                                 else
                                 {
-                                    newMenuItem1.Items.Add(new MenuItem { Header = "Default value: " + apmValueProperty.DefaultValue });
                                     newMenuItem1.Items.Add(new MenuItem { Header = "User value: " + ((apmValueProperty.UserValue == 0) ? "n/a" : apmValueProperty.UserValue.ToString()) });
                                     newMenuItem1.Items.Add(new Separator());
                                     var newMenuItem2 = new MenuItem { Header = "Set" };

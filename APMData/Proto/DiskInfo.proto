@@ -84,8 +84,7 @@ message PowerStateReply {
 
 message DriveAPMConfigurationReplyEntry {
 	string DeviceID = 1;
-	uint32 DefaultValue = 2;
-	uint32 UserValue = 3;
+	uint32 UserValue = 2;
 }
 
 message DriveAPMConfigurationReply {

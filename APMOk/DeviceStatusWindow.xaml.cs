@@ -136,7 +136,6 @@ namespace APMOk
                 {
                     var device = _apmOkData.APMValueDictionary.Single(item => item.Key == selectedItem.DeviceID);
                     APMValue.UserValue = device.Value.UserValue;
-                    APMValue.DefaultValue = device.Value.DefaultValue;
 
                     Task.Run(async () =>
                     {

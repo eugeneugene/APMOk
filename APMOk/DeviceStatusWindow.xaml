@@ -190,30 +190,10 @@
             <Grid>
                 <Grid.RowDefinitions />
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="33*" />
-                    <ColumnDefinition Width="33*" />
-                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="50*" />
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Row="0" Grid.Column="0">
-                    <Grid.RowDefinitions />
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="60" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Margin="5">
-                        Default:
-                    </TextBlock>
-                    <TextBlock
-                        x:Name="DefaultAPMValue"
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Margin="5"
-                        Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.DefaultValue, Converter={StaticResource APMValueConverter}}" />
-                </Grid>
-                <Grid Grid.Row="0" Grid.Column="1">
                     <Grid.RowDefinitions />
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="60" />
@@ -232,7 +212,7 @@
                         Margin="5"
                         Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.UserValue, Converter={StaticResource APMValueConverter}}" />
                 </Grid>
-                <Grid Grid.Row="0" Grid.Column="2">
+                <Grid Grid.Row="0" Grid.Column="1">
                     <Grid.RowDefinitions />
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="60" />
