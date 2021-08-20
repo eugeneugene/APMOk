@@ -10,12 +10,21 @@ namespace APMOk
 {
     public class APMOkModel : JsonToString, INotifyPropertyChanged, IDisposable
     {
+        private DisksReply _systemDiskInfo;
+        private PowerStateReply _powerState;
+        private bool _connectFailure;
+        private bool disposedValue;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public ObservableConcurrentDictionary<string, APMValueProperty> APMValueDictionary { get; }
+
         public APMOkModel()
         {
-            _APMValueDictionary.PropertyChanged += APMValueDictionaryPropertyChanged;
+            APMValueDictionary = new();
+            APMValueDictionary.PropertyChanged += APMValueDictionaryPropertyChanged;
         }
 
-        private DisksReply _systemDiskInfo;
         public DisksReply SystemDiskInfo
         {
             get => _systemDiskInfo;
@@ -29,7 +38,6 @@ namespace APMOk
             }
         }
 
-        private PowerStateReply _powerState;
         public PowerStateReply PowerState
         {
             get => _powerState;
@@ -43,7 +51,6 @@ namespace APMOk
             }
         }
 
-        private bool _connectFailure;
         public bool ConnectFailure
         {
             get => _connectFailure;
@@ -57,18 +64,11 @@ namespace APMOk
             }
         }
 
-        private readonly ObservableConcurrentDictionary<string, APMValueProperty> _APMValueDictionary = new();
-        public ObservableConcurrentDictionary<string, APMValueProperty> APMValueDictionary
-        {
-            get => _APMValueDictionary;
-        }
-
         private void APMValueDictionaryPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             NotifyPropertyChanged(nameof(APMValueDictionary));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
             if (string.IsNullOrEmpty(propertyName))
@@ -77,14 +77,13 @@ namespace APMOk
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private bool disposedValue;
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
-                    _APMValueDictionary.PropertyChanged -= APMValueDictionaryPropertyChanged;
+                    APMValueDictionary.PropertyChanged -= APMValueDictionaryPropertyChanged;
                 }
             }
             disposedValue = true;

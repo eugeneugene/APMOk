@@ -82,6 +82,8 @@ namespace APMOkSvc.Code
                         break;
                     case "-D":
                     case "/D":
+                    case "-G":
+                    case "/G":
                     case "-DEBUG":
                     case "/DEBUG":
                     case "--DEBUG":

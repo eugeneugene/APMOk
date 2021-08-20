@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace APMOk
 {
@@ -23,6 +24,10 @@ namespace APMOk
         private readonly APMOkModel _apmOkData;
         private readonly Services.DiskInfoService _diskInfoService;
         private bool disposedValue;
+
+        private static ImageSource Error = Properties.Resources.Error.ToImageSource();
+        private static ImageSource Checked = Properties.Resources.Checked.ToImageSource();
+        private static ImageSource Battery = Properties.Resources.Battery.ToImageSource();
 
         public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
 
@@ -88,6 +93,7 @@ namespace APMOk
                 PowerStateItems[nameof(_apmOkData.PowerState.BatteryLifePercent)] = _apmOkData.PowerState.BatteryLifePercent;
                 PowerStateItems[nameof(_apmOkData.PowerState.BatteryLifeTime)] = _apmOkData.PowerState.BatteryLifeTime;
             }
+            UpdateIcon();
         }
 
         private void LoadDisksInfo()
@@ -202,5 +208,31 @@ namespace APMOk
                     SelectDiskCombo.SelectedIndex = -1;
             }
         }
+
+        private void UpdateIcon()
+        {
+            if (_apmOkData.ConnectFailure)
+                Icon = Error;
+            else
+            {
+                var PowerSource = _apmOkData.PowerState?.PowerSource ?? EPowerSource.Unknown;
+                Dispatcher.Invoke(() =>
+                {
+                    switch (PowerSource)
+                    {
+                        case EPowerSource.Mains:
+                            Icon = Checked;
+                            break;
+                        case EPowerSource.Battery:
+                            Icon = Battery;
+                            break;
+                        default:
+                            Icon = Error;
+                            break;
+                    }
+                });
+            }
+        }
+
     }
 }

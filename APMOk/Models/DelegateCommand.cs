@@ -4,7 +4,7 @@ using System.Windows.Input;
 namespace APMOk
 {
     /// <summary>
-    /// Simplistic delegate command for the demo.
+    /// Simplistic delegate command
     /// </summary>
     public class DelegateCommand : ICommand
     {

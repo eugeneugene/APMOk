@@ -13,7 +13,7 @@ namespace APMOkLib
         public static readonly Availability NotApplicable = new("Not Applicable", 6);
         public static readonly Availability PowerOff = new("Power Off", 7);
         public static readonly Availability OffLine = new("Off Line", 8);
-        public static readonly Availability OffDuty  = new("Off Duty", 9);
+        public static readonly Availability OffDuty = new("Off Duty", 9);
         public static readonly Availability Degraded = new("Degraded", 10);
         public static readonly Availability NotInstalled = new("Not Installed", 11);
         public static readonly Availability InstallError = new("Install Error", 12);
@@ -26,9 +26,8 @@ namespace APMOkLib
         public static readonly Availability NotReady = new("Not Ready", 19);
         public static readonly Availability NotConfigured = new("Not Configured", 20);
         public static readonly Availability Quiesced = new("Quiesced ", 21);
-      
+
         private Availability(string name, ushort type) : base(name, type)
-        {
-        }
+        { }
     }
 }

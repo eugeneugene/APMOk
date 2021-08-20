@@ -3,6 +3,7 @@ using APMOkSvc.Code;
 using APMOkSvc.Types;
 using Microsoft.Extensions.Logging;
 using System;
+using System.ComponentModel;
 using System.Linq;
 
 namespace APMOkSvc.Services
@@ -80,6 +81,10 @@ namespace APMOkSvc.Services
                 }
                 else
                     _logger.LogTrace("GetAPM returned false");
+            }
+            catch(Win32Exception wex)
+            {
+                _logger.LogError("Win32Exception: '{0}' DeviceId: {1}", wex.Message, request.DeviceID);
             }
             catch (Exception ex)
             {
