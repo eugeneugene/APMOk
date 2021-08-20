@@ -1,24 +1,21 @@
-﻿using CustomConfiguration;
+﻿using APMOkLib.CustomConfiguration;
 using Microsoft.Extensions.Configuration;
 using System;
 
-namespace APMOk
+namespace APMOk.Code
 {
-    public class TasksStartupConfiguration : ICustomConfiguration
+    public class TasksStartupConfiguration : SmartConfiguration, ITasksStartupConfiguration
     {
-        public IConfiguration Configuration { get; }
-        public string SectionName => "TasksStartup";
-
         public IConfigurationParameter<ITaskStartup> PowerStatusReader { get; }
         public IConfigurationParameter<ITaskStartup> DiskStatusReader { get; }
 
-        public TasksStartupConfiguration(IConfiguration configuration)
+        public TasksStartupConfiguration(IConfiguration configuration, ConfigurationParameterFactory parameterFactory)
+            : base("TasksStartup", configuration)
         {
-            Configuration = configuration;
-            PowerStatusReader = ConfigurationParameterFactory.CreateParameter(Configuration, nameof(PowerStatusReader), SectionName + ":" + nameof(PowerStatusReader),
-                new TaskStartupParameterDecorator<ITaskStartup>(new DefaultTaskStartup(TimeSpan.FromSeconds(1))), "Периодичность чтения статуса батареи");
-            DiskStatusReader = ConfigurationParameterFactory.CreateParameter(Configuration, nameof(DiskStatusReader), SectionName + ":" + nameof(DiskStatusReader),
-                new TaskStartupParameterDecorator<ITaskStartup>(new DefaultTaskStartup(TimeSpan.FromMinutes(1))), "Периодичность чтения информации о жёстких дисках");        
+            PowerStatusReader = parameterFactory.CreateParameter(this, nameof(PowerStatusReader), nameof(PowerStatusReader),
+                new TaskStartupParameterDecorator<ITaskStartup>(new TaskStartupParameter(TimeSpan.FromSeconds(1))), "Периодичность чтения статуса батареи");
+            DiskStatusReader = parameterFactory.CreateParameter(this, nameof(DiskStatusReader), nameof(DiskStatusReader),
+                new TaskStartupParameterDecorator<ITaskStartup>(new TaskStartupParameter(TimeSpan.FromMinutes(1))), "Периодичность чтения информации о жёстких дисках");
         }
     }
 }

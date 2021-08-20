@@ -1,6 +1,6 @@
-﻿using APMData.Proto;
+﻿using APMData;
+using APMData.Proto;
 using APMOk.Code;
-using APMOkLib;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -25,9 +25,9 @@ namespace APMOk
         private readonly Services.DiskInfoService _diskInfoService;
         private bool disposedValue;
 
-        private static ImageSource Error = Properties.Resources.Error.ToImageSource();
-        private static ImageSource Checked = Properties.Resources.Checked.ToImageSource();
-        private static ImageSource Battery = Properties.Resources.Battery.ToImageSource();
+        private static readonly ImageSource Error = Properties.Resources.Error.ToImageSource();
+        private static readonly ImageSource Checked = Properties.Resources.Checked.ToImageSource();
+        private static readonly ImageSource Battery = Properties.Resources.Battery.ToImageSource();
 
         public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
 
@@ -87,11 +87,11 @@ namespace APMOk
         {
             if (_apmOkData.PowerState != null && _apmOkData.PowerState.ReplyResult != 0)
             {
-                PowerStateItems[nameof(_apmOkData.PowerState.PowerSource)] = _apmOkData.PowerState.PowerSource;
-                PowerStateItems[nameof(_apmOkData.PowerState.BatteryFlag)] = _apmOkData.PowerState.BatteryFlag;
-                PowerStateItems[nameof(_apmOkData.PowerState.BatteryFullLifeTime)] = _apmOkData.PowerState.BatteryFullLifeTime;
-                PowerStateItems[nameof(_apmOkData.PowerState.BatteryLifePercent)] = _apmOkData.PowerState.BatteryLifePercent;
-                PowerStateItems[nameof(_apmOkData.PowerState.BatteryLifeTime)] = _apmOkData.PowerState.BatteryLifeTime;
+                PowerStateItems[nameof(_apmOkData.PowerState.PowerState.PowerSource)] = _apmOkData.PowerState.PowerState.PowerSource;
+                PowerStateItems[nameof(_apmOkData.PowerState.PowerState.BatteryFlag)] = _apmOkData.PowerState.PowerState.BatteryFlag;
+                PowerStateItems[nameof(_apmOkData.PowerState.PowerState.BatteryFullLifeTime)] = _apmOkData.PowerState.PowerState.BatteryFullLifeTime;
+                PowerStateItems[nameof(_apmOkData.PowerState.PowerState.BatteryLifePercent)] = _apmOkData.PowerState.PowerState.BatteryLifePercent;
+                PowerStateItems[nameof(_apmOkData.PowerState.PowerState.BatteryLifeTime)] = _apmOkData.PowerState.PowerState.BatteryLifeTime;
             }
             UpdateIcon();
         }
@@ -215,24 +215,19 @@ namespace APMOk
                 Icon = Error;
             else
             {
-                var PowerSource = _apmOkData.PowerState?.PowerSource ?? EPowerSource.Unknown;
+                EPowerSource PowerSource = EPowerSource.Unknown;
+                if (_apmOkData.PowerState.ReplyResult == 1)
+                    PowerSource = _apmOkData.PowerState?.PowerState.PowerSource ?? EPowerSource.Unknown;
                 Dispatcher.Invoke(() =>
                 {
-                    switch (PowerSource)
+                    Icon = PowerSource switch
                     {
-                        case EPowerSource.Mains:
-                            Icon = Checked;
-                            break;
-                        case EPowerSource.Battery:
-                            Icon = Battery;
-                            break;
-                        default:
-                            Icon = Error;
-                            break;
-                    }
+                        EPowerSource.Mains => Checked,
+                        EPowerSource.Battery => Battery,
+                        _ => Error,
+                    };
                 });
             }
         }
-
     }
 }

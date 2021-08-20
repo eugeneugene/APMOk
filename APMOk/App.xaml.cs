@@ -2,11 +2,12 @@
 using APMOk.Code;
 using APMOk.Services;
 using APMOk.Tasks;
-using CustomConfiguration;
+using APMOkLib;
+using APMOkLib.CustomConfiguration;
+using APMOkLib.RecurrentTasks;
 using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RecurrentTasks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -51,9 +52,11 @@ namespace APMOk
                     services.AddTransient<DeviceStatusWindow>();
                     services.AddHostedService<NotificationIconUpdaterTask>();
 
-                    TasksStartupConfiguration tasksStartupConfiguration = new(context.Configuration);
-                    services.AddTask<PowerStatusReaderTask>(task => task.AutoStart(tasksStartupConfiguration.PowerStatusReader.Value));
-                    services.AddTask<DiskInfoReaderTask>(task => task.AutoStart(tasksStartupConfiguration.DiskStatusReader.Value));
+                    services.AddSingleton<ConfigurationParameterFactory>();
+                    services.AddSingleton<ITasksStartupConfiguration, TasksStartupConfiguration>();
+
+                    services.AddTask<PowerStatusReaderTask>(options => options.TaskOptions.AutoStart(options.ServiceProvider.GetRequiredService<ITasksStartupConfiguration>().PowerStatusReader.Value));
+                    services.AddTask<DiskInfoReaderTask>(options => options.TaskOptions.AutoStart(options.ServiceProvider.GetRequiredService<ITasksStartupConfiguration>().DiskStatusReader.Value));
                 });
                 host = hostBuilder.Build();
                 await host.StartAsync();
@@ -86,7 +89,7 @@ namespace APMOk
                 {
                     if (item is MenuItem menuItem1 && menuItem1.Name == "OnMains")
                     {
-                        while(menuItem1.Items.Count > 0)
+                        while (menuItem1.Items.Count > 0)
                             menuItem1.Items.RemoveAt(0);
                         menuItem1.IsEnabled = true;
 

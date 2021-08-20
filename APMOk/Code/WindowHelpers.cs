@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Windows;
 
-namespace APMOk
+namespace APMOk.Code
 {
     public static class WindowHelpers
     {

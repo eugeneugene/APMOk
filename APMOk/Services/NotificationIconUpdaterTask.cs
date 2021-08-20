@@ -1,8 +1,8 @@
 ﻿using APMData.Proto;
 using APMOk.Tasks;
+using APMOkLib.RecurrentTasks;
 using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Extensions.Hosting;
-using RecurrentTasks;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,7 +57,10 @@ namespace APMOk.Services
                 _taskbarIcon.Icon = Properties.Resources.Error;
             else
             {
-                var PowerSource = _data.PowerState?.PowerSource ?? EPowerSource.Unknown;
+
+                EPowerSource PowerSource = EPowerSource.Unknown;
+                if (_data.PowerState.ReplyResult == 1)
+                    PowerSource = _data.PowerState?.PowerState.PowerSource ?? EPowerSource.Unknown;
                 _taskbarIcon.Dispatcher.Invoke(() =>
                 {
                     switch (PowerSource)

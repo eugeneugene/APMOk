@@ -1,4 +1,5 @@
-﻿using APMOkSvc.Code;
+﻿using APMOkLib.CustomConfiguration;
+using APMOkSvc.Code;
 using APMOkSvc.Data;
 using APMOkSvc.Services;
 using Microsoft.AspNetCore.Builder;
@@ -15,37 +16,14 @@ namespace APMOkSvc
 {
     internal class Startup
     {
-        private readonly IConfiguration _configuration;
-        private readonly IHostEnvironment _environment;
-
-        public Startup(IConfiguration configuration, IHostEnvironment environment)
-        {
-            _configuration = configuration;
-            _environment = environment;
-        }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            ConnectionStringsConfiguration connectionStringsConfiguration = new(_configuration);
-            services.AddDbContext<DataContext>(options =>
-            {
-                var DataContext = connectionStringsConfiguration.DataContext.Value;
-                if (string.IsNullOrEmpty(DataContext))
-                    throw new Exception("DataContext is not set and must not be empty");
+            services.AddSingleton<ConfigurationParameterFactory>();
+            services.AddSingleton<ITasksStartupConfiguration, TasksStartupConfiguration>();
+            services.AddSingleton<IConnectionStringsConfiguration, ConnectionStringsConfiguration>();
 
-                var connectionOptions = new SqliteConnectionStringBuilder(DataContext);
-                var dbFile = connectionOptions.DataSource;
-                var dbPath = Path.GetDirectoryName(Path.GetFullPath(dbFile));
-                if (string.IsNullOrEmpty(dbPath))
-                    throw new Exception("DataContext path must not be empty");
-
-                Directory.CreateDirectory(dbPath);
-
-                options.UseSqlite(connectionStringsConfiguration.DataContext.Value);
-                options.EnableSensitiveDataLogging(_environment.IsDevelopment());
-                options.EnableDetailedErrors(_environment.IsDevelopment());
-            });
+            services.AddDbContext<DataContext>();
             services.AddHostedService<StartupHostedService>();
             services.AddTransient<DiskInfoServiceImpl>();
             services.AddTransient<PowerStateServiceImpl>();

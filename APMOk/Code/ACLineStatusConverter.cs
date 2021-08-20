@@ -11,7 +11,9 @@ namespace APMOk.Code
         {
             if (value is PowerStateReply reply)
             {
-                return reply.PowerSource switch
+                if (reply.ReplyResult == 0)
+                    return -1;
+                return reply.PowerState.PowerSource switch
                 {
                     EPowerSource.Battery => 0,
                     EPowerSource.Mains => 1,
