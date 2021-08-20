@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 
 namespace APMOkSvc.Services
 {
-    public class DiskInfoService : APMData.Proto.DiskInfoService.DiskInfoServiceBase
+    /// <summary>
+    /// DiskInfo GRPC Service
+    /// </summary>
+    public class DiskInfoGRPCService : DiskInfoService.DiskInfoServiceBase
     {
         private readonly ILogger _logger;
         private readonly DiskInfoServiceImpl _diskInfoServiceImpl;
 
-        public DiskInfoService(ILogger<DiskInfoService> logger, DiskInfoServiceImpl diskInfoServiceImpl)
+        public DiskInfoGRPCService(ILogger<DiskInfoGRPCService> logger, DiskInfoServiceImpl diskInfoServiceImpl)
         {
             _logger = logger;
             _diskInfoServiceImpl = diskInfoServiceImpl;

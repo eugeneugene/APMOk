@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 
 namespace APMOkSvc.Services
 {
-    public class ConfigurationService : APMData.Proto.ConfigurationService.ConfigurationServiceBase
+    /// <summary>
+    /// Configuration GRPC Service
+    /// </summary>
+    public class ConfigurationGRPCService : ConfigurationService.ConfigurationServiceBase
     {
         private readonly ILogger _logger;
         private readonly ConfigurationServiceImpl _configurationServiceImpl;
 
-        public ConfigurationService(ILogger<ConfigurationService> logger, ConfigurationServiceImpl configurationServiceImpl)
+        public ConfigurationGRPCService(ILogger<ConfigurationGRPCService> logger, ConfigurationServiceImpl configurationServiceImpl)
         {
             _logger = logger;
             _configurationServiceImpl = configurationServiceImpl;

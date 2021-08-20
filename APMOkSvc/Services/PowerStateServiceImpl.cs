@@ -5,6 +5,10 @@ using System;
 
 namespace APMOkSvc.Services
 {
+    /// <summary>
+    /// Implementation PowerState GRPC Service
+    /// DI Lifetime: Transient
+    /// </summary>
     public class PowerStateServiceImpl
     {
         private readonly ILogger _logger;
@@ -33,16 +37,16 @@ namespace APMOkSvc.Services
                     _logger.LogTrace("BatteryLifePercent : {0}", powerState.BatteryLifePercent);
                     _logger.LogTrace("BatteryLifeTime : {0}", powerState.BatteryLifeTime);
 
-                    reply.PowerSource = powerState.ACLineStatus switch
+                    reply.PowerState.PowerSource = powerState.ACLineStatus switch
                     {
                         ACLineStatus.Offline => EPowerSource.Battery,
                         ACLineStatus.Online => EPowerSource.Mains,
                         _ => EPowerSource.Unknown,
                     };
-                    reply.BatteryFlag = (EBatteryFlag)powerState.BatteryFlag;
-                    reply.BatteryFullLifeTime = powerState.BatteryFullLifeTime;
-                    reply.BatteryLifePercent = powerState.BatteryLifePercent;
-                    reply.BatteryLifeTime = powerState.BatteryLifeTime;
+                    reply.PowerState.BatteryFlag = (EBatteryFlag)powerState.BatteryFlag;
+                    reply.PowerState.BatteryFullLifeTime = powerState.BatteryFullLifeTime;
+                    reply.PowerState.BatteryLifePercent = powerState.BatteryLifePercent;
+                    reply.PowerState.BatteryLifeTime = powerState.BatteryLifeTime;
                     reply.ReplyResult = 1;
                 }
                 else

@@ -45,6 +45,7 @@ message CurrentAPMRequest {
 message CurrentAPMReply {
 	int32 ReplyResult = 1;
 	uint32 APMValue = 2;
+	EPowerSource PowerSource = 3;
 }
 
 message APMRequest {
@@ -75,16 +76,21 @@ enum EPowerSource {
 
 message PowerStateReply {
 	int32 ReplyResult = 1;
-	EPowerSource PowerSource = 2;
-	EBatteryFlag BatteryFlag = 3;
-	int32 BatteryLifePercent = 4;
-	int32 BatteryLifeTime = 5;
-	int32 BatteryFullLifeTime = 6;
+	PowerStateEntry PowerState = 2;
+}
+
+message PowerStateEntry {
+	EPowerSource PowerSource = 1;
+	EBatteryFlag BatteryFlag = 2;
+	int32 BatteryLifePercent = 3;
+	int32 BatteryLifeTime = 4;
+	int32 BatteryFullLifeTime = 5;
 }
 
 message DriveAPMConfigurationReplyEntry {
 	string DeviceID = 1;
-	uint32 UserValue = 2;
+	uint32 OnMains = 2;
+	uint32 OnBatteries = 3;
 }
 
 message DriveAPMConfigurationReply {

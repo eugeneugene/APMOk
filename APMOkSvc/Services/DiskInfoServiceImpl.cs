@@ -8,6 +8,10 @@ using System.Linq;
 
 namespace APMOkSvc.Services
 {
+    /// <summary>
+    /// Implementation of DiskInfo GRPC Service
+    /// DI Lifetime: Transient
+    /// </summary>
     public class DiskInfoServiceImpl
     {
         private readonly ILogger _logger;

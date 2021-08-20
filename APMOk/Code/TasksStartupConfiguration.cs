@@ -9,13 +9,13 @@ namespace APMOk
         public IConfiguration Configuration { get; }
         public string SectionName => "TasksStartup";
 
-        public IConfigurationParameter<ITaskStartup> BatteryStatusReader { get; }
+        public IConfigurationParameter<ITaskStartup> PowerStatusReader { get; }
         public IConfigurationParameter<ITaskStartup> DiskStatusReader { get; }
 
         public TasksStartupConfiguration(IConfiguration configuration)
         {
             Configuration = configuration;
-            BatteryStatusReader = ConfigurationParameterFactory.CreateParameter(Configuration, nameof(BatteryStatusReader), SectionName + ":" + nameof(BatteryStatusReader),
+            PowerStatusReader = ConfigurationParameterFactory.CreateParameter(Configuration, nameof(PowerStatusReader), SectionName + ":" + nameof(PowerStatusReader),
                 new TaskStartupParameterDecorator<ITaskStartup>(new DefaultTaskStartup(TimeSpan.FromSeconds(1))), "Периодичность чтения статуса батареи");
             DiskStatusReader = ConfigurationParameterFactory.CreateParameter(Configuration, nameof(DiskStatusReader), SectionName + ":" + nameof(DiskStatusReader),
                 new TaskStartupParameterDecorator<ITaskStartup>(new DefaultTaskStartup(TimeSpan.FromMinutes(1))), "Периодичность чтения информации о жёстких дисках");        

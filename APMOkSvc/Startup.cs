@@ -46,7 +46,7 @@ namespace APMOkSvc
                 options.EnableSensitiveDataLogging(_environment.IsDevelopment());
                 options.EnableDetailedErrors(_environment.IsDevelopment());
             });
-            services.AddHostedService<HostedService>();
+            services.AddHostedService<StartupHostedService>();
             services.AddTransient<DiskInfoServiceImpl>();
             services.AddTransient<PowerStateServiceImpl>();
             services.AddTransient<ConfigurationServiceImpl>();
@@ -65,9 +65,9 @@ namespace APMOkSvc
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<DiskInfoService>();
-                endpoints.MapGrpcService<PowerStateService>();
-                endpoints.MapGrpcService<ConfigurationService>();
+                endpoints.MapGrpcService<DiskInfoGRPCService>();
+                endpoints.MapGrpcService<PowerStateGRPCService>();
+                endpoints.MapGrpcService<ConfigurationGRPCService>();
                 endpoints.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");

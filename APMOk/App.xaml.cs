@@ -52,13 +52,13 @@ namespace APMOk
                     services.AddHostedService<NotificationIconUpdaterTask>();
 
                     TasksStartupConfiguration tasksStartupConfiguration = new(context.Configuration);
-                    services.AddTask<BatteryStatusReaderTask>(task => task.AutoStart(tasksStartupConfiguration.BatteryStatusReader.Value));
+                    services.AddTask<PowerStatusReaderTask>(task => task.AutoStart(tasksStartupConfiguration.PowerStatusReader.Value));
                     services.AddTask<DiskInfoReaderTask>(task => task.AutoStart(tasksStartupConfiguration.DiskStatusReader.Value));
                 });
                 host = hostBuilder.Build();
                 await host.StartAsync();
 
-                var _batteryStatusReaderTask = host.Services.GetRequiredService<ITask<BatteryStatusReaderTask>>();
+                var _batteryStatusReaderTask = host.Services.GetRequiredService<ITask<PowerStatusReaderTask>>();
                 _batteryStatusReaderTask.TryRunImmediately();
 
                 var _diskInfoReaderTask = host.Services.GetRequiredService<ITask<DiskInfoReaderTask>>();
@@ -82,40 +82,57 @@ namespace APMOk
             if (e.Source is TaskbarIcon taskbarIcon)
             {
                 var items = taskbarIcon.ContextMenu.Items;
-                for (int i = 0; i < items.Count; i++)
+                foreach (var item in items)
                 {
-                    var item = items[i];
-                    if (_apmOkData.SystemDiskInfo != null)
+                    if (item is MenuItem menuItem1 && menuItem1.Name == "OnMains")
                     {
-                        if (item is Separator)
-                        {
-                            int j = 0;
-                            foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
-                            {
-                                _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
-                                var newMenuItem1 = new MenuItem { Name = $"ID{j}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
-                                if (apmValueProperty == null)
-                                    newMenuItem1.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
-                                else
-                                {
-                                    newMenuItem1.Items.Add(new MenuItem { Header = "User value: " + ((apmValueProperty.UserValue == 0) ? "n/a" : apmValueProperty.UserValue.ToString()) });
-                                    newMenuItem1.Items.Add(new Separator());
-                                    var newMenuItem2 = new MenuItem { Header = "Set" };
-                                    newMenuItem2.Items.AddRange(GetSetMenuItems());
-                                    newMenuItem1.Items.Add(newMenuItem2);
-                                }
+                        while(menuItem1.Items.Count > 0)
+                            menuItem1.Items.RemoveAt(0);
+                        menuItem1.IsEnabled = true;
 
-                                items.Insert(i + j + 1, newMenuItem1);
-                                j++;
+                        int j = 0;
+                        foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
+                        {
+                            var newMenuItem = new MenuItem { Name = $"ID{j++}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
+                            _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
+                            if (apmValueProperty == null)
+                                newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
+                            else
+                            {
+                                newMenuItem.Items.Add(new MenuItem { Header = "User value: " + ((apmValueProperty.UserValue == 0) ? "n/a" : apmValueProperty.UserValue.ToString()) });
+                                newMenuItem.Items.Add(new Separator());
+                                var newMenuItem2 = new MenuItem { Header = "Set" };
+                                newMenuItem2.Items.AddRange(GetSetMenuItems());
+                                newMenuItem.Items.Add(newMenuItem2);
                             }
-                            i += j;
-                            continue;
+
+                            menuItem1.Items.Add(newMenuItem);
                         }
                     }
-                    if (item is MenuItem menuItem && menuItem.Name.StartsWith("ID"))
+                    if (item is MenuItem menuItem2 && menuItem2.Name == "OnBattery")
                     {
-                        items.RemoveAt(i);
-                        --i;
+                        while (menuItem2.Items.Count > 0)
+                            menuItem2.Items.RemoveAt(0);
+                        menuItem2.IsEnabled = true;
+
+                        int j = 0;
+                        foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
+                        {
+                            var newMenuItem = new MenuItem { Name = $"ID{j++}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
+                            _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
+                            if (apmValueProperty == null)
+                                newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
+                            else
+                            {
+                                newMenuItem.Items.Add(new MenuItem { Header = "User value: " + ((apmValueProperty.UserValue == 0) ? "n/a" : apmValueProperty.UserValue.ToString()) });
+                                newMenuItem.Items.Add(new Separator());
+                                var newMenuItem2 = new MenuItem { Header = "Set" };
+                                newMenuItem2.Items.AddRange(GetSetMenuItems());
+                                newMenuItem.Items.Add(newMenuItem2);
+                            }
+
+                            menuItem2.Items.Add(newMenuItem);
+                        }
                     }
                 }
             }

@@ -14,11 +14,11 @@ namespace APMOk.Services
         private readonly APMOkModel _data;
         private readonly TaskbarIcon _taskbarIcon;
         private readonly ITask<DiskInfoReaderTask> _diskInfoReaderTask;
-        private readonly ITask<BatteryStatusReaderTask> _batteryStatusReaderTask;
+        private readonly ITask<PowerStatusReaderTask> _batteryStatusReaderTask;
 
         //private bool IgnoreUpdate = false;
 
-        public NotificationIconUpdaterTask(APMOkModel data, TaskbarIcon taskbarIcon, ITask<DiskInfoReaderTask> diskInfoReaderTask, ITask<BatteryStatusReaderTask> batteryStatusReaderTask)
+        public NotificationIconUpdaterTask(APMOkModel data, TaskbarIcon taskbarIcon, ITask<DiskInfoReaderTask> diskInfoReaderTask, ITask<PowerStatusReaderTask> batteryStatusReaderTask)
         {
             _data = data;
             _taskbarIcon = taskbarIcon;

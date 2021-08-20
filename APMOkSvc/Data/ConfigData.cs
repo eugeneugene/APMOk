@@ -18,10 +18,10 @@ namespace APMOkSvc.Data
         public string DeviceID { get; set; }
 
         [Required]
-        public uint DefaultValue { get; set; }
+        public uint OnMains { get; set; }
 
         [Required]
-        public uint UserValue { get; set; }
+        public uint OnBatteries { get; set; }
 
         public ConfigData()
         { }

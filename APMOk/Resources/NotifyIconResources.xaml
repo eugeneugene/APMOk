@@ -5,6 +5,15 @@
     <ContextMenu x:Key="SysTrayMenu" x:Shared="false">
         <MenuItem Command="{Binding ShowWindowCommand}" Header="APM Info" />
         <Separator />
+        <MenuItem
+            Name="OnMains"
+            Header="On Mains"
+            IsEnabled="False" />
+        <MenuItem
+            Name="OnBattery"
+            Header="On Batterys"
+            IsEnabled="False" />
+        <Separator />
         <MenuItem Command="{Binding ExitApplicationCommand}" Header="Exit" />
     </ContextMenu>
     <tb:TaskbarIcon

@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace APMOk.Tasks
 {
-    public class BatteryStatusReaderTask : IRunnable
+    public class PowerStatusReaderTask : IRunnable
     {
         private readonly APMOkModel _apmOkData;
 
-        public BatteryStatusReaderTask(APMOkModel apmOkData)
+        public PowerStatusReaderTask(APMOkModel apmOkData)
         {
             _apmOkData = apmOkData;
         }

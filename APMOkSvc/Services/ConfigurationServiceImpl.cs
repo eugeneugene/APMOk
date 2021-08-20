@@ -6,6 +6,10 @@ using System.Linq;
 
 namespace APMOkSvc.Services
 {
+    /// <summary>
+    /// Implementation of Configuration GRPC Service
+    /// DI Lifetime: Transient
+    /// </summary>
     public class ConfigurationServiceImpl
     {
         private readonly ILogger _logger;
@@ -29,7 +33,8 @@ namespace APMOkSvc.Services
                 reply.DriveAPMConfigurationReplyEntries.AddRange(_dataContext.ConfigDataSet.Select(item => new DriveAPMConfigurationReplyEntry
                 {
                     DeviceID = item.DeviceID,
-                    UserValue = item.UserValue,
+                    OnMains = item.OnMains,
+                    OnBatteries = item.OnBatteries,
                 }));
                 reply.ReplyResult = 1;
             }
