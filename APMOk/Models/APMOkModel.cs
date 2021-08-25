@@ -1,5 +1,4 @@
-﻿using APMData.Proto;
-using APMOk.Code;
+﻿using APMOk.Code;
 using APMOkLib;
 using System;
 using System.Collections.Concurrent;
@@ -10,8 +9,8 @@ namespace APMOk
 {
     public class APMOkModel : JsonToString, INotifyPropertyChanged, IDisposable
     {
-        private DisksReply _systemDiskInfo;
-        private PowerStateReply _powerState;
+        private APMData.Proto.DisksReply _systemDiskInfo;
+        private APMData.Proto.PowerStateReply _powerState;
         private bool _connectFailure;
         private bool disposedValue;
 
@@ -25,7 +24,7 @@ namespace APMOk
             APMValueDictionary.PropertyChanged += APMValueDictionaryPropertyChanged;
         }
 
-        public DisksReply SystemDiskInfo
+        public APMData.Proto.DisksReply SystemDiskInfo
         {
             get => _systemDiskInfo;
             set
@@ -38,7 +37,7 @@ namespace APMOk
             }
         }
 
-        public PowerStateReply PowerState
+        public APMData.Proto.PowerStateReply PowerState
         {
             get => _powerState;
             set

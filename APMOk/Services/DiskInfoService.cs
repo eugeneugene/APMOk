@@ -1,5 +1,4 @@
-﻿using APMData.Proto;
-using APMOkLib;
+﻿using APMOkLib;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -43,14 +42,14 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<DisksReply> EnumerateDisksAsync(CancellationToken cancellationToken = default)
+        public async Task<APMData.Proto.DisksReply> EnumerateDisksAsync(CancellationToken cancellationToken = default)
         {
             var client = new APMData.Proto.DiskInfoService.DiskInfoServiceClient(_channel);
             var reply = await client.EnumerateDisksAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }
 
-        public async Task<CurrentAPMReply> GetCurrentAPMAsync(CurrentAPMRequest request, CancellationToken cancellationToken = default)
+        public async Task<APMData.Proto.CurrentAPMReply> GetCurrentAPMAsync(APMData.Proto.CurrentAPMRequest request, CancellationToken cancellationToken = default)
         {
             var client = new APMData.Proto.DiskInfoService.DiskInfoServiceClient(_channel);
             var reply = await client.GetCurrentAPMAsync(request, new CallOptions(cancellationToken: cancellationToken));

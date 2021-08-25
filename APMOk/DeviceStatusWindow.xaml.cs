@@ -1,6 +1,5 @@
-﻿using APMData;
-using APMData.Proto;
-using APMOk.Code;
+﻿using APMOk.Code;
+using APMOkLib;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -29,7 +28,7 @@ namespace APMOk
         private static readonly ImageSource Checked = Properties.Resources.Checked.ToImageSource();
         private static readonly ImageSource Battery = Properties.Resources.Battery.ToImageSource();
 
-        public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
+        public ObservableCollection<APMData.Proto.DiskInfoEntry> DiskInfo { get; } = new();
 
         public ObservableConcurrentDictionary<string, object> DiskInfoItems { get; } = new();
 
@@ -120,7 +119,7 @@ namespace APMOk
         {
             e.Handled = true;
 
-            if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry selectedItem)
+            if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is APMData.Proto.DiskInfoEntry selectedItem)
             {
                 var availability = Availability.FromValue((ushort)selectedItem.Availability).Name;
                 DiskInfoItems[nameof(selectedItem.Availability)] = availability;

@@ -1,6 +1,4 @@
-﻿using APMData;
-using APMData.Proto;
-using APMOkLib;
+﻿using APMOkLib;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -44,7 +42,7 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<PowerStateReply> GetPowerStateAsync(CancellationToken cancellationToken = default)
+        public async Task<APMData.Proto.PowerStateReply> GetPowerStateAsync(CancellationToken cancellationToken = default)
         {
             var client = new APMData.Proto.PowerStateService.PowerStateServiceClient(_channel);
             var reply = await client.GetPowerStateAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));

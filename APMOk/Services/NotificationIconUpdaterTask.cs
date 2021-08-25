@@ -1,5 +1,4 @@
-﻿using APMData.Proto;
-using APMOk.Tasks;
+﻿using APMOk.Tasks;
 using APMOkLib.RecurrentTasks;
 using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Extensions.Hosting;
@@ -58,18 +57,18 @@ namespace APMOk.Services
             else
             {
 
-                EPowerSource PowerSource = EPowerSource.Unknown;
+                var PowerSource = APMData.Proto.EPowerSource.Unknown;
                 if (_data.PowerState.ReplyResult == 1)
-                    PowerSource = _data.PowerState?.PowerState.PowerSource ?? EPowerSource.Unknown;
+                    PowerSource = _data.PowerState?.PowerState.PowerSource ?? APMData.Proto.EPowerSource.Unknown;
                 _taskbarIcon.Dispatcher.Invoke(() =>
                 {
                     switch (PowerSource)
                     {
-                        case EPowerSource.Mains:
+                        case APMData.Proto.EPowerSource.Mains:
                             _taskbarIcon.Icon = Properties.Resources.Checked;
                             _taskbarIcon.ToolTipText = "Online";
                             break;
-                        case EPowerSource.Battery:
+                        case APMData.Proto.EPowerSource.Battery:
                             _taskbarIcon.Icon = Properties.Resources.Battery;
                             _taskbarIcon.ToolTipText = "Offline";
                             break;

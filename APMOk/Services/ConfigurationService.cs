@@ -1,5 +1,4 @@
-﻿using APMData.Proto;
-using APMOkLib;
+﻿using APMOkLib;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -43,7 +42,7 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<DriveAPMConfigurationReply> GetDriveAPMConfigurationAsync(CancellationToken cancellationToken = default)
+        public async Task<APMData.Proto.DriveAPMConfigurationReply> GetDriveAPMConfigurationAsync(CancellationToken cancellationToken = default)
         {
             var client = new APMData.Proto.ConfigurationService.ConfigurationServiceClient(_channel);
             var reply = await client.GetDriveAPMConfigurationAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
