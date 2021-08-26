@@ -45,9 +45,9 @@ namespace APMOk
                     services.AddSingleton(notifyIcon);
                     services.AddSingleton<APMOkModel>();
                     services.AddSingleton<NotifyIconViewModel>();
-                    services.AddTransient<APMDiskInfoService>();
-                    services.AddTransient<APMPowerStateService>();
-                    services.AddTransient<APMConfigurationService>();
+                    services.AddTransient<DiskInfoService>();
+                    services.AddTransient<PowerStateService>();
+                    services.AddTransient<ConfigurationService>();
                     services.AddTransient<DeviceStatusWindow>();
                     services.AddHostedService<NotificationIconUpdaterTask>();
 

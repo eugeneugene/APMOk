@@ -22,8 +22,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\APMDataProto\APMDataProto.csproj" />
 		<ProjectReference Include="..\APMOkLib\APMOkLib.csproj" />
-		<Protobuf Include="$(SolutionDir)\Proto\APMData.proto" GrpcServices="Server" />
 	</ItemGroup>
 
 	<ItemGroup>

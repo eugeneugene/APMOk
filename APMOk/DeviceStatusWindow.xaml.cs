@@ -21,7 +21,7 @@ namespace APMOk
     internal partial class DeviceStatusWindow : Window, IDisposable
     {
         private readonly APMOkModel _apmOkData;
-        private readonly APMDiskInfoService _diskInfoService;
+        private readonly Services.DiskInfoService _diskInfoService;
         private bool disposedValue;
 
         private static readonly ImageSource Error = Properties.Resources.Error.ToImageSource();
@@ -36,7 +36,7 @@ namespace APMOk
 
         public APMValueProperty APMValue { get; }
 
-        public DeviceStatusWindow(APMOkModel apmOkData, APMDiskInfoService diskInfoService)
+        public DeviceStatusWindow(APMOkModel apmOkData, Services.DiskInfoService diskInfoService)
         {
             InitializeComponent();
 

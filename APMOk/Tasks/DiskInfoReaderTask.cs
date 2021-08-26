@@ -23,8 +23,8 @@ namespace APMOk.Tasks
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var diskInfoService = scopeServiceProvider.GetRequiredService<Services.APMDiskInfoService>();
-                var configurationService = scopeServiceProvider.GetRequiredService<Services.APMConfigurationService>();
+                var diskInfoService = scopeServiceProvider.GetRequiredService<Services.DiskInfoService>();
+                var configurationService = scopeServiceProvider.GetRequiredService<Services.ConfigurationService>();
 
                 var systemDiskInfoReply = await diskInfoService.EnumerateDisksAsync(cancellationToken);
                 _apmOkData.SystemDiskInfo = systemDiskInfoReply ?? throw new Exception("Service is offline");

@@ -1,12 +1,10 @@
 ﻿using APMOkLib.CustomConfiguration;
+using APMOkLib.RecurrentTasks;
 using APMOkSvc.Code;
 using APMOkSvc.Data;
 using APMOkSvc.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -17,15 +15,18 @@ namespace APMOkSvc
     internal class Startup
     {
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public static void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<ConfigurationParameterFactory>();
             services.AddSingleton<ITasksStartupConfiguration, TasksStartupConfiguration>();
             services.AddSingleton<IConnectionStringsConfiguration, ConnectionStringsConfiguration>();
 
+            services.AddTask<PowerStateReaderTask>(options => options.TaskOptions.Interval = TimeSpan.FromSeconds(1));
             services.AddDbContext<DataContext>();
-            services.AddHostedService<StartupHostedService>();
+            services.AddHostedService<PowerStateWatcher>();
+            services.AddSingleton<PowerStateContainer>();
             services.AddTransient<DiskInfoServiceImpl>();
+            services.AddTransient<APMServiceImpl>();
             services.AddTransient<PowerStateServiceImpl>();
             services.AddTransient<ConfigurationServiceImpl>();
             services.AddGrpc();
@@ -44,6 +45,7 @@ namespace APMOkSvc
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<DiskInfoGRPCService>();
+                endpoints.MapGrpcService<APMGRPCService>();
                 endpoints.MapGrpcService<PowerStateGRPCService>();
                 endpoints.MapGrpcService<ConfigurationGRPCService>();
                 endpoints.MapGet("/", async context =>

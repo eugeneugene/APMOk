@@ -15,15 +15,15 @@ using System.Threading.Tasks;
 namespace APMOk.Services
 {
     /// <summary>
-    /// Получить информацию о системных дисках
+    /// Получить информацию о текущих настройках APM
     /// DI Lifetime: Transient
     /// </summary>
-    public class APMDiskInfoService : IDisposable
+    public class ConfigurationService : IDisposable
     {
         private readonly GrpcChannel _channel;
         private bool disposedValue;
 
-        public APMDiskInfoService()
+        public ConfigurationService()
         {
             var udsEndPoint = new UnixDomainSocketEndPoint(SocketData.SocketPath);
             var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
@@ -43,17 +43,10 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<DisksReply> EnumerateDisksAsync(CancellationToken cancellationToken)
+        public async Task<DriveAPMConfigurationReply> GetDriveAPMConfigurationAsync(CancellationToken cancellationToken)
         {
-            var client = new DiskInfoService.DiskInfoServiceClient(_channel);
-            var reply = await client.EnumerateDisksAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
-            return reply;
-        }
-
-        public async Task<CurrentAPMReply> GetCurrentAPMAsync(CurrentAPMRequest request, CancellationToken cancellationToken)
-        {
-            var client = new DiskInfoService.DiskInfoServiceClient(_channel);
-            var reply = await client.GetCurrentAPMAsync(request, new CallOptions(cancellationToken: cancellationToken));
+            var client = new APMData.ConfigurationService.ConfigurationServiceClient(_channel);
+            var reply = await client.GetDriveAPMConfigurationAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }
 

@@ -8,6 +8,9 @@ import "google/protobuf/Empty.proto";
 
 service DiskInfoService {
 	rpc EnumerateDisks (google.protobuf.Empty) returns (DisksReply);
+}
+
+service APMService {
 	rpc GetCurrentAPM (CurrentAPMRequest) returns (CurrentAPMReply);
 	rpc SetAPM (APMRequest) returns (APMReply);
 }

@@ -2,7 +2,6 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace APMOkSvc.Services
@@ -26,16 +25,6 @@ namespace APMOkSvc.Services
         {
             var reply = _diskInfoServiceImpl.EnumerateDisks();
             return Task.FromResult(reply);
-        }
-
-        public override Task<CurrentAPMReply> GetCurrentAPM(CurrentAPMRequest request, ServerCallContext context)
-        {
-            return Task.FromResult(_diskInfoServiceImpl.GetCurrentAPM(request));
-        }
-
-        public override async Task<APMReply> SetAPM(APMRequest request, ServerCallContext context)
-        {
-            return await _diskInfoServiceImpl.SetAPMAsync(request, CancellationToken.None);
         }
     }
 }

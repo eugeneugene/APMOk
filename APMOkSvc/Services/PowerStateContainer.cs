@@ -8,7 +8,7 @@ namespace APMOkSvc.Services
     /// Container for the latest PowerStatus data
     /// DI Lifetime: Singleton
     /// </summary>
-    public class PowerStatusContainer
+    public class PowerStateContainer
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private PowerStateReply _powerState;

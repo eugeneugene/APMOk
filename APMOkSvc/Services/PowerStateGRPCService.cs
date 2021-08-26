@@ -12,9 +12,9 @@ namespace APMOkSvc.Services
     public class PowerStateGRPCService : PowerStateService.PowerStateServiceBase
     {
         private readonly ILogger _logger;
-        private readonly PowerStatusContainer _powerStatusContainer;
+        private readonly PowerStateContainer _powerStatusContainer;
 
-        public PowerStateGRPCService(ILogger<PowerStateGRPCService> logger, PowerStatusContainer powerStatusContainer)
+        public PowerStateGRPCService(ILogger<PowerStateGRPCService> logger, PowerStateContainer powerStatusContainer)
         {
             _logger = logger;
             _powerStatusContainer = powerStatusContainer;

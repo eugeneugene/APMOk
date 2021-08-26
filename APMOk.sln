@@ -15,10 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7A0FEE2C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APMTest", "Tests\APMTest\APMTest.csproj", "{49AF2366-2E9E-4382-8217-9545E31791EB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Proto", "Proto", "{FEB57C4A-84A5-4170-BBD5-0B1D6A7E6078}"
-	ProjectSection(SolutionItems) = preProject
-		Proto\APMData.proto = Proto\APMData.proto
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APMDataProto", "APMDataProto\APMDataProto.csproj", "{A789F645-8E36-42B5-8DD1-8B4133FBCE84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +43,10 @@ Global
 		{49AF2366-2E9E-4382-8217-9545E31791EB}.Debug|x64.Build.0 = Debug|x64
 		{49AF2366-2E9E-4382-8217-9545E31791EB}.Release|x64.ActiveCfg = Release|x64
 		{49AF2366-2E9E-4382-8217-9545E31791EB}.Release|x64.Build.0 = Release|x64
+		{A789F645-8E36-42B5-8DD1-8B4133FBCE84}.Debug|x64.ActiveCfg = Debug|x64
+		{A789F645-8E36-42B5-8DD1-8B4133FBCE84}.Debug|x64.Build.0 = Debug|x64
+		{A789F645-8E36-42B5-8DD1-8B4133FBCE84}.Release|x64.ActiveCfg = Release|x64
+		{A789F645-8E36-42B5-8DD1-8B4133FBCE84}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
