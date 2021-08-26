@@ -57,18 +57,18 @@ namespace APMOk.Services
             else
             {
 
-                var PowerSource = APMData.Proto.EPowerSource.Unknown;
+                var PowerSource = APMData.EPowerSource.Unknown;
                 if (_data.PowerState.ReplyResult == 1)
-                    PowerSource = _data.PowerState?.PowerState.PowerSource ?? APMData.Proto.EPowerSource.Unknown;
+                    PowerSource = _data.PowerState?.PowerState.PowerSource ?? APMData.EPowerSource.Unknown;
                 _taskbarIcon.Dispatcher.Invoke(() =>
                 {
                     switch (PowerSource)
                     {
-                        case APMData.Proto.EPowerSource.Mains:
+                        case APMData.EPowerSource.Mains:
                             _taskbarIcon.Icon = Properties.Resources.Checked;
                             _taskbarIcon.ToolTipText = "Online";
                             break;
-                        case APMData.Proto.EPowerSource.Battery:
+                        case APMData.EPowerSource.Battery:
                             _taskbarIcon.Icon = Properties.Resources.Battery;
                             _taskbarIcon.ToolTipText = "Offline";
                             break;

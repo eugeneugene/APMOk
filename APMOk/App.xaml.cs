@@ -45,9 +45,9 @@ namespace APMOk
                     services.AddSingleton(notifyIcon);
                     services.AddSingleton<APMOkModel>();
                     services.AddSingleton<NotifyIconViewModel>();
-                    services.AddTransient<DiskInfoService>();
-                    services.AddTransient<PowerStateService>();
-                    services.AddTransient<ConfigurationService>();
+                    services.AddTransient<APMDiskInfoService>();
+                    services.AddTransient<APMPowerStateService>();
+                    services.AddTransient<APMConfigurationService>();
                     services.AddTransient<DeviceStatusWindow>();
                     services.AddHostedService<NotificationIconUpdaterTask>();
 
@@ -101,7 +101,7 @@ namespace APMOk
                                 newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
                             else
                             {
-                                newMenuItem.Items.Add(new MenuItem { Header = "User value: " + ((apmValueProperty.UserValue == 0) ? "n/a" : apmValueProperty.UserValue.ToString()) });
+                                newMenuItem.Items.Add(new MenuItem { Header = "User value: " + ((apmValueProperty.OnMains == 0) ? "n/a" : apmValueProperty.OnMains.ToString()) });
                                 newMenuItem.Items.Add(new Separator());
                                 var newMenuItem2 = new MenuItem { Header = "Set" };
                                 newMenuItem2.Items.AddRange(GetSetMenuItems());
@@ -126,7 +126,7 @@ namespace APMOk
                                 newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
                             else
                             {
-                                newMenuItem.Items.Add(new MenuItem { Header = "User value: " + ((apmValueProperty.UserValue == 0) ? "n/a" : apmValueProperty.UserValue.ToString()) });
+                                newMenuItem.Items.Add(new MenuItem { Header = "User value: " + ((apmValueProperty.OnMains == 0) ? "n/a" : apmValueProperty.OnMains.ToString()) });
                                 newMenuItem.Items.Add(new Separator());
                                 var newMenuItem2 = new MenuItem { Header = "Set" };
                                 newMenuItem2.Items.AddRange(GetSetMenuItems());

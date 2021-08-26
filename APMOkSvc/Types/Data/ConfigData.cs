@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace APMOkSvc.Data
+namespace APMOkSvc.Types.Data
 {
     [Table("APMCONFIG")]
     public class ConfigData : JsonToString
@@ -25,5 +25,12 @@ namespace APMOkSvc.Data
 
         public ConfigData()
         { }
+
+        public ConfigData(string deviceID, uint onMains, uint onBatteries)
+        {
+            DeviceID = deviceID;
+            OnMains = onMains;
+            OnBatteries = onBatteries;
+        }
     }
 }

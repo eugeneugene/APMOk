@@ -9,36 +9,36 @@ namespace APMOk.Code
         public APMValueProperty()
         { }
 
-        public APMValueProperty(int userValue, int currentValue)
+        public APMValueProperty(uint onMains, uint onBatteries)
         {
-            _userValue = userValue;
-            _currentValue = currentValue;
+            _onMains = onMains;
+            _onBatteries = onBatteries;
         }
 
-        private int _userValue;
-        public int UserValue
+        private uint _onMains;
+        public uint OnMains
         {
-            get => _userValue;
+            get => _onMains;
             set
             {
-                if (value != _userValue)
+                if (value != _onMains)
                 {
-                    _userValue = value;
-                    NotifyPropertyChanged(nameof(UserValue));
+                    _onMains = value;
+                    NotifyPropertyChanged(nameof(OnMains));
                 }
             }
         }
 
-        private int _currentValue;
-        public int CurrentValue
+        private uint _onBatteries;
+        public uint OnBatteries
         {
-            get => _currentValue;
+            get => _onBatteries;
             set
             {
-                if (value != _currentValue)
+                if (value != _onBatteries)
                 {
-                    _currentValue = value;
-                    NotifyPropertyChanged(nameof(CurrentValue));
+                    _onBatteries = value;
+                    NotifyPropertyChanged(nameof(OnBatteries));
                 }
             }
         }
@@ -56,7 +56,7 @@ namespace APMOk.Code
         {
             if (ReferenceEquals(this, other))
                 return true;
-            return _userValue == other.UserValue;
+            return _onMains == other.OnMains;
         }
 
         public override bool Equals(object obj)
@@ -66,7 +66,7 @@ namespace APMOk.Code
 
         public override int GetHashCode()
         {
-            return _userValue.GetHashCode();
+            return _onMains.GetHashCode();
         }
     }
 }

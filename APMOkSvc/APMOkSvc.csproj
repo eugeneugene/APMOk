@@ -23,7 +23,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\APMOkLib\APMOkLib.csproj" />
-		<Protobuf Include="..\APMData\Proto\DiskInfo.proto" GrpcServices="Server" />
+		<Protobuf Include="$(SolutionDir)\Proto\DiskInfo.proto" GrpcServices="Server" />
 	</ItemGroup>
 
 	<ItemGroup>

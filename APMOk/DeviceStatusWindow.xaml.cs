@@ -1,4 +1,6 @@
-﻿using APMOk.Code;
+﻿using APMData;
+using APMOk.Code;
+using APMOk.Services;
 using APMOkLib;
 using System;
 using System.Collections.Concurrent;
@@ -6,8 +8,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -21,14 +21,14 @@ namespace APMOk
     internal partial class DeviceStatusWindow : Window, IDisposable
     {
         private readonly APMOkModel _apmOkData;
-        private readonly Services.DiskInfoService _diskInfoService;
+        private readonly APMDiskInfoService _diskInfoService;
         private bool disposedValue;
 
         private static readonly ImageSource Error = Properties.Resources.Error.ToImageSource();
         private static readonly ImageSource Checked = Properties.Resources.Checked.ToImageSource();
         private static readonly ImageSource Battery = Properties.Resources.Battery.ToImageSource();
 
-        public ObservableCollection<APMData.Proto.DiskInfoEntry> DiskInfo { get; } = new();
+        public ObservableCollection<DiskInfoEntry> DiskInfo { get; } = new();
 
         public ObservableConcurrentDictionary<string, object> DiskInfoItems { get; } = new();
 
@@ -36,7 +36,7 @@ namespace APMOk
 
         public APMValueProperty APMValue { get; }
 
-        public DeviceStatusWindow(APMOkModel apmOkData, Services.DiskInfoService diskInfoService)
+        public DeviceStatusWindow(APMOkModel apmOkData, APMDiskInfoService diskInfoService)
         {
             InitializeComponent();
 
@@ -119,7 +119,7 @@ namespace APMOk
         {
             e.Handled = true;
 
-            if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is APMData.Proto.DiskInfoEntry selectedItem)
+            if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry selectedItem)
             {
                 var availability = Availability.FromValue((ushort)selectedItem.Availability).Name;
                 DiskInfoItems[nameof(selectedItem.Availability)] = availability;
@@ -140,13 +140,8 @@ namespace APMOk
                 if (_apmOkData.APMValueDictionary.Any(item => item.Key == selectedItem.DeviceID))
                 {
                     var device = _apmOkData.APMValueDictionary.Single(item => item.Key == selectedItem.DeviceID);
-                    APMValue.UserValue = device.Value.UserValue;
-
-                    Task.Run(async () =>
-                    {
-                        var apmReply = await _diskInfoService.GetCurrentAPMAsync(new CurrentAPMRequest { DeviceID = device.Key }, CancellationToken.None);
-                        APMValue.CurrentValue = apmReply.ReplyResult != 0 ? (int)apmReply.APMValue : -1;
-                    });
+                    APMValue.OnMains = device.Value.OnMains;
+                    APMValue.OnBatteries = device.Value.OnBatteries;
                 }
             }
         }

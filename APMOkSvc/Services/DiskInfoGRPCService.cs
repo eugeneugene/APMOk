@@ -2,6 +2,7 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace APMOkSvc.Services
@@ -32,9 +33,9 @@ namespace APMOkSvc.Services
             return Task.FromResult(_diskInfoServiceImpl.GetCurrentAPM(request));
         }
 
-        public override Task<APMReply> SetAPM(APMRequest request, ServerCallContext context)
+        public override async Task<APMReply> SetAPM(APMRequest request, ServerCallContext context)
         {
-            return Task.FromResult(_diskInfoServiceImpl.SetAPM(request));
+            return await _diskInfoServiceImpl.SetAPMAsync(request, CancellationToken.None);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using APMOkSvc.Code;
+using APMOkSvc.Types.Data;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;

@@ -22,7 +22,7 @@ namespace APMOk.Tasks
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var diskInfoService = scopeServiceProvider.GetRequiredService<Services.PowerStateService>();
+                var diskInfoService = scopeServiceProvider.GetRequiredService<Services.APMPowerStateService>();
                 var reply = await diskInfoService.GetPowerStateAsync(cancellationToken);
                 _apmOkData.PowerState = reply ?? throw new Exception("Service is offline");
                 _apmOkData.ConnectFailure = false;

@@ -1,4 +1,5 @@
-﻿using APMOkLib;
+﻿using APMData;
+using APMOkLib;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -14,15 +15,15 @@ using System.Threading.Tasks;
 namespace APMOk.Services
 {
     /// <summary>
-    /// Получить информацию о текущем состоянии питания
+    /// Получить информацию о системных дисках
     /// DI Lifetime: Transient
     /// </summary>
-    public class PowerStateService : IDisposable
+    public class APMDiskInfoService : IDisposable
     {
         private readonly GrpcChannel _channel;
         private bool disposedValue;
 
-        public PowerStateService()
+        public APMDiskInfoService()
         {
             var udsEndPoint = new UnixDomainSocketEndPoint(SocketData.SocketPath);
             var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
@@ -42,10 +43,17 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<APMData.Proto.PowerStateReply> GetPowerStateAsync(CancellationToken cancellationToken = default)
+        public async Task<DisksReply> EnumerateDisksAsync(CancellationToken cancellationToken = default)
         {
-            var client = new APMData.Proto.PowerStateService.PowerStateServiceClient(_channel);
-            var reply = await client.GetPowerStateAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
+            var client = new DiskInfoService.DiskInfoServiceClient(_channel);
+            var reply = await client.EnumerateDisksAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
+            return reply;
+        }
+
+        public async Task<CurrentAPMReply> GetCurrentAPMAsync(CurrentAPMRequest request, CancellationToken cancellationToken = default)
+        {
+            var client = new DiskInfoService.DiskInfoServiceClient(_channel);
+            var reply = await client.GetCurrentAPMAsync(request, new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }
 

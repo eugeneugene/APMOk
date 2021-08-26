@@ -1,4 +1,5 @@
-﻿using APMOkLib;
+﻿using APMData;
+using APMOkLib;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -14,15 +15,15 @@ using System.Threading.Tasks;
 namespace APMOk.Services
 {
     /// <summary>
-    /// Получить информацию о системных дисках
+    /// Получить информацию о текущих настройках APM
     /// DI Lifetime: Transient
     /// </summary>
-    public class DiskInfoService : IDisposable
+    public class APMConfigurationService : IDisposable
     {
         private readonly GrpcChannel _channel;
         private bool disposedValue;
 
-        public DiskInfoService()
+        public APMConfigurationService()
         {
             var udsEndPoint = new UnixDomainSocketEndPoint(SocketData.SocketPath);
             var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
@@ -42,17 +43,10 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<APMData.Proto.DisksReply> EnumerateDisksAsync(CancellationToken cancellationToken = default)
+        public async Task<DriveAPMConfigurationReply> GetDriveAPMConfigurationAsync(CancellationToken cancellationToken = default)
         {
-            var client = new APMData.Proto.DiskInfoService.DiskInfoServiceClient(_channel);
-            var reply = await client.EnumerateDisksAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
-            return reply;
-        }
-
-        public async Task<APMData.Proto.CurrentAPMReply> GetCurrentAPMAsync(APMData.Proto.CurrentAPMRequest request, CancellationToken cancellationToken = default)
-        {
-            var client = new APMData.Proto.DiskInfoService.DiskInfoServiceClient(_channel);
-            var reply = await client.GetCurrentAPMAsync(request, new CallOptions(cancellationToken: cancellationToken));
+            var client = new ConfigurationService.ConfigurationServiceClient(_channel);
+            var reply = await client.GetDriveAPMConfigurationAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }
 

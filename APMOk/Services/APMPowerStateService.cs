@@ -1,4 +1,5 @@
-﻿using APMOkLib;
+﻿using APMData;
+using APMOkLib;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -14,15 +15,15 @@ using System.Threading.Tasks;
 namespace APMOk.Services
 {
     /// <summary>
-    /// Получить информацию о текущих настройках APM
+    /// Получить информацию о текущем состоянии питания
     /// DI Lifetime: Transient
     /// </summary>
-    public class ConfigurationService : IDisposable
+    public class APMPowerStateService : IDisposable
     {
         private readonly GrpcChannel _channel;
         private bool disposedValue;
 
-        public ConfigurationService()
+        public APMPowerStateService()
         {
             var udsEndPoint = new UnixDomainSocketEndPoint(SocketData.SocketPath);
             var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
@@ -42,10 +43,10 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<APMData.Proto.DriveAPMConfigurationReply> GetDriveAPMConfigurationAsync(CancellationToken cancellationToken = default)
+        public async Task<PowerStateReply> GetPowerStateAsync(CancellationToken cancellationToken = default)
         {
-            var client = new APMData.Proto.ConfigurationService.ConfigurationServiceClient(_channel);
-            var reply = await client.GetDriveAPMConfigurationAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
+            var client = new APMData.PowerStateService.PowerStateServiceClient(_channel);
+            var reply = await client.GetPowerStateAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }
 
