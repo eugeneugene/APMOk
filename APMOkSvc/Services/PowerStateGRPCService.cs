@@ -1,4 +1,4 @@
-﻿using APMData.Proto;
+﻿using APMData;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;

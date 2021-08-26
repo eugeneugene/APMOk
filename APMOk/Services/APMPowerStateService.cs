@@ -43,9 +43,9 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<PowerStateReply> GetPowerStateAsync(CancellationToken cancellationToken = default)
+        public async Task<PowerStateReply> GetPowerStateAsync(CancellationToken cancellationToken)
         {
-            var client = new APMData.PowerStateService.PowerStateServiceClient(_channel);
+            var client = new PowerStateService.PowerStateServiceClient(_channel);
             var reply = await client.GetPowerStateAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }

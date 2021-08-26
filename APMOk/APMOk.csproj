@@ -19,6 +19,7 @@
 
 	<ItemGroup>
 		<None Remove="Checked.ico" />
+		<None Remove="Proto\APMData.proto" />
 		<Resource Include="Properties\checked.ico" />
 		<None Remove="Error.ico" />
 		<Resource Include="Properties\error.ico" />
@@ -39,7 +40,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\APMOkLib\APMOkLib.csproj" />
-		<Protobuf Include="$(SolutionDir)\Proto\APMData.proto" GrpcServices="Client" />
+		<Protobuf Include="$(SolutionDir)\Proto\APMData.proto" GrpcServices="Both" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,4 +1,4 @@
-﻿using APMData.Proto;
+﻿using APMData;
 using APMOkSvc.Types;
 using Microsoft.Extensions.Logging;
 using System;

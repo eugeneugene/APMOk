@@ -43,7 +43,7 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<DriveAPMConfigurationReply> GetDriveAPMConfigurationAsync(CancellationToken cancellationToken = default)
+        public async Task<DriveAPMConfigurationReply> GetDriveAPMConfigurationAsync(CancellationToken cancellationToken)
         {
             var client = new ConfigurationService.ConfigurationServiceClient(_channel);
             var reply = await client.GetDriveAPMConfigurationAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
