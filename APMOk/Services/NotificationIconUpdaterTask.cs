@@ -40,11 +40,11 @@ namespace APMOk.Services
 
         private void APMOkDataPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "ConnectFailure" && _data.ConnectFailure == false)
+            if (e.PropertyName == "ConnectFailure" && !_data.ConnectFailure)
             {
-                if (_data.SystemDiskInfo == null && _diskInfoReaderTask.IsStarted)
+                if (_data.SystemDiskInfo is null && _diskInfoReaderTask.IsStarted)
                     _diskInfoReaderTask.TryRunImmediately();
-                if (_data.PowerState == null && _batteryStatusReaderTask.IsStarted)
+                if (_data.PowerState is null && _batteryStatusReaderTask.IsStarted)
                     _batteryStatusReaderTask.TryRunImmediately();
             }
             UpdateIcon();
@@ -58,8 +58,8 @@ namespace APMOk.Services
             {
 
                 var PowerSource = APMData.EPowerSource.Unknown;
-                if (_data.PowerState.ReplyResult == 1)
-                    PowerSource = _data.PowerState?.PowerState.PowerSource ?? APMData.EPowerSource.Unknown;
+                if (_data.PowerState is not null && _data.PowerState.ReplyResult == 1)
+                    PowerSource = _data.PowerState.PowerState.PowerSource;
                 _taskbarIcon.Dispatcher.Invoke(() =>
                 {
                     switch (PowerSource)

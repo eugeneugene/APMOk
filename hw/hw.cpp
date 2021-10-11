@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "hw.h"
+#include "WriteLog.h"
 
 HRESULT hrInit = HRESULT_CODE(-1);
 HRESULT hrInitSec = HRESULT_CODE(-1);

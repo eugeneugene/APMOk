@@ -196,14 +196,14 @@
                 <Grid Grid.Row="0" Grid.Column="0">
                     <Grid.RowDefinitions />
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="60" />
+                        <ColumnDefinition Width="80" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <TextBlock
                         Grid.Row="0"
                         Grid.Column="0"
                         Margin="5">
-                        User:
+                        On Mains:
                     </TextBlock>
                     <TextBlock
                         x:Name="UserAPMValue"
@@ -215,14 +215,14 @@
                 <Grid Grid.Row="0" Grid.Column="1">
                     <Grid.RowDefinitions />
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="60" />
+                        <ColumnDefinition Width="80" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <TextBlock
                         Grid.Row="0"
                         Grid.Column="0"
                         Margin="5">
-                        Current:
+                        On batteries:
                     </TextBlock>
                     <TextBlock
                         x:Name="CurrentAPMValue"
