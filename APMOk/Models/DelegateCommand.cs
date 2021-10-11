@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace APMOk
+namespace APMOk.Models
 {
     /// <summary>
     /// Simplistic delegate command

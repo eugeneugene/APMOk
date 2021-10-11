@@ -1,4 +1,5 @@
 ﻿using APMOk.Code;
+using APMOk.Models;
 using APMOk.Services;
 using APMOk.Tasks;
 using APMOkLib;
@@ -90,51 +91,61 @@ namespace APMOk
                     {
                         while (menuItem1.Items.Count > 0)
                             menuItem1.Items.RemoveAt(0);
-                        menuItem1.IsEnabled = true;
 
-                        int j = 0;
-                        foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
+                        if (!_apmOkData.ConnectFailure)
                         {
-                            var newMenuItem = new MenuItem { Name = $"ID{j++}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
-                            _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
-                            if (apmValueProperty == null)
-                                newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
-                            else
+                            menuItem1.IsEnabled = true;
+                            int j = 0;
+                            foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
                             {
-                                newMenuItem.Items.Add(new MenuItem { Header = "User value: " + ((apmValueProperty.OnMains == 0) ? "n/a" : apmValueProperty.OnMains.ToString()) });
-                                newMenuItem.Items.Add(new Separator());
-                                var newMenuItem2 = new MenuItem { Header = "Set" };
-                                newMenuItem2.Items.AddRange(GetSetMenuItems());
-                                newMenuItem.Items.Add(newMenuItem2);
-                            }
+                                var newMenuItem = new MenuItem { Name = $"ID{j++}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
+                                _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
+                                if (apmValueProperty == null)
+                                    newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
+                                else
+                                {
+                                    newMenuItem.Items.Add(new MenuItem { Header = "On Mains: " + ((apmValueProperty.OnMains == 0) ? "n/a" : apmValueProperty.OnMains.ToString()) });
+                                    newMenuItem.Items.Add(new Separator());
+                                    var newMenuItem2 = new MenuItem { Header = "Set" };
+                                    newMenuItem2.Items.AddRange(GetSetMenuItems());
+                                    newMenuItem.Items.Add(newMenuItem2);
+                                }
 
-                            menuItem1.Items.Add(newMenuItem);
+                                menuItem1.Items.Add(newMenuItem);
+                            }
                         }
+                        else
+                            menuItem1.IsEnabled = false;
                     }
                     if (item is MenuItem menuItem2 && menuItem2.Name == "OnBattery")
                     {
                         while (menuItem2.Items.Count > 0)
                             menuItem2.Items.RemoveAt(0);
-                        menuItem2.IsEnabled = true;
 
-                        int j = 0;
-                        foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
+                        if (!_apmOkData.ConnectFailure)
                         {
-                            var newMenuItem = new MenuItem { Name = $"ID{j++}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
-                            _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
-                            if (apmValueProperty == null)
-                                newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
-                            else
+                            menuItem2.IsEnabled = true;
+                            int j = 0;
+                            foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
                             {
-                                newMenuItem.Items.Add(new MenuItem { Header = "User value: " + ((apmValueProperty.OnMains == 0) ? "n/a" : apmValueProperty.OnMains.ToString()) });
-                                newMenuItem.Items.Add(new Separator());
-                                var newMenuItem2 = new MenuItem { Header = "Set" };
-                                newMenuItem2.Items.AddRange(GetSetMenuItems());
-                                newMenuItem.Items.Add(newMenuItem2);
-                            }
+                                var newMenuItem = new MenuItem { Name = $"ID{j++}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
+                                _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
+                                if (apmValueProperty == null)
+                                    newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
+                                else
+                                {
+                                    newMenuItem.Items.Add(new MenuItem { Header = "On Batteries: " + ((apmValueProperty.OnBatteries == 0) ? "n/a" : apmValueProperty.OnBatteries.ToString()) });
+                                    newMenuItem.Items.Add(new Separator());
+                                    var newMenuItem2 = new MenuItem { Header = "Set" };
+                                    newMenuItem2.Items.AddRange(GetSetMenuItems());
+                                    newMenuItem.Items.Add(newMenuItem2);
+                                }
 
-                            menuItem2.Items.Add(newMenuItem);
+                                menuItem2.Items.Add(newMenuItem);
+                            }
                         }
+                        else
+                            menuItem2.IsEnabled = false;
                     }
                 }
             }
@@ -186,7 +197,6 @@ namespace APMOk
 
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }

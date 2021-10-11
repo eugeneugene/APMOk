@@ -10,8 +10,8 @@
             Header="On Mains"
             IsEnabled="False" />
         <MenuItem
-            Name="OnBattery"
-            Header="On Batterys"
+            Name="OnBatteries"
+            Header="On Batteries"
             IsEnabled="False" />
         <Separator />
         <MenuItem Command="{Binding ExitApplicationCommand}" Header="Exit" />

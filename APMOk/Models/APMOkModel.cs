@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace APMOk
+namespace APMOk.Models
 {
     public class APMOkModel : JsonToString, INotifyPropertyChanged, IDisposable
     {

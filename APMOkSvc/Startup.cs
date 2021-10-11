@@ -21,7 +21,11 @@ namespace APMOkSvc
             services.AddSingleton<ITasksStartupConfiguration, TasksStartupConfiguration>();
             services.AddSingleton<IConnectionStringsConfiguration, ConnectionStringsConfiguration>();
 
-            services.AddTask<PowerStateReaderTask>(options => options.TaskOptions.Interval = TimeSpan.FromSeconds(1));
+            services.AddTask<PowerStateReaderTask>(options =>
+            {
+                options.TaskOptions.Interval = TimeSpan.FromSeconds(1);
+                options.TaskOptions.FirstRunDelay = TimeSpan.FromSeconds(5);
+            });
             services.AddDbContext<DataContext>();
             services.AddHostedService<PowerStateWatcher>();
             services.AddSingleton<PowerStateContainer>();

@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace APMOk.Code
+namespace APMOk.Models
 {
     public class APMValueProperty : INotifyPropertyChanged, IEquatable<APMValueProperty>
     {

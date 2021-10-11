@@ -3,7 +3,7 @@ using System;
 using System.Windows;
 using System.Windows.Input;
 
-namespace APMOk
+namespace APMOk.Models
 {
     /// <summary>
     /// Provides bindable properties and commands for the NotifyIcon. In this sample, the

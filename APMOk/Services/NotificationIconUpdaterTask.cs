@@ -1,4 +1,5 @@
-﻿using APMOk.Tasks;
+﻿using APMOk.Models;
+using APMOk.Tasks;
 using APMOkLib.RecurrentTasks;
 using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Extensions.Hosting;

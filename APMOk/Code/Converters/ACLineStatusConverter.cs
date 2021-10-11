@@ -3,7 +3,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace APMOk.Code
+namespace APMOk.Code.Converters
 {
     internal class PowerSourceConverter : IValueConverter
     {
