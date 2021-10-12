@@ -52,10 +52,7 @@ namespace APMOkLib
         public string Filename
         {
             get => filename;
-            set
-            {
-                filename = value;
-            }
+            set => filename = value;
         }
 
         public override AddressFamily AddressFamily => AddressFamily.Unix;

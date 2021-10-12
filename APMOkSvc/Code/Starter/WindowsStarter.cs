@@ -358,6 +358,8 @@ namespace APMOkSvc.Code
 
         private IHostBuilder CreateHostBuilder(string[] args)
         {
+            var socketPathProvider = new SocketPathProvider();
+            
             var hostbuilder = Host.CreateDefaultBuilder(args);
 
             hostbuilder = hostbuilder.ConfigureLogging(logging =>
@@ -383,8 +385,8 @@ namespace APMOkSvc.Code
             var pathToContentRoot = Path.GetDirectoryName(pathToExe);
             Directory.SetCurrentDirectory(pathToContentRoot);
 
-            if (File.Exists(SocketData.SocketPath))
-                File.Delete(SocketData.SocketPath);
+            if (File.Exists(socketPathProvider.GetSocketPath()))
+                File.Delete(socketPathProvider.GetSocketPath());
 
             hostbuilder = hostbuilder.ConfigureWebHostDefaults(webBuilder =>
             {
@@ -394,7 +396,7 @@ namespace APMOkSvc.Code
                     var configuration = options.ApplicationServices.GetService(typeof(IConfiguration)) as IConfiguration;
                     var path = configuration["Kestrel:EndpointDefaults:Certificate:Path"];
                     var password = configuration["Kestrel:EndpointDefaults:Certificate:Password"];
-                    options.ListenUnixSocket(SocketData.SocketPath, options =>
+                    options.ListenUnixSocket(socketPathProvider.GetSocketPath(), options =>
                     {
                         options.UseHttps(path, password);
                         options.Protocols = HttpProtocols.Http2;

@@ -79,6 +79,7 @@ namespace APMOk
                     services.AddSingleton(notifyIcon);
                     services.AddSingleton<APMOkModel>();
                     services.AddSingleton<NotifyIconViewModel>();
+                    services.AddTransient<ISocketPathProvider, SocketPathProvider>();
                     services.AddTransient<DiskInfo>();
                     services.AddTransient<PowerState>();
                     services.AddTransient<Configuration>();

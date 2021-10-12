@@ -27,16 +27,16 @@ namespace APMOkLib
         public string Convert(DateTime dateTime) => dateTime.ToString(Format, FormatProvider);
     }
 
-    public sealed class JsonToStringDateTimeConverter : JsonDateTimeConverterBase
+    public sealed class StringJsonDateTimeConverter : JsonDateTimeConverterBase
     {
-        public static string FormatStatic => "yyyy-MM-dd\\THH:mm:ss.fff";
+        public static string FormatStatic => StringDateTimeConverter.FormatStatic;
 
-        public JsonToStringDateTimeConverter()
+        public StringJsonDateTimeConverter()
         {
             FormatProvider = InvariantCulture;
         }
 
-        public JsonToStringDateTimeConverter(IFormatProvider formatProvider)
+        public StringJsonDateTimeConverter(IFormatProvider formatProvider)
         {
             FormatProvider = formatProvider ?? InvariantCulture;
         }

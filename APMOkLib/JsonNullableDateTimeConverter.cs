@@ -43,7 +43,7 @@ namespace APMOkLib
             FormatProvider = formatProvider ?? InvariantCulture;
         }
 
-        protected override string Format { get => JsonToStringDateTimeConverter.FormatStatic; }
+        protected override string Format { get => StringDateTimeConverter.FormatStatic; }
         protected override IFormatProvider FormatProvider { get; }
     }
 

@@ -18,9 +18,9 @@ namespace APMOk.Services
         private readonly GrpcChannel _channel;
         private bool disposedValue;
 
-        public APM()
+        public APM(ISocketPathProvider socketPathProvider)
         {
-            var udsEndPoint = new UnixDomainSocketEndPoint(SocketData.SocketPath);
+            var udsEndPoint = new UnixDomainSocketEndPoint(socketPathProvider.GetSocketPath());
             var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
             var socketsHttpHandler = new SocketsHttpHandler
             {

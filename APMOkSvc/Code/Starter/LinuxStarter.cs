@@ -155,6 +155,8 @@ namespace APMOkSvc.Code
 
         private IHostBuilder CreateHostBuilder(string[] args)
         {
+            var socketPathProvider = new SocketPathProvider();
+
             var hostbuilder = Host.CreateDefaultBuilder(args);
 
             hostbuilder = hostbuilder.ConfigureLogging(logging =>
@@ -174,15 +176,15 @@ namespace APMOkSvc.Code
             hostbuilder = hostbuilder.UseSystemd();
             logger.Info("Using Linux Systemd Service");
 
-            if (File.Exists(SocketData.SocketPath))
-                File.Delete(SocketData.SocketPath);
+            if (File.Exists(socketPathProvider.GetSocketPath()))
+                File.Delete(socketPathProvider.GetSocketPath());
 
             hostbuilder = hostbuilder.ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<TStartup>();
                 webBuilder.ConfigureKestrel(options =>
                 {
-                    options.ListenUnixSocket(SocketData.SocketPath, options =>
+                    options.ListenUnixSocket(socketPathProvider.GetSocketPath(), options =>
                     {
                         options.Protocols = HttpProtocols.Http1;
                     });

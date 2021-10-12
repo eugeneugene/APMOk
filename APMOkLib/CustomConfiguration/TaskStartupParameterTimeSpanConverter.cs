@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace APMOkLib
+namespace APMOkLib.CustomConfiguration
 {
     public class TaskStartupParameterTimeSpanConverter : JsonConverter<TimeSpan>
     {

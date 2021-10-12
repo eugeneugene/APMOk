@@ -26,6 +26,7 @@ namespace APMOkLib.CustomConfiguration
         }
 
         public IReadOnlyCollection<ISmartConfiguration> SmartConfigurations => _parameters.Keys.AsReadOnly();
+
         public IReadOnlyCollection<IConfigurationParameter> GetConfigurationParameters(ISmartConfiguration smartConfiguration)
         {
             if (smartConfiguration is null)
