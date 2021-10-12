@@ -1,7 +1,6 @@
 ﻿using APMData;
 using APMOk.Code;
 using APMOk.Models;
-using APMOk.Services;
 using APMOkLib;
 using System;
 using System.Collections.Concurrent;
@@ -22,7 +21,6 @@ namespace APMOk
     internal partial class DeviceStatusWindow : Window, IDisposable
     {
         private readonly APMOkModel _apmOkData;
-        private readonly Services.DiskInfoService _diskInfoService;
         private bool disposedValue;
 
         private static readonly ImageSource Error = Properties.Resources.Error.ToImageSource();
@@ -37,12 +35,11 @@ namespace APMOk
 
         public APMValueProperty APMValue { get; }
 
-        public DeviceStatusWindow(APMOkModel apmOkData, Services.DiskInfoService diskInfoService)
+        public DeviceStatusWindow(APMOkModel apmOkData)
         {
             InitializeComponent();
 
             _apmOkData = apmOkData;
-            _diskInfoService = diskInfoService;
 
             // DeviceStatusDataSource
             CollectionViewSource deviceStatusDataSource = FindResource("DeviceStatusDataSource") as CollectionViewSource;
@@ -71,9 +68,8 @@ namespace APMOk
                     LoadDisksInfo();
                     break;
                 case "PowerState":
-                    LoadPowerState();
-                    break;
                 case "ConnectFailure":
+                    LoadPowerState();
                     break;
                 case "APMValueDictionary":
                     LoadAPMValue();
@@ -85,7 +81,7 @@ namespace APMOk
 
         private void LoadPowerState()
         {
-            if (_apmOkData.PowerState != null && _apmOkData.PowerState.ReplyResult != 0)
+            if (_apmOkData.PowerState is not null && _apmOkData.PowerState.ReplyResult != 0)
             {
                 PowerStateItems[nameof(_apmOkData.PowerState.PowerState.PowerSource)] = _apmOkData.PowerState.PowerState.PowerSource;
                 PowerStateItems[nameof(_apmOkData.PowerState.PowerState.BatteryFlag)] = _apmOkData.PowerState.PowerState.BatteryFlag;
@@ -98,13 +94,12 @@ namespace APMOk
 
         private void LoadDisksInfo()
         {
-            if (_apmOkData.SystemDiskInfo == null || _apmOkData.SystemDiskInfo.ReplyResult == 0)
+            if (_apmOkData.SystemDiskInfo is null || _apmOkData.SystemDiskInfo.ReplyResult == 0)
                 return;
 
             Dispatcher.Invoke(() =>
             {
-                if (DiskInfo.Any())
-                    return;
+                DiskInfo.Clear();
 
                 foreach (var entry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.DeviceID))
                     DiskInfo.Add(entry);
@@ -168,7 +163,7 @@ namespace APMOk
 
         private void SelectDiskComboDropDownOpened(object sender, EventArgs e)
         {
-            if (_apmOkData.SystemDiskInfo == null || _apmOkData.SystemDiskInfo.ReplyResult == 0)
+            if (_apmOkData.SystemDiskInfo is null || _apmOkData.SystemDiskInfo.ReplyResult == 0)
                 return;
 
             string selectedSerial = null;
@@ -193,7 +188,7 @@ namespace APMOk
                 DiskInfo.Add(item);
 
             var selectItem = DiskInfo.SingleOrDefault(item => item.SerialNumber == selectedSerial);
-            if (selectItem != null)
+            if (selectItem is not null)
                 SelectDiskCombo.SelectedItem = selectItem;
             else
             {
@@ -207,12 +202,12 @@ namespace APMOk
         private void UpdateIcon()
         {
             if (_apmOkData.ConnectFailure)
-                Icon = Error;
+                Dispatcher.Invoke(() => Icon = Error);
             else
             {
                 EPowerSource PowerSource = EPowerSource.Unknown;
-                if (_apmOkData.PowerState.ReplyResult == 1)
-                    PowerSource = _apmOkData.PowerState?.PowerState.PowerSource ?? EPowerSource.Unknown;
+                if (_apmOkData.PowerState is not null && _apmOkData.PowerState.ReplyResult == 1)
+                    PowerSource = _apmOkData.PowerState.PowerState.PowerSource;
                 Dispatcher.Invoke(() =>
                 {
                     Icon = PowerSource switch

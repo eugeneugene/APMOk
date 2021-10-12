@@ -18,12 +18,12 @@ namespace APMOk.Services
     /// Получить информацию о системных дисках
     /// DI Lifetime: Transient
     /// </summary>
-    public class DiskInfoService : IDisposable
+    public class DiskInfo : IDisposable
     {
         private readonly GrpcChannel _channel;
         private bool disposedValue;
 
-        public DiskInfoService()
+        public DiskInfo()
         {
             var udsEndPoint = new UnixDomainSocketEndPoint(SocketData.SocketPath);
             var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
@@ -45,7 +45,7 @@ namespace APMOk.Services
 
         public async Task<DisksReply> EnumerateDisksAsync(CancellationToken cancellationToken)
         {
-            var client = new APMData.DiskInfoService.DiskInfoServiceClient(_channel);
+            var client = new DiskInfoService.DiskInfoServiceClient(_channel);
             var reply = await client.EnumerateDisksAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }

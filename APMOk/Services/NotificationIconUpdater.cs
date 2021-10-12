@@ -9,18 +9,18 @@ using System.Threading.Tasks;
 
 namespace APMOk.Services
 {
-    public class NotificationIconUpdaterTask : IHostedService
+    public class NotificationIconUpdater : IHostedService
     {
-        private readonly APMOkModel _data;
+        private readonly APMOkModel _apmOkModel;
         private readonly TaskbarIcon _taskbarIcon;
         private readonly ITask<DiskInfoReaderTask> _diskInfoReaderTask;
         private readonly ITask<PowerStatusReaderTask> _batteryStatusReaderTask;
 
         //private bool IgnoreUpdate = false;
 
-        public NotificationIconUpdaterTask(APMOkModel data, TaskbarIcon taskbarIcon, ITask<DiskInfoReaderTask> diskInfoReaderTask, ITask<PowerStatusReaderTask> batteryStatusReaderTask)
+        public NotificationIconUpdater(APMOkModel apmOkModel, TaskbarIcon taskbarIcon, ITask<DiskInfoReaderTask> diskInfoReaderTask, ITask<PowerStatusReaderTask> batteryStatusReaderTask)
         {
-            _data = data;
+            _apmOkModel = apmOkModel;
             _taskbarIcon = taskbarIcon;
             _diskInfoReaderTask = diskInfoReaderTask;
             _batteryStatusReaderTask = batteryStatusReaderTask;
@@ -29,23 +29,23 @@ namespace APMOk.Services
         public Task StartAsync(CancellationToken cancellationToken)
         {
             UpdateIcon();
-            _data.PropertyChanged += APMOkDataPropertyChanged;
+            _apmOkModel.PropertyChanged += APMOkDataPropertyChanged;
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _data.PropertyChanged -= APMOkDataPropertyChanged;
+            _apmOkModel.PropertyChanged -= APMOkDataPropertyChanged;
             return Task.CompletedTask;
         }
 
         private void APMOkDataPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "ConnectFailure" && !_data.ConnectFailure)
+            if (e.PropertyName == "ConnectFailure" && !_apmOkModel.ConnectFailure)
             {
-                if (_data.SystemDiskInfo is null && _diskInfoReaderTask.IsStarted)
+                if (_apmOkModel.SystemDiskInfo is null && _diskInfoReaderTask.IsStarted)
                     _diskInfoReaderTask.TryRunImmediately();
-                if (_data.PowerState is null && _batteryStatusReaderTask.IsStarted)
+                if (_apmOkModel.PowerState is null && _batteryStatusReaderTask.IsStarted)
                     _batteryStatusReaderTask.TryRunImmediately();
             }
             UpdateIcon();
@@ -53,14 +53,13 @@ namespace APMOk.Services
 
         private void UpdateIcon()
         {
-            if (_data.ConnectFailure)
+            if (_apmOkModel.ConnectFailure)
                 _taskbarIcon.Icon = Properties.Resources.Error;
             else
             {
-
                 var PowerSource = APMData.EPowerSource.Unknown;
-                if (_data.PowerState is not null && _data.PowerState.ReplyResult == 1)
-                    PowerSource = _data.PowerState.PowerState.PowerSource;
+                if (_apmOkModel.PowerState is not null && _apmOkModel.PowerState.ReplyResult == 1)
+                    PowerSource = _apmOkModel.PowerState.PowerState.PowerSource;
                 _taskbarIcon.Dispatcher.Invoke(() =>
                 {
                     switch (PowerSource)

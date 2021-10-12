@@ -15,15 +15,15 @@ using System.Threading.Tasks;
 namespace APMOk.Services
 {
     /// <summary>
-    /// Получить информацию о текущем состоянии питания
+    /// Получить информацию о текущих настройках APM
     /// DI Lifetime: Transient
     /// </summary>
-    public class PowerStateService : IDisposable
+    public class Configuration : IDisposable
     {
         private readonly GrpcChannel _channel;
         private bool disposedValue;
 
-        public PowerStateService()
+        public Configuration()
         {
             var udsEndPoint = new UnixDomainSocketEndPoint(SocketData.SocketPath);
             var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
@@ -43,10 +43,10 @@ namespace APMOk.Services
             });
         }
 
-        public async Task<PowerStateReply> GetPowerStateAsync(CancellationToken cancellationToken)
+        public async Task<DriveAPMConfigurationReply> GetDriveAPMConfigurationAsync(CancellationToken cancellationToken)
         {
-            var client = new APMData.PowerStateService.PowerStateServiceClient(_channel);
-            var reply = await client.GetPowerStateAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
+            var client = new ConfigurationService.ConfigurationServiceClient(_channel);
+            var reply = await client.GetDriveAPMConfigurationAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
             return reply;
         }
 

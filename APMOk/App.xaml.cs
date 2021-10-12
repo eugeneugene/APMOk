@@ -16,6 +16,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Markup;
 
 namespace APMOk
@@ -25,6 +26,38 @@ namespace APMOk
         private IHost host = null;
         private TaskbarIcon notifyIcon = null;
         private bool disposedValue = false;
+        private CommandBinding onMainsCommandBinding = new();
+        private CommandBinding onBatteriesCommandBinding = new();
+
+        public App()
+        {
+            onMainsCommandBinding.Command = AppCommands.OnMainsCommand;
+            onMainsCommandBinding.CanExecute += OnMainsCommandBindingCanExecute;
+            onMainsCommandBinding.Executed += OnMainsCommandBindingExecuted;
+            onBatteriesCommandBinding.Command = AppCommands.OnBatteriesCommand;
+            onBatteriesCommandBinding.CanExecute += OnBatteriesCommandBindingCanExecute;
+            onBatteriesCommandBinding.Executed += OnBatteriesCommandBindingExecuted;
+        }
+
+        private void OnBatteriesCommandBindingExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OnBatteriesCommandBindingCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OnMainsCommandBindingExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OnMainsCommandBindingCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -46,11 +79,11 @@ namespace APMOk
                     services.AddSingleton(notifyIcon);
                     services.AddSingleton<APMOkModel>();
                     services.AddSingleton<NotifyIconViewModel>();
-                    services.AddTransient<DiskInfoService>();
-                    services.AddTransient<PowerStateService>();
-                    services.AddTransient<ConfigurationService>();
+                    services.AddTransient<DiskInfo>();
+                    services.AddTransient<PowerState>();
+                    services.AddTransient<Configuration>();
                     services.AddTransient<DeviceStatusWindow>();
-                    services.AddHostedService<NotificationIconUpdaterTask>();
+                    services.AddHostedService<NotificationIconUpdater>();
 
                     services.AddSingleton<ConfigurationParameterFactory>();
                     services.AddSingleton<ITasksStartupConfiguration, TasksStartupConfiguration>();
@@ -99,6 +132,8 @@ namespace APMOk
                             foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
                             {
                                 var newMenuItem = new MenuItem { Name = $"ID{j++}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
+                                newMenuItem.CommandBindings.Add(onMainsCommandBinding);
+                                newMenuItem.CommandParameter = diskInfoEntry;
                                 _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
                                 if (apmValueProperty == null)
                                     newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
@@ -117,7 +152,7 @@ namespace APMOk
                         else
                             menuItem1.IsEnabled = false;
                     }
-                    if (item is MenuItem menuItem2 && menuItem2.Name == "OnBattery")
+                    if (item is MenuItem menuItem2 && menuItem2.Name == "OnBatteries")
                     {
                         while (menuItem2.Items.Count > 0)
                             menuItem2.Items.RemoveAt(0);
@@ -129,6 +164,8 @@ namespace APMOk
                             foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
                             {
                                 var newMenuItem = new MenuItem { Name = $"ID{j++}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
+                                newMenuItem.CommandBindings.Add(onBatteriesCommandBinding);
+                                newMenuItem.CommandParameter = diskInfoEntry;
                                 _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
                                 if (apmValueProperty == null)
                                     newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
@@ -187,6 +224,11 @@ namespace APMOk
             {
                 if (disposing)
                 {
+                    onMainsCommandBinding.CanExecute -= OnMainsCommandBindingCanExecute;
+                    onMainsCommandBinding.Executed -= OnMainsCommandBindingExecuted;
+                    onBatteriesCommandBinding.CanExecute -= OnBatteriesCommandBindingCanExecute;
+                    onBatteriesCommandBinding.Executed -= OnBatteriesCommandBindingExecuted;
+
                     notifyIcon?.Dispose();
                     host?.Dispose();
                 }
