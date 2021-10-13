@@ -122,8 +122,6 @@ namespace APMOk
                             foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.OrderBy(item => item.Index))
                             {
                                 var newMenuItem = new MenuItem { Name = $"ID{j++}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
-                                newMenuItem.CommandBindings.Add(onApmCommandBinding);
-                                newMenuItem.CommandParameter = diskInfoEntry;
                                 _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
                                 if (apmValueProperty == null)
                                     newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
@@ -185,8 +183,9 @@ namespace APMOk
                 if (!level.NotMapped())
                 {
                     var newItem = new MenuItem { Header = $"{level.DisplayEnum()} ({(uint)level})" };
-                    newItem.CommandBindings.Add(onApmCommandBinding);
-                    newItem.CommandParameter = new ApmCommandParameter(driveID, powerSource, (uint)level);
+                    newItem.Click += delegate { MessageBox.Show("Test"); };
+                    //newItem.CommandBindings.Add(onApmCommandBinding);
+                    //newItem.CommandParameter = new ApmCommandParameter(driveID, powerSource, (uint)level);
                     items.Add(newItem);
                 }
             }
