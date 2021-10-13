@@ -15,9 +15,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Markup;
 
 namespace APMOk
@@ -27,26 +28,6 @@ namespace APMOk
         private IHost host = null;
         private TaskbarIcon notifyIcon = null;
         private bool disposedValue = false;
-
-        private readonly CommandBinding onApmCommandBinding;
-
-        public App()
-        {
-            onApmCommandBinding = new();
-            onApmCommandBinding.Command = ApmCommand.OnApmCommand;
-            onApmCommandBinding.CanExecute += OnApmCommandBindingCanExecute;
-            onApmCommandBinding.Executed += OnApmCommandBindingExecuted;
-        }
-
-        private void OnApmCommandBindingExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void OnApmCommandBindingCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -71,6 +52,7 @@ namespace APMOk
                     services.AddTransient<ISocketPathProvider, SocketPathProvider>();
                     services.AddTransient<DiskInfo>();
                     services.AddTransient<PowerState>();
+                    services.AddTransient<APM>();
                     services.AddTransient<Configuration>();
                     services.AddTransient<DeviceStatusWindow>();
                     services.AddHostedService<NotificationIconUpdater>();
@@ -176,23 +158,50 @@ namespace APMOk
 
         private IEnumerable<Control> GetSetMenuItems(string driveID, EPowerSource powerSource)
         {
-            List<Control> items = new();
-
             foreach (APMLevel level in Enum.GetValues(typeof(APMLevel)))
             {
                 if (!level.NotMapped())
                 {
                     var newItem = new MenuItem { Header = $"{level.DisplayEnum()} ({(uint)level})" };
-                    newItem.Click += delegate { MessageBox.Show("Test"); };
-                    //newItem.CommandBindings.Add(onApmCommandBinding);
-                    //newItem.CommandParameter = new ApmCommandParameter(driveID, powerSource, (uint)level);
-                    items.Add(newItem);
+                    newItem.Click += delegate { OnClicked(new ApmCommandParameter(driveID, powerSource, (uint)level)); };
+                    yield return newItem;
                 }
             }
-            items.Add(new Separator());
-            items.Add(new MenuItem { Header = "Set custom value" });
+            yield return new Separator();
+            yield return new MenuItem { Header = "Set custom value" };
+        }
 
-            return items;
+        private async void OnClicked(ApmCommandParameter parameter)
+        {
+            var applicationLifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
+            bool res = false;
+            try
+            {
+                res = await OnClickedAsync(parameter, applicationLifetime.ApplicationStopping);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+            if (res)
+                Debug.WriteLine("Success");
+            else
+                Debug.WriteLine("Failed");
+        }
+
+        private async Task<bool> OnClickedAsync(ApmCommandParameter parameter, CancellationToken cancellationToken)
+        {
+            Debug.WriteLine("SetAPM Request: {0}", parameter);
+            var apm = host.Services.GetRequiredService<APM>();
+            APMRequest request = new()
+            {
+                DeviceID = parameter.DeviceID,
+                PowerSource = parameter.PowerSource,
+                APMValue = parameter.ApmValue
+            };
+            var result = await apm.SetAPMAsync(request, cancellationToken);
+            Debug.WriteLine("SetAPM Result: {0}", result);
+            return result.ReplyResult != 0;
         }
 
         protected override async void OnExit(ExitEventArgs e)
@@ -216,9 +225,6 @@ namespace APMOk
             {
                 if (disposing)
                 {
-                    onApmCommandBinding.CanExecute -= OnApmCommandBindingCanExecute;
-                    onApmCommandBinding.Executed -= OnApmCommandBindingExecuted;
-
                     notifyIcon?.Dispose();
                     host?.Dispose();
                 }

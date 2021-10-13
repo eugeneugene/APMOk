@@ -1,8 +1,9 @@
 ﻿using APMData;
+using APMOkLib;
 
-namespace APMOk
+namespace APMOk.Code
 {
-    public class ApmCommandParameter
+    public class ApmCommandParameter : JsonEnumToString
     {
         public ApmCommandParameter(string deviceId, EPowerSource powerSource, uint apmValue)
         {

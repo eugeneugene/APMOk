@@ -45,6 +45,13 @@ namespace APMOk.Services
             return reply;
         }
 
+        public async Task<APMReply> SetAPMAsync(APMRequest request, CancellationToken cancellationToken)
+        {
+            var client = new APMService.APMServiceClient(_channel);
+            var reply = await client.SetAPMAsync(request, new CallOptions(cancellationToken: cancellationToken));
+            return reply;
+        }
+
         private static bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             return true;
