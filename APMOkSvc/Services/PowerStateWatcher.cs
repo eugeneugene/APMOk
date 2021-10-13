@@ -54,9 +54,12 @@ namespace APMOkSvc.Services
                 var reply = _diskInfoServiceImpl.EnumerateDisks();
                 if (reply.ReplyResult != 0)
                 {
-                    _logger.LogTrace("Обнаружены диски:");
-                    foreach (var disk in reply.DiskInfoEntries.Where(item => item.InfoValid))
-                        _logger.LogTrace("{0}", disk);
+                    if (_logger.IsEnabled(LogLevel.Trace))
+                    {
+                        _logger.LogTrace("Обнаружены диски:");
+                        foreach (var disk in reply.DiskInfoEntries)
+                            _logger.LogTrace("{0}", disk);
+                    }
 
                     var powerStateReply = _powerStateServiceImpl.GetPowerState();
                     if (powerStateReply.ReplyResult != 0)
@@ -66,7 +69,7 @@ namespace APMOkSvc.Services
                         using var scope = _serviceScopeFactory.CreateScope();
                         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
-                        foreach (var disk in reply.DiskInfoEntries.Where(item => item.InfoValid))
+                        foreach (var disk in reply.DiskInfoEntries)
                         {
                             if (dataContext.ConfigDataSet.Any(item => item.DeviceID == disk.DeviceID))
                             {

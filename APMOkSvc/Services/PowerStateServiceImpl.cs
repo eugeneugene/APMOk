@@ -30,12 +30,15 @@ namespace APMOkSvc.Services
                 var powerState = PowerState.GetPowerState();
                 if (powerState != null)
                 {
-                    _logger.LogTrace("PowerState:");
-                    _logger.LogTrace("ACLineStatus : {0}", powerState.ACLineStatus);
-                    _logger.LogTrace("BatteryFlag : {0}", powerState.BatteryFlag);
-                    _logger.LogTrace("BatteryFullLifeTime : {0}", powerState.BatteryFullLifeTime);
-                    _logger.LogTrace("BatteryLifePercent : {0}", powerState.BatteryLifePercent);
-                    _logger.LogTrace("BatteryLifeTime : {0}", powerState.BatteryLifeTime);
+                    if (_logger.IsEnabled(LogLevel.Trace))
+                    {
+                        _logger.LogTrace("PowerState:");
+                        _logger.LogTrace("ACLineStatus : {0}", powerState.ACLineStatus);
+                        _logger.LogTrace("BatteryFlag : {0}", powerState.BatteryFlag);
+                        _logger.LogTrace("BatteryFullLifeTime : {0}", powerState.BatteryFullLifeTime);
+                        _logger.LogTrace("BatteryLifePercent : {0}", powerState.BatteryLifePercent);
+                        _logger.LogTrace("BatteryLifeTime : {0}", powerState.BatteryLifeTime);
+                    }
 
                     reply.PowerState = new()
                     {
@@ -57,7 +60,7 @@ namespace APMOkSvc.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("Exception: {0}", ex);
+                _logger.LogError("{0}", ex);
             }
             _logger.LogTrace("Reply: {0}", reply);
             return reply;

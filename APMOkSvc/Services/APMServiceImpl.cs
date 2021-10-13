@@ -22,12 +22,14 @@ namespace APMOkSvc.Services
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly PowerStateContainer _powerStatusContainer;
+        private readonly TestDriveService _testDriveService;
 
-        public APMServiceImpl(ILogger<APMServiceImpl> logger, IServiceScopeFactory serviceScopeFactory, PowerStateContainer powerStatusContainer)
+        public APMServiceImpl(ILogger<APMServiceImpl> logger, IServiceScopeFactory serviceScopeFactory, PowerStateContainer powerStatusContainer, TestDriveService testDriveService)
         {
             _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
             _powerStatusContainer = powerStatusContainer;
+            _testDriveService = testDriveService;
             _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
         }
 
@@ -37,7 +39,18 @@ namespace APMOkSvc.Services
             var reply = new CurrentAPMReply { APMValue = 0, ReplyResult = 0, PowerSource = EPowerSource.Unknown, };
             try
             {
-                if (HW.GetAPM(request.DeviceID, out uint apmValue))
+                if (request.DeviceID == _testDriveService.TestDriveDiskInfoEntry.DeviceID)
+                {
+                    reply.APMValue = _powerStatusContainer.PowerState.PowerState.PowerSource switch
+                    {
+                        EPowerSource.Mains => _testDriveService.OnMainsApmValue,
+                        EPowerSource.Battery => _testDriveService.OnBatteriesApmValue,
+                        _ => 0U,
+                    };
+                    reply.PowerSource = _powerStatusContainer.PowerState.PowerState.PowerSource;
+                    reply.ReplyResult = 1;
+                }
+                else if (HW.GetAPM(request.DeviceID, out uint apmValue))
                 {
                     reply.APMValue = apmValue;
                     reply.PowerSource = _powerStatusContainer.PowerState.PowerState.PowerSource;
@@ -52,7 +65,7 @@ namespace APMOkSvc.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("Exception: {0}", ex);
+                _logger.LogError("{0}", ex);
             }
             _logger.LogTrace("Reply: {0}", reply);
             return reply;
@@ -65,57 +78,69 @@ namespace APMOkSvc.Services
             try
             {
                 var powerSource = _powerStatusContainer.PowerState.PowerState.PowerSource;
-                if (powerSource == request.PowerSource)
-                {
-                    byte val = request.APMValue > 254 ? (byte)0 : (byte)request.APMValue;
-                    bool disable = request.APMValue > 254;
-                    if (HW.SetAPM(request.DeviceID, val, disable))
-                    {
-                        _logger.LogDebug("APM set successfully");
-                        reply.ReplyResult = 1;
 
-                    }
-                    else
-                        _logger.LogWarning("Failed to set APM");
-                }
-
-                using var scope = _serviceScopeFactory.CreateScope();
-                var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-                if (dataContext.ConfigDataSet.Any(item => item.DeviceID == request.DeviceID))
+                if (request.DeviceID == _testDriveService.TestDriveDiskInfoEntry.DeviceID)
                 {
-                    var configData = dataContext.ConfigDataSet.Single(item => item.DeviceID == request.DeviceID);
-                    switch (powerSource)
-                    {
-                        case EPowerSource.Mains:
-                            configData.OnMains = request.APMValue;
-                            dataContext.ConfigDataSet.Update(configData);
-                            break;
-                        case EPowerSource.Battery:
-                            configData.OnBatteries = request.APMValue;
-                            dataContext.ConfigDataSet.Update(configData);
-                            break;
-                    }
+                    if (request.PowerSource == EPowerSource.Mains)
+                        _testDriveService.OnMainsApmValue = request.APMValue;
+                    if (request.PowerSource == EPowerSource.Battery)
+                        _testDriveService.OnBatteriesApmValue = request.APMValue;
+                    reply.ReplyResult = 1;
                 }
                 else
                 {
-                    uint OnMains = 0U;
-                    uint OnBatteries = 0U;
-                    switch (powerSource)
+                    if (powerSource == request.PowerSource)
                     {
-                        case EPowerSource.Mains:
-                            OnMains = request.APMValue;
-                            break;
-                        case EPowerSource.Battery:
-                            OnBatteries = request.APMValue;
-                            break;
+                        byte val = request.APMValue > 254 ? (byte)0 : (byte)request.APMValue;
+                        bool disable = request.APMValue > 254;
+                        if (HW.SetAPM(request.DeviceID, val, disable))
+                        {
+                            _logger.LogDebug("APM set successfully");
+                            reply.ReplyResult = 1;
+
+                        }
+                        else
+                            _logger.LogWarning("Failed to set APM");
                     }
-                    dataContext.ConfigDataSet.Add(new ConfigData(request.DeviceID, OnMains, OnBatteries));
+
+                    using var scope = _serviceScopeFactory.CreateScope();
+                    var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                    if (dataContext.ConfigDataSet.Any(item => item.DeviceID == request.DeviceID))
+                    {
+                        var configData = dataContext.ConfigDataSet.Single(item => item.DeviceID == request.DeviceID);
+                        switch (powerSource)
+                        {
+                            case EPowerSource.Mains:
+                                configData.OnMains = request.APMValue;
+                                dataContext.ConfigDataSet.Update(configData);
+                                break;
+                            case EPowerSource.Battery:
+                                configData.OnBatteries = request.APMValue;
+                                dataContext.ConfigDataSet.Update(configData);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        uint OnMains = 0U;
+                        uint OnBatteries = 0U;
+                        switch (powerSource)
+                        {
+                            case EPowerSource.Mains:
+                                OnMains = request.APMValue;
+                                break;
+                            case EPowerSource.Battery:
+                                OnBatteries = request.APMValue;
+                                break;
+                        }
+                        dataContext.ConfigDataSet.Add(new ConfigData(request.DeviceID, OnMains, OnBatteries));
+                    }
+                    dataContext.SaveChanges();
                 }
-                dataContext.SaveChanges();
             }
             catch (Exception ex)
             {
-                _logger.LogError("Exception: {0}", ex);
+                _logger.LogError("{0}", ex);
             }
             _logger.LogTrace("Reply: {0}", reply);
             return reply;
@@ -128,57 +153,69 @@ namespace APMOkSvc.Services
             try
             {
                 var powerSource = _powerStatusContainer.PowerState.PowerState.PowerSource;
-                if (powerSource == request.PowerSource)
-                {
-                    byte val = request.APMValue > 254 ? (byte)0 : (byte)request.APMValue;
-                    bool disable = request.APMValue > 254;
-                    if (HW.SetAPM(request.DeviceID, val, disable))
-                    {
-                        _logger.LogDebug("APM set successfully");
-                        reply.ReplyResult = 1;
 
-                    }
-                    else
-                        _logger.LogWarning("Failed to set APM");
-                }
-
-                using var scope = _serviceScopeFactory.CreateScope();
-                var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-                if (await dataContext.ConfigDataSet.AnyAsync(item => item.DeviceID == request.DeviceID, cancellationToken))
+                if (request.DeviceID == _testDriveService.TestDriveDiskInfoEntry.DeviceID)
                 {
-                    var configData = await dataContext.ConfigDataSet.SingleAsync(item => item.DeviceID == request.DeviceID, cancellationToken);
-                    switch (powerSource)
-                    {
-                        case EPowerSource.Mains:
-                            configData.OnMains = request.APMValue;
-                            dataContext.ConfigDataSet.Update(configData);
-                            break;
-                        case EPowerSource.Battery:
-                            configData.OnBatteries = request.APMValue;
-                            dataContext.ConfigDataSet.Update(configData);
-                            break;
-                    }
+                    if (request.PowerSource == EPowerSource.Mains)
+                        _testDriveService.OnMainsApmValue = request.APMValue;
+                    if (request.PowerSource == EPowerSource.Battery)
+                        _testDriveService.OnBatteriesApmValue = request.APMValue;
+                    reply.ReplyResult = 1;
                 }
                 else
                 {
-                    uint OnMains = 0U;
-                    uint OnBatteries = 0U;
-                    switch (powerSource)
+                    if (powerSource == request.PowerSource)
                     {
-                        case EPowerSource.Mains:
-                            OnMains = request.APMValue;
-                            break;
-                        case EPowerSource.Battery:
-                            OnBatteries = request.APMValue;
-                            break;
+                        byte val = request.APMValue > 254 ? (byte)0 : (byte)request.APMValue;
+                        bool disable = request.APMValue > 254;
+                        if (HW.SetAPM(request.DeviceID, val, disable))
+                        {
+                            _logger.LogDebug("APM set successfully");
+                            reply.ReplyResult = 1;
+
+                        }
+                        else
+                            _logger.LogWarning("Failed to set APM");
                     }
-                    dataContext.ConfigDataSet.Add(new ConfigData(request.DeviceID, OnMains, OnBatteries));
+
+                    using var scope = _serviceScopeFactory.CreateScope();
+                    var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                    if (await dataContext.ConfigDataSet.AnyAsync(item => item.DeviceID == request.DeviceID, cancellationToken))
+                    {
+                        var configData = await dataContext.ConfigDataSet.SingleAsync(item => item.DeviceID == request.DeviceID, cancellationToken);
+                        switch (powerSource)
+                        {
+                            case EPowerSource.Mains:
+                                configData.OnMains = request.APMValue;
+                                dataContext.ConfigDataSet.Update(configData);
+                                break;
+                            case EPowerSource.Battery:
+                                configData.OnBatteries = request.APMValue;
+                                dataContext.ConfigDataSet.Update(configData);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        uint OnMains = 0U;
+                        uint OnBatteries = 0U;
+                        switch (powerSource)
+                        {
+                            case EPowerSource.Mains:
+                                OnMains = request.APMValue;
+                                break;
+                            case EPowerSource.Battery:
+                                OnBatteries = request.APMValue;
+                                break;
+                        }
+                        dataContext.ConfigDataSet.Add(new ConfigData(request.DeviceID, OnMains, OnBatteries));
+                    }
+                    await dataContext.SaveChangesAsync(cancellationToken);
                 }
-                dataContext.SaveChanges();
             }
             catch (Exception ex)
             {
-                _logger.LogError("Exception: {0}", ex);
+                _logger.LogError("{0}", ex);
             }
             _logger.LogTrace("Reply: {0}", reply);
             return reply;

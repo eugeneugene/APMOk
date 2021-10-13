@@ -1,4 +1,5 @@
-﻿using APMOk.Code;
+﻿using APMData;
+using APMOk.Code;
 using APMOk.Models;
 using APMOk.Services;
 using APMOk.Tasks;
@@ -26,35 +27,23 @@ namespace APMOk
         private IHost host = null;
         private TaskbarIcon notifyIcon = null;
         private bool disposedValue = false;
-        private CommandBinding onMainsCommandBinding = new();
-        private CommandBinding onBatteriesCommandBinding = new();
+
+        private readonly CommandBinding onApmCommandBinding;
 
         public App()
         {
-            onMainsCommandBinding.Command = AppCommands.OnMainsCommand;
-            onMainsCommandBinding.CanExecute += OnMainsCommandBindingCanExecute;
-            onMainsCommandBinding.Executed += OnMainsCommandBindingExecuted;
-            onBatteriesCommandBinding.Command = AppCommands.OnBatteriesCommand;
-            onBatteriesCommandBinding.CanExecute += OnBatteriesCommandBindingCanExecute;
-            onBatteriesCommandBinding.Executed += OnBatteriesCommandBindingExecuted;
+            onApmCommandBinding = new();
+            onApmCommandBinding.Command = ApmCommand.OnApmCommand;
+            onApmCommandBinding.CanExecute += OnApmCommandBindingCanExecute;
+            onApmCommandBinding.Executed += OnApmCommandBindingExecuted;
         }
 
-        private void OnBatteriesCommandBindingExecuted(object sender, ExecutedRoutedEventArgs e)
+        private void OnApmCommandBindingExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             throw new NotImplementedException();
         }
 
-        private void OnBatteriesCommandBindingCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void OnMainsCommandBindingExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void OnMainsCommandBindingCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void OnApmCommandBindingCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             throw new NotImplementedException();
         }
@@ -130,10 +119,10 @@ namespace APMOk
                         {
                             menuItem1.IsEnabled = true;
                             int j = 0;
-                            foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
+                            foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.OrderBy(item => item.Index))
                             {
                                 var newMenuItem = new MenuItem { Name = $"ID{j++}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
-                                newMenuItem.CommandBindings.Add(onMainsCommandBinding);
+                                newMenuItem.CommandBindings.Add(onApmCommandBinding);
                                 newMenuItem.CommandParameter = diskInfoEntry;
                                 _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
                                 if (apmValueProperty == null)
@@ -143,7 +132,7 @@ namespace APMOk
                                     newMenuItem.Items.Add(new MenuItem { Header = "On Mains: " + ((apmValueProperty.OnMains == 0) ? "n/a" : apmValueProperty.OnMains.ToString()) });
                                     newMenuItem.Items.Add(new Separator());
                                     var newMenuItem2 = new MenuItem { Header = "Set" };
-                                    newMenuItem2.Items.AddRange(GetSetMenuItems());
+                                    newMenuItem2.Items.AddRange(GetSetMenuItems(diskInfoEntry.DeviceID, EPowerSource.Mains));
                                     newMenuItem.Items.Add(newMenuItem2);
                                 }
 
@@ -162,11 +151,9 @@ namespace APMOk
                         {
                             menuItem2.IsEnabled = true;
                             int j = 0;
-                            foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.Index))
+                            foreach (var diskInfoEntry in _apmOkData.SystemDiskInfo.DiskInfoEntries.OrderBy(item => item.Index))
                             {
                                 var newMenuItem = new MenuItem { Name = $"ID{j++}", Header = $"{diskInfoEntry.Index}. {diskInfoEntry.Caption}", };
-                                newMenuItem.CommandBindings.Add(onBatteriesCommandBinding);
-                                newMenuItem.CommandParameter = diskInfoEntry;
                                 _apmOkData.APMValueDictionary.TryGetValue(diskInfoEntry.DeviceID, out var apmValueProperty);
                                 if (apmValueProperty == null)
                                     newMenuItem.Items.Add(new MenuItem { Header = "APM not available", IsEnabled = false });
@@ -175,7 +162,7 @@ namespace APMOk
                                     newMenuItem.Items.Add(new MenuItem { Header = "On Batteries: " + ((apmValueProperty.OnBatteries == 0) ? "n/a" : apmValueProperty.OnBatteries.ToString()) });
                                     newMenuItem.Items.Add(new Separator());
                                     var newMenuItem2 = new MenuItem { Header = "Set" };
-                                    newMenuItem2.Items.AddRange(GetSetMenuItems());
+                                    newMenuItem2.Items.AddRange(GetSetMenuItems(diskInfoEntry.DeviceID, EPowerSource.Battery));
                                     newMenuItem.Items.Add(newMenuItem2);
                                 }
 
@@ -189,14 +176,19 @@ namespace APMOk
             }
         }
 
-        private static IEnumerable<Control> GetSetMenuItems()
+        private IEnumerable<Control> GetSetMenuItems(string driveID, EPowerSource powerSource)
         {
             List<Control> items = new();
 
             foreach (APMLevel level in Enum.GetValues(typeof(APMLevel)))
             {
                 if (!level.NotMapped())
-                    items.Add(new MenuItem { Header = level.DisplayEnum() });
+                {
+                    var newItem = new MenuItem { Header = $"{level.DisplayEnum()} ({(uint)level})" };
+                    newItem.CommandBindings.Add(onApmCommandBinding);
+                    newItem.CommandParameter = new ApmCommandParameter(driveID, powerSource, (uint)level);
+                    items.Add(newItem);
+                }
             }
             items.Add(new Separator());
             items.Add(new MenuItem { Header = "Set custom value" });
@@ -225,10 +217,8 @@ namespace APMOk
             {
                 if (disposing)
                 {
-                    onMainsCommandBinding.CanExecute -= OnMainsCommandBindingCanExecute;
-                    onMainsCommandBinding.Executed -= OnMainsCommandBindingExecuted;
-                    onBatteriesCommandBinding.CanExecute -= OnBatteriesCommandBindingCanExecute;
-                    onBatteriesCommandBinding.Executed -= OnBatteriesCommandBindingExecuted;
+                    onApmCommandBinding.CanExecute -= OnApmCommandBindingCanExecute;
+                    onApmCommandBinding.Executed -= OnApmCommandBindingExecuted;
 
                     notifyIcon?.Dispose();
                     host?.Dispose();

@@ -347,7 +347,7 @@ namespace APMOkSvc.Code
             }
             catch (Exception ex)
             {
-                logger.Error(ex);
+                logger.Error(ex, "Failed to start");
                 return StarterRunResult.Error;
             }
             finally

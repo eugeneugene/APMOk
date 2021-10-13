@@ -101,7 +101,7 @@ namespace APMOk
             {
                 DiskInfo.Clear();
 
-                foreach (var entry in _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).OrderBy(item => item.DeviceID))
+                foreach (var entry in _apmOkData.SystemDiskInfo.DiskInfoEntries.OrderBy(item => item.DeviceID))
                     DiskInfo.Add(entry);
 
                 if (DiskInfo.Any())
@@ -171,12 +171,12 @@ namespace APMOk
                 selectedSerial = selectedItem.SerialNumber;
 
             // Items to delete from combobox
-            var deleteItems = DiskInfo.Where(item => !_apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid).Any(item1 => item1.Equals(item)));
+            var deleteItems = DiskInfo.Where(item => !_apmOkData.SystemDiskInfo.DiskInfoEntries.Any(item1 => item1.Equals(item)));
             foreach (var item in deleteItems)
                 DiskInfo.Remove(item);
 
             // Items to add to combobox
-            var addItems = _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => item.InfoValid && !DiskInfo.Any(item1 => item1.Equals(item)));
+            var addItems = _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => !DiskInfo.Any(item1 => item1.Equals(item)));
             foreach (var item in addItems)
                 DiskInfo.Add(item);
 

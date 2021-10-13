@@ -29,6 +29,7 @@ namespace APMOkSvc
             services.AddDbContext<DataContext>();
             services.AddHostedService<PowerStateWatcher>();
             services.AddSingleton<PowerStateContainer>();
+            services.AddSingleton<TestDriveService>();
             services.AddTransient<DiskInfoServiceImpl>();
             services.AddTransient<APMServiceImpl>();
             services.AddTransient<PowerStateServiceImpl>();

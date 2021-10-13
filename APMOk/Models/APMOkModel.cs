@@ -1,5 +1,4 @@
 ﻿using APMData;
-using APMOk.Code;
 using APMOkLib;
 using System;
 using System.Collections.Concurrent;
@@ -8,6 +7,10 @@ using System.Runtime.CompilerServices;
 
 namespace APMOk.Models
 {
+    /// <summary>
+    /// APM Model
+    /// DI Lifetime: Singleton
+    /// </summary>
     public class APMOkModel : JsonToString, INotifyPropertyChanged, IDisposable
     {
         private DisksReply _systemDiskInfo;

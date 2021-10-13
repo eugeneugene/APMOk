@@ -1,7 +1,7 @@
 ﻿using APMData;
 using APMOkSvc.Code;
-using APMOkSvc.Data;
 using APMOkSvc.Types;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -15,10 +15,14 @@ namespace APMOkSvc.Services
     public class DiskInfoServiceImpl
     {
         private readonly ILogger _logger;
+        private readonly IHostEnvironment _environment;
+        private readonly TestDriveService _testDriveService;
 
-        public DiskInfoServiceImpl(ILogger<DiskInfoServiceImpl> logger)
+        public DiskInfoServiceImpl(ILogger<DiskInfoServiceImpl> logger, IHostEnvironment environment, TestDriveService testDriveService)
         {
             _logger = logger;
+            _environment = environment;
+            _testDriveService = testDriveService;
             _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
         }
 
@@ -42,9 +46,8 @@ namespace APMOkSvc.Services
                 }
                 else
                 {
-                    var diskInfos = diskInfoEnum.Select(item => new DiskInfoEntry
+                    var diskInfos = diskInfoEnum.Where(item => item.InfoValid != 0).Select(item => new DiskInfoEntry
                     {
-                        InfoValid = item.InfoValid != 0,
                         Index = item.Index,
                         Availability = item.Availability,
                         Caption = item.Caption,
@@ -54,18 +57,24 @@ namespace APMOkSvc.Services
                         Manufacturer = item.Manufacturer,
                         Model = item.Model,
                         SerialNumber = item.SerialNumber,
-                    });
+                    }).ToList();
+
+                    if (_environment.IsDevelopment())
+                        diskInfos.Add(_testDriveService.TestDriveDiskInfoEntry);
 
                     reply.DiskInfoEntries.AddRange(diskInfos);
                     reply.ReplyResult = 1;
 
-                    foreach (var di in diskInfos)
-                        _logger.LogTrace(di.InfoValid ? di.Caption : "<Invalid>");
+                    if (_logger.IsEnabled(LogLevel.Trace))
+                    {
+                        foreach (var di in diskInfos)
+                            _logger.LogTrace(di.Caption);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError("Exception: {0}", ex);
+                _logger.LogError("{0}", ex);
             }
 
             _logger.LogTrace("Reply: {0}", reply);
