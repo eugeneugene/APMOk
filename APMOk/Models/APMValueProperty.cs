@@ -9,10 +9,11 @@ namespace APMOk.Models
         public APMValueProperty()
         { }
 
-        public APMValueProperty(uint onMains, uint onBatteries)
+        public APMValueProperty(uint onMains, uint onBatteries, uint current)
         {
             _onMains = onMains;
             _onBatteries = onBatteries;
+            _current = current;
         }
 
         private uint _onMains;
@@ -43,6 +44,20 @@ namespace APMOk.Models
             }
         }
 
+        private uint _current;
+        public uint Current
+        {
+            get => _current;
+            set
+            {
+                if (value != _current)
+                {
+                    _current = value;
+                    NotifyPropertyChanged(nameof(Current));
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
@@ -56,7 +71,7 @@ namespace APMOk.Models
         {
             if (ReferenceEquals(this, other))
                 return true;
-            return _onMains == other.OnMains;
+            return _onMains == other.OnMains && _onBatteries == other._onBatteries && _current == other._current;
         }
 
         public override bool Equals(object obj)
@@ -66,7 +81,7 @@ namespace APMOk.Models
 
         public override int GetHashCode()
         {
-            return _onMains.GetHashCode();
+            return HashCode.Combine(_onMains, _onBatteries, _current);
         }
     }
 }

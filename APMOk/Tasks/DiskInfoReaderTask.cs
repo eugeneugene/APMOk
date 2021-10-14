@@ -1,8 +1,10 @@
-﻿using APMOk.Models;
+﻿using APMData;
+using APMOk.Models;
 using APMOkLib.RecurrentTasks;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,11 +12,11 @@ namespace APMOk.Tasks
 {
     public class DiskInfoReaderTask : IRunnable
     {
-        private readonly APMOkModel _apmOkData;
+        private readonly APMOkModel _apmOkModel;
 
-        public DiskInfoReaderTask(APMOkModel apmOkData)
+        public DiskInfoReaderTask(APMOkModel apmOkModel)
         {
-            _apmOkData = apmOkData;
+            _apmOkModel = apmOkModel;
         }
 
         public async Task RunAsync(ITask currentTask, IServiceProvider scopeServiceProvider, CancellationToken cancellationToken)
@@ -25,6 +27,7 @@ namespace APMOk.Tasks
 
                 var diskInfoService = scopeServiceProvider.GetRequiredService<Services.DiskInfo>();
                 var configurationService = scopeServiceProvider.GetRequiredService<Services.Configuration>();
+                var apmService = scopeServiceProvider.GetRequiredService<Services.APM>();
 
                 var systemDiskInfoReply = await diskInfoService.EnumerateDisksAsync(cancellationToken);
                 if (systemDiskInfoReply is null)
@@ -34,19 +37,41 @@ namespace APMOk.Tasks
                 if (driveAPMConfigurationReply is null)
                     throw new Exception("Service is offline");
 
-                _apmOkData.ConnectFailure = false;
-                _apmOkData.SystemDiskInfo = systemDiskInfoReply;
+                _apmOkModel.ConnectFailure = false;
+                _apmOkModel.SystemDiskInfo = systemDiskInfoReply;
 
-                if (driveAPMConfigurationReply.ReplyResult != 0)
+                foreach (var entry in systemDiskInfoReply.DiskInfoEntries)
                 {
-                    foreach (var entry in driveAPMConfigurationReply.DriveAPMConfigurationReplyEntries)
-                        _apmOkData.APMValueDictionary[entry.DeviceID] = new APMValueProperty(onMains: entry.OnMains, onBatteries: entry.OnBatteries);
+                    var currentAPM = await apmService.GetCurrentAPMAsync(new()
+                    {
+                        DeviceID = entry.DeviceID,
+                    }, cancellationToken);
+
+                    DriveAPMConfigurationReplyEntry driveAPMConfiguration = null;
+                    if (driveAPMConfigurationReply.ReplyResult != 0)
+                        driveAPMConfiguration = driveAPMConfigurationReply.DriveAPMConfigurationReplyEntries.SingleOrDefault(item => item.DeviceID == entry.DeviceID);
+                    if (driveAPMConfiguration is null)
+                        driveAPMConfiguration = new DriveAPMConfigurationReplyEntry
+                        {
+                            DeviceID = entry.DeviceID,
+                            OnMains = 0U,
+                            OnBatteries = 0U,
+                        };
+                    if (_apmOkModel.APMValueDictionary.ContainsKey(entry.DeviceID))
+                    {
+                        var value = _apmOkModel.APMValueDictionary[entry.DeviceID];
+                        value.OnMains = driveAPMConfiguration.OnMains;
+                        value.OnBatteries = driveAPMConfiguration.OnBatteries;
+                        value.Current = currentAPM.APMValue;
+                    }
+                    else
+                        _apmOkModel.APMValueDictionary[entry.DeviceID] = new APMValueProperty(onMains: driveAPMConfiguration.OnMains, onBatteries: driveAPMConfiguration.OnBatteries, current: currentAPM.APMValue);
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                _apmOkData.ConnectFailure = true;
+                _apmOkModel.ConnectFailure = true;
             }
         }
     }

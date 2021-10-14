@@ -138,6 +138,13 @@ namespace APMOk
                     var device = _apmOkData.APMValueDictionary.Single(item => item.Key == selectedItem.DeviceID);
                     APMValue.OnMains = device.Value.OnMains;
                     APMValue.OnBatteries = device.Value.OnBatteries;
+                    APMValue.Current = device.Value.Current;
+                }
+                else
+                {
+                    APMValue.OnMains = 0U;
+                    APMValue.OnBatteries = 0U;
+                    APMValue.Current = 0U;
                 }
             }
         }

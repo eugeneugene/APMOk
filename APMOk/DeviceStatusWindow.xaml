@@ -191,8 +191,9 @@
             <Grid>
                 <Grid.RowDefinitions />
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50*" />
-                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Row="0" Grid.Column="0">
                     <Grid.RowDefinitions />
@@ -231,6 +232,25 @@
                         Grid.Column="1"
                         Margin="5"
                         Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.OnBatteries, Converter={StaticResource APMValueConverter}}" />
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="2">
+                    <Grid.RowDefinitions />
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Margin="5">
+                        Current:
+                    </TextBlock>
+                    <TextBlock
+                        x:Name="CurrentValue"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Margin="5"
+                        Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.Current, Converter={StaticResource APMValueConverter}}" />
                 </Grid>
             </Grid>
         </GroupBox>

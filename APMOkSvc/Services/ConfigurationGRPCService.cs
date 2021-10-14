@@ -14,13 +14,11 @@ namespace APMOkSvc.Services
     {
         private readonly ILogger _logger;
         private readonly ConfigurationServiceImpl _configurationServiceImpl;
-        private readonly CancellationToken _cancellationToken;
 
-        public ConfigurationGRPCService(ILogger<ConfigurationGRPCService> logger, ConfigurationServiceImpl configurationServiceImpl, CancellationToken cancellationToken)
+        public ConfigurationGRPCService(ILogger<ConfigurationGRPCService> logger, ConfigurationServiceImpl configurationServiceImpl)
         {
             _logger = logger;
             _configurationServiceImpl = configurationServiceImpl;
-            _cancellationToken = cancellationToken;
             _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
         }
 
@@ -31,7 +29,7 @@ namespace APMOkSvc.Services
 
         public override async Task<ResetDriveReply> ResetDriveAPMConfiguration(ResetDriveRequest request, ServerCallContext context)
         {
-            return await _configurationServiceImpl.ResetDriveAPMConfigurationAsync(request, _cancellationToken);
+            return await _configurationServiceImpl.ResetDriveAPMConfigurationAsync(request, context.CancellationToken);
         }
     }
 }
