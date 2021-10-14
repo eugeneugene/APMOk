@@ -1,11 +1,12 @@
 ﻿using APMData;
 using APMOkSvc.Data;
 using APMOkSvc.Types;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,11 +47,23 @@ namespace APMOkSvc.Services
             return Task.CompletedTask;
         }
 
-        private void PowerStateChangeDelegate(object sender, PropertyChangedEventArgs e)
+        private async void PowerStateChangeDelegate(object sender, PropertyChangedEventArgs e)
         {
-            _logger.LogDebug("PowerState has changed");
+            try
+            {
+                await PowerStateChangeAsync(sender, e, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("{0}", ex);
+            }
+        }
+
+        private async Task PowerStateChangeAsync(object sender, PropertyChangedEventArgs e, CancellationToken cancellationToken)
+        {
             if (e.PropertyName == "PowerState")
             {
+                _logger.LogDebug("PowerState has changed");
                 var reply = _diskInfoServiceImpl.EnumerateDisks();
                 if (reply.ReplyResult != 0)
                 {
@@ -71,9 +84,9 @@ namespace APMOkSvc.Services
 
                         foreach (var disk in reply.DiskInfoEntries)
                         {
-                            if (dataContext.ConfigDataSet.Any(item => item.DeviceID == disk.DeviceID))
+                            if (await dataContext.ConfigDataSet.AnyAsync(item => item.DeviceID == disk.DeviceID, cancellationToken))
                             {
-                                var configData = dataContext.ConfigDataSet.Single(item => item.DeviceID == disk.DeviceID);
+                                var configData = await dataContext.ConfigDataSet.SingleAsync(item => item.DeviceID == disk.DeviceID, cancellationToken);
                                 switch (powerStateReply.PowerState.PowerSource)
                                 {
                                     case EPowerSource.Mains:

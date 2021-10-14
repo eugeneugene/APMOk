@@ -1,10 +1,13 @@
 ﻿using APMData;
 using APMOkSvc.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace APMOkSvc.Services
 {
@@ -61,6 +64,33 @@ namespace APMOkSvc.Services
             {
                 _logger.LogError(ex.ToString());
             }
+            return reply;
+        }
+
+        public async Task<ResetDriveReply> ResetDriveAPMConfigurationAsync(ResetDriveRequest request, CancellationToken cancellationToken)
+        {
+            var reply = new ResetDriveReply
+            {
+                ReplyResult = 0
+            };
+            try
+            {
+                using var scope = _serviceScopeFactory.CreateScope();
+                var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+                var configItem = await dataContext.ConfigDataSet.SingleOrDefaultAsync(item => item.DeviceID == request.DeviceID, cancellationToken);
+                if (configItem is not null)
+                {
+                    dataContext.ConfigDataSet.Remove(configItem);
+                    await dataContext.SaveChangesAsync(cancellationToken);
+                    reply.ReplyResult = 1;
+                    reply.DeviceID = configItem.DeviceID;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+            }
+
             return reply;
         }
     }

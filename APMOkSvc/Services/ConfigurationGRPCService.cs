@@ -2,6 +2,7 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace APMOkSvc.Services
@@ -13,17 +14,24 @@ namespace APMOkSvc.Services
     {
         private readonly ILogger _logger;
         private readonly ConfigurationServiceImpl _configurationServiceImpl;
+        private readonly CancellationToken _cancellationToken;
 
-        public ConfigurationGRPCService(ILogger<ConfigurationGRPCService> logger, ConfigurationServiceImpl configurationServiceImpl)
+        public ConfigurationGRPCService(ILogger<ConfigurationGRPCService> logger, ConfigurationServiceImpl configurationServiceImpl, CancellationToken cancellationToken)
         {
             _logger = logger;
             _configurationServiceImpl = configurationServiceImpl;
+            _cancellationToken = cancellationToken;
             _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
         }
 
         public override Task<DriveAPMConfigurationReply> GetDriveAPMConfiguration(Empty request, ServerCallContext context)
         {
             return Task.FromResult(_configurationServiceImpl.GetDriveAPMConfiguration());
+        }
+
+        public override async Task<ResetDriveReply> ResetDriveAPMConfiguration(ResetDriveRequest request, ServerCallContext context)
+        {
+            return await _configurationServiceImpl.ResetDriveAPMConfigurationAsync(request, _cancellationToken);
         }
     }
 }

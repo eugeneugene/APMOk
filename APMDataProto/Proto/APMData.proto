@@ -21,6 +21,7 @@ service PowerStateService {
 
 service ConfigurationService {
 	rpc GetDriveAPMConfiguration (google.protobuf.Empty) returns (DriveAPMConfigurationReply);
+	rpc ResetDriveAPMConfiguration (ResetDriveRequest) returns (ResetDriveReply);
 }
 
 message DiskInfoEntry {
@@ -35,7 +36,7 @@ message DiskInfoEntry {
 	string SerialNumber		= 9;
 }
 
-// ReplyResult нужно понимать как тип WINDOWS BOOL - 0-ложь, иначе - истина
+// ReplyResult нужно понимать как тип WINDOWS BOOL - 0 - ложь, иначе - истина
 message DisksReply {
 	int32 ReplyResult						= 1;
 	repeated DiskInfoEntry DiskInfoEntries	= 2;
@@ -99,4 +100,13 @@ message DriveAPMConfigurationReplyEntry {
 message DriveAPMConfigurationReply {
 	int32 ReplyResult															= 1;
 	repeated DriveAPMConfigurationReplyEntry DriveAPMConfigurationReplyEntries	= 2;
+}
+
+message ResetDriveRequest {
+	string DeviceID		= 1;
+}
+
+message ResetDriveReply {
+	int32 ReplyResult	= 1;
+	string DeviceID		= 2;
 }
