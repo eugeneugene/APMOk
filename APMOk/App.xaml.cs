@@ -74,7 +74,7 @@ namespace APMOk
 
                 var _notifyIconViewModel = host.Services.GetRequiredService<NotifyIconViewModel>();
                 notifyIcon.DataContext = _notifyIconViewModel;
-                notifyIcon.TrayContextMenuOpen += NotifyIconTrayContextMenuOpen;
+                //notifyIcon.TrayContextMenuOpen += NotifyIconTrayContextMenuOpen;
                 base.OnStartup(e);
             }
             catch (Exception ex)

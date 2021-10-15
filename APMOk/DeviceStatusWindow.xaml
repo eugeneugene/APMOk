@@ -18,7 +18,9 @@
         <CollectionViewSource x:Key="DeviceStatusDataSource" CollectionViewType="ListCollectionView" />
         <localmodels:APMValueProperty x:Key="APMValue" />
         <localcodeconverters:APMValueConverter x:Key="APMValueConverter" />
+        <localcodeconverters:APMValueBoolConverter x:Key="APMValueBoolConverter" />
         <localcodeconverters:PowerSourceConverter x:Key="PowerSourceConverter" />
+
         <Style x:Key="PowerStatus" TargetType="TextBlock">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding PowerState, Converter={StaticResource PowerSourceConverter}}" Value="0">
@@ -52,6 +54,19 @@
                 </DataTrigger>
                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ConnectFailure}" Value="false">
                     <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="SetApmValueButtonEnabler"
+            BasedOn="{StaticResource PressButtonEffectStyle}"
+            TargetType="Button">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.Current, Converter={StaticResource APMValueBoolConverter}}" Value="true">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.Current, Converter={StaticResource APMValueBoolConverter}}" Value="false">
+                    <Setter Property="IsEnabled" Value="False" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -185,15 +200,17 @@
         <GroupBox
             Grid.Row="2"
             Grid.Column="0"
+            Grid.ColumnSpan="2"
             Margin="5"
             Header="APM Value"
             ToolTip="{StaticResource APMValueToolTip}">
             <Grid>
                 <Grid.RowDefinitions />
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="33*" />
-                    <ColumnDefinition Width="33*" />
-                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="25*" />
+                    <ColumnDefinition Width="25*" />
+                    <ColumnDefinition Width="25*" />
+                    <ColumnDefinition Width="25*" />
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Row="0" Grid.Column="0">
                     <Grid.RowDefinitions />
@@ -252,6 +269,14 @@
                         Margin="5"
                         Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.Current, Converter={StaticResource APMValueConverter}}" />
                 </Grid>
+                <Button
+                    x:Name="SetApmValueButton"
+                    Grid.Row="0"
+                    Grid.Column="3"
+                    Width="100"
+                    Height="22"
+                    Content="Set APM Value"
+                    Style="{StaticResource SetApmValueButtonEnabler}" />
             </Grid>
         </GroupBox>
     </Grid>
