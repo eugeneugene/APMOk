@@ -7,6 +7,24 @@
         <Separator />
         <MenuItem Command="{Binding ExitApplicationCommand}" Header="Exit" />
     </ContextMenu>
+    <Style TargetType="{x:Type MenuItem}">
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+    </Style>
+    <x:Array
+        x:Key="ApmValuesMenuItems"
+        x:Shared="false"
+        Type="MenuItem">
+        <MenuItem Header="Minimum power consumption with Standby (0x01)" />
+        <MenuItem Header="Intermediate power management levels with Standby (0x02)" />
+        <MenuItem Header="Minimum power consumption without Standby (0x80)" />
+        <MenuItem Header="Intermediate power management levels without Standby (0x81)" />
+        <MenuItem Header="Maximum performance (0xFE)" />
+    </x:Array>
+    <ContextMenu x:Key="SetApmValueContextMenu" x:Shared="false">
+        <MenuItem Header="OnMains" ItemsSource="{StaticResource ApmValuesMenuItems}" />
+        <MenuItem Header="OnBatteries" ItemsSource="{StaticResource ApmValuesMenuItems}" />
+    </ContextMenu>
     <tb:TaskbarIcon
         x:Key="NotifyIcon"
         ContextMenu="{StaticResource SysTrayMenu}"

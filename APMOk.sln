@@ -11,10 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APMOk", "APMOk\APMOk.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APMOkLib", "APMOkLib\APMOkLib.csproj", "{B073FFD2-98E2-4C12-B202-9890D0FCF29F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7A0FEE2C-4F94-4DA4-A7A2-C0EEC6432034}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APMTest", "Tests\APMTest\APMTest.csproj", "{49AF2366-2E9E-4382-8217-9545E31791EB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APMDataProto", "APMDataProto\APMDataProto.csproj", "{A789F645-8E36-42B5-8DD1-8B4133FBCE84}"
 EndProject
 Global
@@ -39,10 +35,6 @@ Global
 		{B073FFD2-98E2-4C12-B202-9890D0FCF29F}.Debug|x64.Build.0 = Debug|x64
 		{B073FFD2-98E2-4C12-B202-9890D0FCF29F}.Release|x64.ActiveCfg = Release|x64
 		{B073FFD2-98E2-4C12-B202-9890D0FCF29F}.Release|x64.Build.0 = Release|x64
-		{49AF2366-2E9E-4382-8217-9545E31791EB}.Debug|x64.ActiveCfg = Debug|x64
-		{49AF2366-2E9E-4382-8217-9545E31791EB}.Debug|x64.Build.0 = Debug|x64
-		{49AF2366-2E9E-4382-8217-9545E31791EB}.Release|x64.ActiveCfg = Release|x64
-		{49AF2366-2E9E-4382-8217-9545E31791EB}.Release|x64.Build.0 = Release|x64
 		{A789F645-8E36-42B5-8DD1-8B4133FBCE84}.Debug|x64.ActiveCfg = Debug|x64
 		{A789F645-8E36-42B5-8DD1-8B4133FBCE84}.Debug|x64.Build.0 = Debug|x64
 		{A789F645-8E36-42B5-8DD1-8B4133FBCE84}.Release|x64.ActiveCfg = Release|x64
@@ -50,9 +42,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{49AF2366-2E9E-4382-8217-9545E31791EB} = {7A0FEE2C-4F94-4DA4-A7A2-C0EEC6432034}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28737301-8A50-4A75-B0B5-54DDC519C27A}

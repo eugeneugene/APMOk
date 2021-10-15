@@ -11,6 +11,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace APMOk
@@ -225,6 +226,20 @@ namespace APMOk
                     };
                 });
             }
+        }
+
+        private void SetAPMValueCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = APMValue is not null && APMValue.Current != 0;
+            e.Handled = true;
+        }
+
+        private void SetAPMValueExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            e.Handled = true;
+            var cm = TryFindResource("SetApmValueContextMenu") as ContextMenu;
+            if (cm is not null)
+                cm.IsOpen = true;
         }
     }
 }
