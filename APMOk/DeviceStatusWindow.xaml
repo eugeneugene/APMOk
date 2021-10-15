@@ -3,10 +3,12 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:data="clr-namespace:APMData;assembly=APMDataProto"
     xmlns:localcodeconverters="clr-namespace:APMOk.Code.Converters"
     xmlns:localcommands="clr-namespace:APMOk.Commands"
     xmlns:localmodels="clr-namespace:APMOk.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:system="clr-namespace:System;assembly=System.Core"
     Title="APM Info"
     Width="800"
     Height="384"
@@ -17,9 +19,9 @@
     mc:Ignorable="d">
     <Window.CommandBindings>
         <CommandBinding
-            CanExecute="SetAPMValueCanExecute"
-            Command="localcommands:APMOkCommands.SetAPMValueCommand"
-            Executed="SetAPMValueExecuted" />
+            CanExecute="SetAPMValueMenuCanExecute"
+            Command="localcommands:APMOkCommands.SetAPMValueMenuCommand"
+            Executed="SetAPMValueMenuExecuted" />
     </Window.CommandBindings>
     <Window.Resources>
         <CollectionViewSource x:Key="DeviceStatusDataSource" CollectionViewType="ListCollectionView" />
@@ -62,6 +64,10 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <Style x:Key="MenuItemAlignStyle" TargetType="{x:Type MenuItem}">
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Top" />
+        </Style>
         <ToolTip x:Key="APMValueToolTip">
             <TextBlock>
                 APM Levels:<LineBreak />
@@ -73,6 +79,130 @@
                 254 - Maximum performance (0xFE)<LineBreak />
                 255 - Reserved (0xff)</TextBlock>
         </ToolTip>
+        <ContextMenu x:Key="SetApmValueContextMenu" x:Shared="false">
+            <ContextMenu.CommandBindings>
+                <CommandBinding
+                    CanExecute="SetAPMValueCanExecute"
+                    Command="localcommands:APMOkCommands.SetAPMValueCommand"
+                    Executed="SetAPMValueExecuted" />
+            </ContextMenu.CommandBindings>
+            <MenuItem Header="OnMains">
+                <MenuItem Header="Reset (after next power cycle)" Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <x:Array Type="system:Object">
+                            <system:UInt32>0</system:UInt32>
+                            <data:EPowerSource>Mains</data:EPowerSource>
+                        </x:Array>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Header="Minimum power consumption with Standby (0x01)" Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <x:Array Type="system:Object">
+                            <system:UInt32>1</system:UInt32>
+                            <data:EPowerSource>Mains</data:EPowerSource>
+                        </x:Array>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Header="Intermediate power management levels with Standby (0x02)" Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>
+                        localcommands:APMOkCommands.SetAPMValueCommand
+                    </MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <x:Array Type="system:Object">
+                            <system:UInt32>2</system:UInt32>
+                            <data:EPowerSource>Mains</data:EPowerSource>
+                        </x:Array>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Header="Minimum power consumption without Standby (0x80)" Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <x:Array Type="system:Object">
+                            <system:UInt32>128</system:UInt32>
+                            <data:EPowerSource>Mains</data:EPowerSource>
+                        </x:Array>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Header="Intermediate power management levels without Standby (0x81)" Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <x:Array Type="system:Object">
+                            <system:UInt32>129</system:UInt32>
+                            <data:EPowerSource>Mains</data:EPowerSource>
+                        </x:Array>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Header="Maximum performance (0xFE)" Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <x:Array Type="system:Object">
+                            <system:UInt32>254</system:UInt32>
+                            <data:EPowerSource>Mains</data:EPowerSource>
+                        </x:Array>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="OnBatteries">
+                <MenuItem Header="Reset (after next power cycle)" Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <x:Array Type="system:Object">
+                            <system:UInt32>0</system:UInt32>
+                            <data:EPowerSource>Battery</data:EPowerSource>
+                        </x:Array>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Header="Minimum power consumption with Standby (0x01)" Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <x:Array Type="system:Object">
+                            <system:UInt32>1</system:UInt32>
+                            <data:EPowerSource>Battery</data:EPowerSource>
+                        </x:Array>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Header="Intermediate power management levels with Standby (0x02)" Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>
+                        localcommands:APMOkCommands.SetAPMValueCommand
+                    </MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <x:Array Type="system:Object">
+                            <system:UInt32>2</system:UInt32>
+                            <data:EPowerSource>Battery</data:EPowerSource>
+                        </x:Array>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Header="Minimum power consumption without Standby (0x80)" Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <x:Array Type="system:Object">
+                            <system:UInt32>128</system:UInt32>
+                            <data:EPowerSource>Battery</data:EPowerSource>
+                        </x:Array>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Header="Intermediate power management levels without Standby (0x81)" Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <x:Array Type="system:Object">
+                            <system:UInt32>129</system:UInt32>
+                            <data:EPowerSource>Battery</data:EPowerSource>
+                        </x:Array>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <MenuItem Header="Maximum performance (0xFE)" Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <x:Array Type="system:Object">
+                            <system:UInt32>254</system:UInt32>
+                            <data:EPowerSource>Battery</data:EPowerSource>
+                        </x:Array>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+            </MenuItem>
+        </ContextMenu>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -267,7 +397,7 @@
                     Grid.Column="3"
                     Width="100"
                     Height="22"
-                    Command="localcommands:APMOkCommands.SetAPMValueCommand"
+                    Command="localcommands:APMOkCommands.SetAPMValueMenuCommand"
                     Content="Set APM Value"
                     Style="{StaticResource PressButtonEffectStyle}" />
             </Grid>

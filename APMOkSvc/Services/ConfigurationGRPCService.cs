@@ -2,7 +2,6 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace APMOkSvc.Services

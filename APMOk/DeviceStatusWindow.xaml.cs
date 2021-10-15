@@ -1,13 +1,18 @@
 ﻿using APMData;
 using APMOk.Code;
 using APMOk.Models;
+using APMOk.Tasks;
 using APMOkLib;
+using APMOkLib.RecurrentTasks;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -22,6 +27,7 @@ namespace APMOk
     internal partial class DeviceStatusWindow : Window, IDisposable
     {
         private readonly APMOkModel _apmOkData;
+        private readonly IServiceProvider _scopeServiceProvider;
         private bool disposedValue;
 
         private static readonly ImageSource Error = Properties.Resources.Error.ToImageSource();
@@ -36,13 +42,13 @@ namespace APMOk
 
         public APMValueProperty APMValue { get; }
 
-        public DeviceStatusWindow(APMOkModel apmOkData)
+        public DeviceStatusWindow(IServiceProvider scopeServiceProvider, APMOkModel apmOkData)
         {
             InitializeComponent();
 
+            _scopeServiceProvider = scopeServiceProvider;
             _apmOkData = apmOkData;
 
-            // DeviceStatusDataSource
             CollectionViewSource deviceStatusDataSource = FindResource("DeviceStatusDataSource") as CollectionViewSource;
             deviceStatusDataSource.Source = DiskInfo;
 
@@ -52,6 +58,15 @@ namespace APMOk
             DataContext = _apmOkData;
 
             APMValue = FindResource("APMValue") as APMValueProperty;
+
+        }
+
+        private void APMValueDictionaryChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(APMOkModel.APMValueDictionary))
+            {
+                LoadAPMValue();
+            }
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -59,6 +74,7 @@ namespace APMOk
             LoadDisksInfo();
             LoadPowerState();
             _apmOkData.PropertyChanged += APMOkDataPropertyChanged;
+            _apmOkData.APMValueDictionary.PropertyChanged += APMValueDictionaryChanged;
         }
 
         private void APMOkDataPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -132,21 +148,13 @@ namespace APMOk
 
         private void LoadAPMValue()
         {
-            if (SelectDiskCombo.SelectedItem is DiskInfoEntry selectedItem)
+            string deviceId = DiskInfoItems[nameof(DiskInfoEntry.DeviceID)] as string;
+            if (_apmOkData.APMValueDictionary.ContainsKey(deviceId))
             {
-                if (_apmOkData.APMValueDictionary.Any(item => item.Key == selectedItem.DeviceID))
-                {
-                    var device = _apmOkData.APMValueDictionary.Single(item => item.Key == selectedItem.DeviceID);
-                    APMValue.OnMains = device.Value.OnMains;
-                    APMValue.OnBatteries = device.Value.OnBatteries;
-                    APMValue.Current = device.Value.Current;
-                }
-                else
-                {
-                    APMValue.OnMains = 0U;
-                    APMValue.OnBatteries = 0U;
-                    APMValue.Current = 0U;
-                }
+                APMValueProperty value = _apmOkData.APMValueDictionary[deviceId];
+                APMValue.OnMains = value.OnMains;
+                APMValue.OnBatteries = value.OnBatteries;
+                APMValue.Current = value.Current;
             }
         }
 
@@ -157,6 +165,7 @@ namespace APMOk
                 if (disposing)
                 {
                     _apmOkData.PropertyChanged -= APMOkDataPropertyChanged;
+                    _apmOkData.APMValueDictionary.PropertyChanged -= APMValueDictionaryChanged;
                 }
                 disposedValue = true;
             }
@@ -228,18 +237,55 @@ namespace APMOk
             }
         }
 
+        private void SetAPMValueMenuCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = APMValue is not null && APMValue.Current != 0;
+            e.Handled = true;
+        }
+
+        private void SetAPMValueMenuExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            e.Handled = true;
+            var cm = TryFindResource("SetApmValueContextMenu") as ContextMenu;
+            if (cm is not null)
+                cm.IsOpen = true;
+        }
+
         private void SetAPMValueCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = APMValue is not null && APMValue.Current != 0;
             e.Handled = true;
         }
 
-        private void SetAPMValueExecuted(object sender, ExecutedRoutedEventArgs e)
+        private async void SetAPMValueExecuted(object sender, ExecutedRoutedEventArgs e)
         {
+            object[] parameters = e.Parameter as object[];
+            Debug.Assert(parameters != null);
+            uint ApmValue = (uint)parameters[0];
+            EPowerSource powerSource = (EPowerSource)parameters[1];
+
+            string deviceId = DiskInfoItems[nameof(DiskInfoEntry.DeviceID)] as string;
+            bool result = false;
+            if (ApmValue == 0U)
+            {
+                var configuration = _scopeServiceProvider.GetRequiredService<Services.Configuration>();
+                var res = await configuration.ResetDriveAPMConfigurationAsync(new() { DeviceID = deviceId }, CancellationToken.None);
+                result = (res?.ReplyResult ?? 0) != 0;
+            }
+            else
+            {
+                var apm = _scopeServiceProvider.GetRequiredService<Services.APM>();
+                var res = await apm.SetAPMAsync(new() { DeviceID = deviceId, APMValue = ApmValue, PowerSource = powerSource }, CancellationToken.None);
+                result = (res?.ReplyResult ?? 0) != 0;
+            }
+
+            if (result)
+            {
+                var diskInfoReaderTask = _scopeServiceProvider.GetRequiredService<ITask<DiskInfoReaderTask>>();
+                if (diskInfoReaderTask.IsStarted && !diskInfoReaderTask.IsRunningRightNow)
+                    diskInfoReaderTask.TryRunImmediately();
+            }
             e.Handled = true;
-            var cm = TryFindResource("SetApmValueContextMenu") as ContextMenu;
-            if (cm is not null)
-                cm.IsOpen = true;
         }
     }
 }
