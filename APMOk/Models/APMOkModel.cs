@@ -1,8 +1,8 @@
 ﻿using APMData;
 using APMOkLib;
-using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace APMOk.Models
@@ -11,21 +11,44 @@ namespace APMOk.Models
     /// APM Model
     /// DI Lifetime: Singleton
     /// </summary>
-    public class APMOkModel : JsonToString, INotifyPropertyChanged, IDisposable
+    public class APMOkModel : JsonToString, INotifyPropertyChanged
     {
         private DisksReply _systemDiskInfo;
         private PowerStateReply _powerState;
         private bool _connectFailure;
-        private bool disposedValue;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ObservableConcurrentDictionary<string, APMValueProperty> APMValueDictionary { get; }
+        private readonly ObservableConcurrentDictionary<string, APMValueProperty> APMValueDictionary = new();
 
-        public APMOkModel()
+        public APMValueProperty GetAPMValue(string deviceID)
         {
-            APMValueDictionary = new();
-            APMValueDictionary.PropertyChanged += APMValueDictionaryPropertyChanged;
+            if (APMValueDictionary.ContainsKey(deviceID))
+                return APMValueDictionary[deviceID];
+            return null;
+        }
+
+        public void UpdateAPMValue(string deviceID, APMValueProperty apmValueProperty)
+        {
+            if (APMValueDictionary.ContainsKey(deviceID))
+            {
+                var value = APMValueDictionary[deviceID];
+                if (!value.Equals(apmValueProperty))
+                {
+                    value.OnMains = apmValueProperty.OnMains;
+                    value.OnBatteries = apmValueProperty.OnBatteries;
+                    value.Current = apmValueProperty.Current;
+                    Debug.WriteLine($"{deviceID}, Updated APMValueProperty: {value}");
+                    PropertyChanged.Invoke(this, new(nameof(APMValueDictionary)));
+                }
+            }
+            else
+            {
+                var value = new APMValueProperty(apmValueProperty.OnMains, apmValueProperty.OnBatteries, apmValueProperty.Current);
+                APMValueDictionary[deviceID] = value;
+                Debug.WriteLine($"{deviceID}, New APMValueProperty: {value}");
+                PropertyChanged.Invoke(this, new(nameof(APMValueDictionary)));
+            }
         }
 
         public DisksReply SystemDiskInfo
@@ -67,36 +90,12 @@ namespace APMOk.Models
             }
         }
 
-        private void APMValueDictionaryPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            NotifyPropertyChanged(nameof(APMValueDictionary));
-        }
-
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
             if (string.IsNullOrEmpty(propertyName))
                 return;
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    APMValueDictionary.PropertyChanged -= APMValueDictionaryPropertyChanged;
-                }
-            }
-            disposedValue = true;
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }

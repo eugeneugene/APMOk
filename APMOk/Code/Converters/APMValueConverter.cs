@@ -10,15 +10,15 @@ namespace APMOk.Code.Converters
         {
             return value switch
             {
-                uint v when v == 0 => "n/a",
-                uint v when v > 0 => value.ToString(),
-                _ => throw new NotImplementedException(),
+                uint v when v == 0 => "Not set",
+                uint v when v > 0 && v <= 254 => value.ToString(),
+                _ => "Invalid",
             };
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException($"In {nameof(APMValueConverter)}");
         }
     }
 }

@@ -2,7 +2,6 @@
 using APMOkSvc.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -19,17 +18,22 @@ namespace APMOkSvc.Services
     {
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly IHostEnvironment _environment;
+#if DEBUG
         private readonly TestDriveService _testDriveService;
+#endif
 
-        public ConfigurationServiceImpl(ILogger<ConfigurationServiceImpl> logger, IServiceScopeFactory serviceScopeFactory,
-            IHostEnvironment environment, TestDriveService testDriveService)
+        public ConfigurationServiceImpl(ILogger<ConfigurationServiceImpl> logger, IServiceScopeFactory serviceScopeFactory
+#if DEBUG
+           , TestDriveService testDriveService
+#endif
+        )
         {
             _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
-            _environment = environment;
+#if DEBUG
             _testDriveService = testDriveService;
-            _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
+#endif
+            _logger.LogTrace("Creating {0}", GetType().Name);
         }
 
         public DriveAPMConfigurationReply GetDriveAPMConfiguration()
@@ -49,21 +53,23 @@ namespace APMOkSvc.Services
                     OnBatteries = item.OnBatteries,
                 }));
 
-                if (_environment.IsDevelopment())
+#if DEBUG
+                reply.DriveAPMConfigurationReplyEntries.Add(new DriveAPMConfigurationReplyEntry
                 {
-                    reply.DriveAPMConfigurationReplyEntries.Add(new DriveAPMConfigurationReplyEntry
-                    {
-                        DeviceID = _testDriveService.TestDriveDiskInfoEntry.DeviceID,
-                        OnMains = _testDriveService.OnMainsApmValue,
-                        OnBatteries = _testDriveService.OnBatteriesApmValue,
-                    });
-                }
+                    DeviceID = _testDriveService.TestDriveDiskInfoEntry.DeviceID,
+                    OnMains = _testDriveService.OnMainsApmValue,
+                    OnBatteries = _testDriveService.OnBatteriesApmValue,
+                });
+#endif
                 reply.ReplyResult = 1;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
             }
+
+            _logger.LogTrace("Reply: {0}", reply);
+
             return reply;
         }
 
@@ -90,6 +96,8 @@ namespace APMOkSvc.Services
             {
                 _logger.LogError(ex.ToString());
             }
+
+            _logger.LogTrace("Reply: {0}", reply);
 
             return reply;
         }

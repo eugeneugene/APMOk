@@ -3,6 +3,7 @@ using APMOkLib;
 
 namespace APMOkSvc.Services
 {
+#if DEBUG
     /// <summary>
     /// Drive for testing purpose
     /// DI Lifetime: Singleton
@@ -31,4 +32,5 @@ namespace APMOkSvc.Services
         public uint OnMainsApmValue { get; set; }
         public uint OnBatteriesApmValue { get; set; }
     }
+#endif
 }

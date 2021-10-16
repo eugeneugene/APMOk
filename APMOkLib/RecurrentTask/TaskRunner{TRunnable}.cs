@@ -164,7 +164,7 @@ namespace APMOkLib.RecurrentTasks
                 if (cancellationToken.IsCancellationRequested)
                 {
                     // must stop and quit
-                    logger.LogWarning("CancellationToken signaled, stopping...");
+                    //logger.LogWarning("CancellationToken signaled, stopping...");
                     mainTask = null;
                     cancellationTokenSource = null;
                     break;

@@ -26,7 +26,7 @@ namespace APMOk
     /// </summary>
     internal partial class DeviceStatusWindow : Window, IDisposable
     {
-        private readonly APMOkModel _apmOkData;
+        private readonly APMOkModel _apmOkModel;
         private readonly IServiceProvider _scopeServiceProvider;
         private bool disposedValue;
 
@@ -42,12 +42,12 @@ namespace APMOk
 
         public APMValueProperty APMValue { get; }
 
-        public DeviceStatusWindow(IServiceProvider scopeServiceProvider, APMOkModel apmOkData)
+        public DeviceStatusWindow(IServiceProvider scopeServiceProvider, APMOkModel apmOkModel)
         {
             InitializeComponent();
 
             _scopeServiceProvider = scopeServiceProvider;
-            _apmOkData = apmOkData;
+            _apmOkModel = apmOkModel;
 
             CollectionViewSource deviceStatusDataSource = FindResource("DeviceStatusDataSource") as CollectionViewSource;
             deviceStatusDataSource.Source = DiskInfo;
@@ -55,70 +55,73 @@ namespace APMOk
             DriveStatusGrid.DataContext = DiskInfoItems;
             BatteryStatusGrid.DataContext = PowerStateItems;
 
-            DataContext = _apmOkData;
+            DataContext = _apmOkModel;
 
             APMValue = FindResource("APMValue") as APMValueProperty;
-
-        }
-
-        private void APMValueDictionaryChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(APMOkModel.APMValueDictionary))
-            {
-                LoadAPMValue();
-            }
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             LoadDisksInfo();
             LoadPowerState();
-            _apmOkData.PropertyChanged += APMOkDataPropertyChanged;
-            _apmOkData.APMValueDictionary.PropertyChanged += APMValueDictionaryChanged;
+            UpdateIcon();
+            _apmOkModel.PropertyChanged += APMOkDataChanged;
         }
 
-        private void APMOkDataPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void APMOkDataChanged(object sender, PropertyChangedEventArgs e)
         {
+            Debug.WriteLine($"APMOkModel has changed: {e.PropertyName}");
+            Debug.WriteLine("{0}", _apmOkModel);
+
             switch (e.PropertyName)
             {
                 case "SystemDiskInfo":
                     LoadDisksInfo();
                     break;
                 case "PowerState":
-                case "ConnectFailure":
                     LoadPowerState();
+                    RunDiskInfoReaderTask();
+                    UpdateIcon();
+                    break;
+                case "ConnectFailure":
+                    UpdateIcon();
                     break;
                 case "APMValueDictionary":
-                    LoadAPMValue();
                     break;
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException($"In {nameof(DeviceStatusWindow)}");
             }
+            LoadAPMValue();
+        }
+
+        private void APMValueChanged(object sender, PropertyChangedEventArgs e)
+        {
+            Debug.WriteLine($"APMValue has changed: {e.PropertyName}");
+            Debug.WriteLine("{0}", APMValue);
         }
 
         private void LoadPowerState()
         {
-            if (_apmOkData.PowerState is not null && _apmOkData.PowerState.ReplyResult != 0)
+            if (_apmOkModel.PowerState is not null && _apmOkModel.PowerState.ReplyResult != 0)
             {
-                PowerStateItems[nameof(_apmOkData.PowerState.PowerState.PowerSource)] = _apmOkData.PowerState.PowerState.PowerSource;
-                PowerStateItems[nameof(_apmOkData.PowerState.PowerState.BatteryFlag)] = _apmOkData.PowerState.PowerState.BatteryFlag;
-                PowerStateItems[nameof(_apmOkData.PowerState.PowerState.BatteryFullLifeTime)] = _apmOkData.PowerState.PowerState.BatteryFullLifeTime;
-                PowerStateItems[nameof(_apmOkData.PowerState.PowerState.BatteryLifePercent)] = _apmOkData.PowerState.PowerState.BatteryLifePercent;
-                PowerStateItems[nameof(_apmOkData.PowerState.PowerState.BatteryLifeTime)] = _apmOkData.PowerState.PowerState.BatteryLifeTime;
+                PowerStateItems[nameof(_apmOkModel.PowerState.PowerState.PowerSource)] = _apmOkModel.PowerState.PowerState.PowerSource;
+                PowerStateItems[nameof(_apmOkModel.PowerState.PowerState.BatteryFlag)] = _apmOkModel.PowerState.PowerState.BatteryFlag;
+                PowerStateItems[nameof(_apmOkModel.PowerState.PowerState.BatteryFullLifeTime)] = _apmOkModel.PowerState.PowerState.BatteryFullLifeTime;
+                PowerStateItems[nameof(_apmOkModel.PowerState.PowerState.BatteryLifePercent)] = _apmOkModel.PowerState.PowerState.BatteryLifePercent;
+                PowerStateItems[nameof(_apmOkModel.PowerState.PowerState.BatteryLifeTime)] = _apmOkModel.PowerState.PowerState.BatteryLifeTime;
             }
-            UpdateIcon();
         }
 
         private void LoadDisksInfo()
         {
-            if (_apmOkData.SystemDiskInfo is null || _apmOkData.SystemDiskInfo.ReplyResult == 0)
+            if (_apmOkModel.SystemDiskInfo is null || _apmOkModel.SystemDiskInfo.ReplyResult == 0)
                 return;
 
             Dispatcher.Invoke(() =>
             {
                 DiskInfo.Clear();
 
-                foreach (var entry in _apmOkData.SystemDiskInfo.DiskInfoEntries.OrderBy(item => item.DeviceID))
+                foreach (var entry in _apmOkModel.SystemDiskInfo.DiskInfoEntries.OrderBy(item => item.DeviceID))
                     DiskInfo.Add(entry);
 
                 if (DiskInfo.Any())
@@ -149,13 +152,16 @@ namespace APMOk
         private void LoadAPMValue()
         {
             string deviceId = DiskInfoItems[nameof(DiskInfoEntry.DeviceID)] as string;
-            if (_apmOkData.APMValueDictionary.ContainsKey(deviceId))
+            var value = _apmOkModel.GetAPMValue(deviceId);
+            if (value is not null)
             {
-                APMValueProperty value = _apmOkData.APMValueDictionary[deviceId];
+                Debug.WriteLine($"APMValue {value}");
                 APMValue.OnMains = value.OnMains;
                 APMValue.OnBatteries = value.OnBatteries;
                 APMValue.Current = value.Current;
             }
+            else
+                Debug.WriteLine("APMValue is null");
         }
 
         protected virtual void Dispose(bool disposing)
@@ -164,8 +170,7 @@ namespace APMOk
             {
                 if (disposing)
                 {
-                    _apmOkData.PropertyChanged -= APMOkDataPropertyChanged;
-                    _apmOkData.APMValueDictionary.PropertyChanged -= APMValueDictionaryChanged;
+                    _apmOkModel.PropertyChanged -= APMOkDataChanged;
                 }
                 disposedValue = true;
             }
@@ -180,7 +185,7 @@ namespace APMOk
 
         private void SelectDiskComboDropDownOpened(object sender, EventArgs e)
         {
-            if (_apmOkData.SystemDiskInfo is null || _apmOkData.SystemDiskInfo.ReplyResult == 0)
+            if (_apmOkModel.SystemDiskInfo is null || _apmOkModel.SystemDiskInfo.ReplyResult == 0)
                 return;
 
             string selectedSerial = null;
@@ -188,12 +193,12 @@ namespace APMOk
                 selectedSerial = selectedItem.SerialNumber;
 
             // Items to delete from combobox
-            var deleteItems = DiskInfo.Where(item => !_apmOkData.SystemDiskInfo.DiskInfoEntries.Any(item1 => item1.Equals(item)));
+            var deleteItems = DiskInfo.Where(item => !_apmOkModel.SystemDiskInfo.DiskInfoEntries.Any(item1 => item1.Equals(item)));
             foreach (var item in deleteItems)
                 DiskInfo.Remove(item);
 
             // Items to add to combobox
-            var addItems = _apmOkData.SystemDiskInfo.DiskInfoEntries.Where(item => !DiskInfo.Any(item1 => item1.Equals(item)));
+            var addItems = _apmOkModel.SystemDiskInfo.DiskInfoEntries.Where(item => !DiskInfo.Any(item1 => item1.Equals(item)));
             foreach (var item in addItems)
                 DiskInfo.Add(item);
 
@@ -209,7 +214,7 @@ namespace APMOk
                 SelectDiskCombo.SelectedItem = selectItem;
             else
             {
-                if (_apmOkData.SystemDiskInfo.DiskInfoEntries.Any())
+                if (_apmOkModel.SystemDiskInfo.DiskInfoEntries.Any())
                     SelectDiskCombo.SelectedIndex = 0;
                 else
                     SelectDiskCombo.SelectedIndex = -1;
@@ -218,13 +223,13 @@ namespace APMOk
 
         private void UpdateIcon()
         {
-            if (_apmOkData.ConnectFailure)
+            if (_apmOkModel.ConnectFailure)
                 Dispatcher.Invoke(() => Icon = Error);
             else
             {
                 EPowerSource PowerSource = EPowerSource.Unknown;
-                if (_apmOkData.PowerState is not null && _apmOkData.PowerState.ReplyResult == 1)
-                    PowerSource = _apmOkData.PowerState.PowerState.PowerSource;
+                if (_apmOkModel.PowerState is not null && _apmOkModel.PowerState.ReplyResult == 1)
+                    PowerSource = _apmOkModel.PowerState.PowerState.PowerSource;
                 Dispatcher.Invoke(() =>
                 {
                     Icon = PowerSource switch
@@ -259,13 +264,13 @@ namespace APMOk
 
         private async void SetAPMValueExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            object[] parameters = e.Parameter as object[];
-            Debug.Assert(parameters != null);
-            uint ApmValue = (uint)parameters[0];
-            EPowerSource powerSource = (EPowerSource)parameters[1];
+            var parameter = e.Parameter as APMCommandParameter;
+            Debug.Assert(parameter != null);
+            uint ApmValue = parameter.ApmValue;
+            EPowerSource powerSource = parameter.PowerSource;
 
             string deviceId = DiskInfoItems[nameof(DiskInfoEntry.DeviceID)] as string;
-            bool result = false;
+            bool result;
             if (ApmValue == 0U)
             {
                 var configuration = _scopeServiceProvider.GetRequiredService<Services.Configuration>();
@@ -280,12 +285,16 @@ namespace APMOk
             }
 
             if (result)
-            {
-                var diskInfoReaderTask = _scopeServiceProvider.GetRequiredService<ITask<DiskInfoReaderTask>>();
-                if (diskInfoReaderTask.IsStarted && !diskInfoReaderTask.IsRunningRightNow)
-                    diskInfoReaderTask.TryRunImmediately();
-            }
+                RunDiskInfoReaderTask();
+            
             e.Handled = true;
+        }
+
+        private void RunDiskInfoReaderTask()
+        {
+            var diskInfoReaderTask = _scopeServiceProvider.GetRequiredService<ITask<DiskInfoReaderTask>>();
+            if (diskInfoReaderTask.IsStarted && !diskInfoReaderTask.IsRunningRightNow)
+                diskInfoReaderTask.TryRunImmediately();
         }
     }
 }

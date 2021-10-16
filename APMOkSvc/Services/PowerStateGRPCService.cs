@@ -18,12 +18,16 @@ namespace APMOkSvc.Services
         {
             _logger = logger;
             _powerStatusContainer = powerStatusContainer;
-            _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
+            _logger.LogTrace("Creating {0}", GetType().Name);
         }
 
         public override Task<PowerStateReply> GetPowerState(Empty request, ServerCallContext context)
         {
-            return Task.FromResult(_powerStatusContainer.PowerState);
+            var reply = _powerStatusContainer.PowerState;
+
+            _logger.LogTrace("Reply: {0}", reply);
+
+            return Task.FromResult(reply);
         }
     }
 }

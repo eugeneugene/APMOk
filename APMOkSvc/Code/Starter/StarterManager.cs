@@ -33,7 +33,7 @@ namespace APMOkSvc.Code
         {
             if (!_starters.TryGetValue(Environment.OSVersion.Platform, out var starter))
             {
-                Console.Error.WriteLine($"Платформа {Environment.OSVersion.Platform} не поддерживается");
+                Console.Error.WriteLine($"This platform {Environment.OSVersion.Platform} is not supported");
                 return StarterRunResult.Error;
             }
             var res = starter.ProcessCommandArgumens(args);
@@ -52,7 +52,7 @@ namespace APMOkSvc.Code
                 case StarterArgumensResult.Run:
                     break;
                 default:
-                    throw new NotImplementedException("Неверная функция");
+                    throw new NotImplementedException("Wrong function");
             }
             return await starter.ProcessHostRunAsync(CancellationToken.None);
         }

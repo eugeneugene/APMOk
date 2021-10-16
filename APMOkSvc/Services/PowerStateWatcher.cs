@@ -32,7 +32,7 @@ namespace APMOkSvc.Services
             _powerStateContainer = powerStateContainer;
             _diskInfoServiceImpl = diskInfoServiceImpl;
             _powerStateServiceImpl = powerStateServiceImpl;
-            _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
+            _logger.LogTrace("Creating {0}", GetType().Name);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -69,7 +69,7 @@ namespace APMOkSvc.Services
                 {
                     if (_logger.IsEnabled(LogLevel.Trace))
                     {
-                        _logger.LogTrace("Обнаружены диски:");
+                        _logger.LogTrace("Found disks:");
                         foreach (var disk in reply.DiskInfoEntries)
                             _logger.LogTrace("{0}", disk);
                     }
@@ -105,12 +105,17 @@ namespace APMOkSvc.Services
 
         private void SetAPM(string DeviceID, uint APMValue)
         {
+            if (APMValue == 0U)
+            {
+                _logger.LogWarning("Skip setting APM Value: {0} for {1}", APMValue, DeviceID);
+                return;
+            }
             byte val = APMValue > 254 ? (byte)0 : (byte)APMValue;
             bool disable = APMValue > 254;
             if (HW.SetAPM(DeviceID, val, disable))
-                _logger.LogDebug("APM set successfully");
+                _logger.LogDebug("APM set successfully for {0} value {1} ({1})", DeviceID, APMValue, disable ? "disabled" : "enabled");
             else
-                _logger.LogWarning("Failed to set APM");
+                _logger.LogWarning("Failed to set APM for {0} value {1}", DeviceID, APMValue);
         }
     }
 }

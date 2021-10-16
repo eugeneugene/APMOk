@@ -9,7 +9,7 @@ namespace APMOkSvc
         {
             try
             {
-                var manager = new StarterManager(new WindowsStarter<Startup>(), new LinuxStarter<Startup>());
+                var manager = new StarterManager(new WindowsStarter<Startup>());
                 manager.Start(args).GetAwaiter().GetResult();
             }
             catch (Exception ex)

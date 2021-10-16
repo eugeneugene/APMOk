@@ -18,10 +18,22 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="appsettings.Development.json" />
+		<None Remove="appsettings.json" />
 		<None Remove="Checked.ico" />
 		<None Remove="Proto\APMData.proto" />
 		<Resource Include="Properties\checked.ico" />
 		<None Remove="Error.ico" />
+		<Content Include="appsettings.Development.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		  <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Include="appsettings.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		  <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
 		<Resource Include="Properties\error.ico" />
 	</ItemGroup>
 

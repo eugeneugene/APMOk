@@ -51,21 +51,13 @@ namespace APMOk.Tasks
                     if (driveAPMConfigurationReply.ReplyResult != 0)
                         driveAPMConfiguration = driveAPMConfigurationReply.DriveAPMConfigurationReplyEntries.SingleOrDefault(item => item.DeviceID == entry.DeviceID);
                     if (driveAPMConfiguration is null)
+                    {
                         driveAPMConfiguration = new DriveAPMConfigurationReplyEntry
                         {
                             DeviceID = entry.DeviceID,
-                            OnMains = 0U,
-                            OnBatteries = 0U,
                         };
-                    if (_apmOkModel.APMValueDictionary.ContainsKey(entry.DeviceID))
-                    {
-                        var value = _apmOkModel.APMValueDictionary[entry.DeviceID];
-                        value.OnMains = driveAPMConfiguration.OnMains;
-                        value.OnBatteries = driveAPMConfiguration.OnBatteries;
-                        value.Current = currentAPM.APMValue;
                     }
-                    else
-                        _apmOkModel.APMValueDictionary[entry.DeviceID] = new APMValueProperty(onMains: driveAPMConfiguration.OnMains, onBatteries: driveAPMConfiguration.OnBatteries, current: currentAPM.APMValue);
+                    _apmOkModel.UpdateAPMValue(entry.DeviceID, new APMValueProperty(onMains: driveAPMConfiguration.OnMains, onBatteries: driveAPMConfiguration.OnBatteries, current: currentAPM.APMValue));
                 }
             }
             catch (Exception ex)

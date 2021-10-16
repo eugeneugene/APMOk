@@ -1,10 +1,12 @@
-﻿using System;
+﻿using APMOkLib;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace APMOk.Models
 {
-    public class APMValueProperty : INotifyPropertyChanged, IEquatable<APMValueProperty>
+    public class APMValueProperty : JsonToString, INotifyPropertyChanged, IEquatable<APMValueProperty>
     {
         public APMValueProperty()
         { }
@@ -16,6 +18,7 @@ namespace APMOk.Models
             _current = current;
         }
 
+        [JsonIgnore]
         private uint _onMains;
         public uint OnMains
         {
@@ -30,6 +33,7 @@ namespace APMOk.Models
             }
         }
 
+        [JsonIgnore]
         private uint _onBatteries;
         public uint OnBatteries
         {
@@ -44,6 +48,7 @@ namespace APMOk.Models
             }
         }
 
+        [JsonIgnore]
         private uint _current;
         public uint Current
         {

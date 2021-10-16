@@ -29,12 +29,14 @@ namespace APMOkSvc
             services.AddDbContext<DataContext>();
             services.AddHostedService<PowerStateWatcher>();
             services.AddSingleton<PowerStateContainer>();
-            services.AddSingleton<TestDriveService>();
             services.AddTransient<DiskInfoServiceImpl>();
             services.AddTransient<APMServiceImpl>();
             services.AddTransient<PowerStateServiceImpl>();
             services.AddTransient<ConfigurationServiceImpl>();
             services.AddGrpc();
+#if DEBUG
+            services.AddSingleton<TestDriveService>();
+#endif
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

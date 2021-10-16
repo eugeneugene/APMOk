@@ -16,7 +16,7 @@ namespace APMOkSvc.Services
         public PowerStateServiceImpl(ILogger<PowerStateServiceImpl> logger)
         {
             _logger = logger;
-            _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
+            _logger.LogTrace("Creating {0}", GetType().Name);
         }
 
         public PowerStateReply GetPowerState()
@@ -62,7 +62,9 @@ namespace APMOkSvc.Services
             {
                 _logger.LogError("{0}", ex);
             }
+     
             _logger.LogTrace("Reply: {0}", reply);
+       
             return reply;
         }
     }

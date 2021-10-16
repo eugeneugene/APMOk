@@ -18,7 +18,7 @@ namespace APMOkSvc.Services
         {
             _logger = logger;
             _configurationServiceImpl = configurationServiceImpl;
-            _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
+            _logger.LogTrace("Creating {0}", GetType().Name);
         }
 
         public override Task<DriveAPMConfigurationReply> GetDriveAPMConfiguration(Empty request, ServerCallContext context)

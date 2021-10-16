@@ -18,7 +18,7 @@ namespace APMOkSvc.Services
         {
             _logger = logger;
             _apmServiceImpl = apmServiceImpl;
-            _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
+            _logger.LogTrace("Creating {0}", GetType().Name);
         }
 
         public override Task<CurrentAPMReply> GetCurrentAPM(CurrentAPMRequest request, ServerCallContext context)

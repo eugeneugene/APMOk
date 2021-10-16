@@ -168,6 +168,7 @@ extern "C" HWLIBRARY_API int EnumerateDisks(EnumDiskInfo * diskInfo)
 extern "C" HWLIBRARY_API uint16_t GetAPM(wchar_t* dskName)
 {
 	WriteLog(L"GetAPM = %s\r\n", dskName);
+	
 	HANDLE hDrive = CreateFile(dskName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
 	if (hDrive == INVALID_HANDLE_VALUE)
 	{
@@ -190,6 +191,7 @@ extern "C" HWLIBRARY_API uint16_t GetAPM(wchar_t* dskName)
 	}
 
 	uint16_t APMVal = hddid.CurAPMvalues & 0x00FF;
+	WriteLog(L"GetAPM Value = %u\r\n", APMVal);
 
 	return APMVal;
 }
@@ -200,7 +202,10 @@ extern "C" HWLIBRARY_API int SetAPM(wchar_t* dskName, byte val, bool disable)
 	if (hDrive == INVALID_HANDLE_VALUE)
 		return -1;
 
+	WriteLog(L"SetAPM = %s, Value = %i, Disable = %i\r\n", dskName, (int)val, (int)disable);
 	BOOL rez = SetAPM(hDrive, val, disable);
+	WriteLog(L"SetAPM Result = %i\r\n", rez);
+
 	return rez;
 }
 

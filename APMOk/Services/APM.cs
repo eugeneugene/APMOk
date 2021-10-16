@@ -41,7 +41,7 @@ namespace APMOk.Services
         public async Task<CurrentAPMReply> GetCurrentAPMAsync(CurrentAPMRequest request, CancellationToken cancellationToken)
         {
             var client = new APMService.APMServiceClient(_channel);
-            var reply = await client.GetCurrentAPMAsync(request, new CallOptions(cancellationToken: cancellationToken));
+            var reply = await client.GetCurrentAPMAsync(request, new CallOptions(cancellationToken: cancellationToken));            
             return reply;
         }
 

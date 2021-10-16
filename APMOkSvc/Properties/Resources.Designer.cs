@@ -61,7 +61,7 @@ namespace APMOkSvc.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Description.
+        ///   Looks up a localized string similar to APMOkSvc service.
         /// </summary>
         internal static string Description {
             get {
@@ -70,7 +70,7 @@ namespace APMOkSvc.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to LongDescription.
+        ///   Looks up a localized string similar to APMOkSvc service provides services for APMOk application.
         /// </summary>
         internal static string LongDescription {
             get {
@@ -79,7 +79,7 @@ namespace APMOkSvc.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ServiceName.
+        ///   Looks up a localized string similar to APMOkSvc.
         /// </summary>
         internal static string ServiceName {
             get {

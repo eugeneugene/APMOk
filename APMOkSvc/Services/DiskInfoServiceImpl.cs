@@ -1,7 +1,6 @@
 ﻿using APMData;
 using APMOkSvc.Code;
 using APMOkSvc.Types;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
@@ -15,15 +14,20 @@ namespace APMOkSvc.Services
     public class DiskInfoServiceImpl
     {
         private readonly ILogger _logger;
-        private readonly IHostEnvironment _environment;
+#if DEBUG
         private readonly TestDriveService _testDriveService;
+#endif
 
-        public DiskInfoServiceImpl(ILogger<DiskInfoServiceImpl> logger, IHostEnvironment environment, TestDriveService testDriveService)
+        public DiskInfoServiceImpl(ILogger<DiskInfoServiceImpl> logger
+#if DEBUG
+           , TestDriveService testDriveService
+#endif
+           )
         {
             _logger = logger;
-            _environment = environment;
+#if DEBUG
             _testDriveService = testDriveService;
-            _logger.LogTrace("Создание экземпляра {0}", GetType().Name);
+#endif
         }
 
         public DisksReply EnumerateDisks()
@@ -59,8 +63,9 @@ namespace APMOkSvc.Services
                         SerialNumber = item.SerialNumber,
                     }).ToList();
 
-                    if (_environment.IsDevelopment())
-                        diskInfos.Add(_testDriveService.TestDriveDiskInfoEntry);
+#if DEBUG
+                    diskInfos.Add(_testDriveService.TestDriveDiskInfoEntry);
+#endif
 
                     reply.DiskInfoEntries.AddRange(diskInfos);
                     reply.ReplyResult = 1;
@@ -78,6 +83,7 @@ namespace APMOkSvc.Services
             }
 
             _logger.LogTrace("Reply: {0}", reply);
+        
             return reply;
         }
     }

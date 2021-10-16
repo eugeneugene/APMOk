@@ -18,7 +18,7 @@ namespace APMOk.Code.Converters
                     EPowerSource.Battery => 0,
                     EPowerSource.Mains => 1,
                     EPowerSource.Unknown => -1,
-                    _ => throw new NotImplementedException(),
+                    _ => throw new NotImplementedException($"In {nameof(PowerSourceConverter)}"),
                 };
             }
             return null;
@@ -26,7 +26,7 @@ namespace APMOk.Code.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException($"In {nameof(PowerSourceConverter)}");
         }
     }
 }

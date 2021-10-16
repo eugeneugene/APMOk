@@ -3,17 +3,9 @@ using APMOkLib;
 
 namespace APMOk.Code
 {
-    public class ApmCommandParameter : JsonEnumToString
+    public class APMCommandParameter : JsonEnumToString
     {
-        public ApmCommandParameter(string deviceId, EPowerSource powerSource, uint apmValue)
-        {
-            DeviceID = deviceId;
-            PowerSource = powerSource;
-            ApmValue = apmValue;
-        }
-
-        public string DeviceID { get; }
-        public EPowerSource PowerSource { get; }
-        public uint ApmValue { get; }
+        public EPowerSource PowerSource { get; set; }
+        public uint ApmValue { get; set; }
     }
 }

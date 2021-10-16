@@ -53,7 +53,7 @@ namespace APMOkSvc.Code
         {
             if (args == null)
             {
-                Console.Error.WriteLine("Набор аргументов равен null");
+                Console.Error.WriteLine("Arguments are null");
                 return StarterArgumensResult.ExitError;
             }
 
@@ -175,7 +175,7 @@ namespace APMOkSvc.Code
                 ++i;
             if (i > 1)
             {
-                Console.Error.WriteLine("Использованы взаимоисключающие опции");
+                Console.Error.WriteLine("Used mutual exclusive options");
                 return StarterArgumensResult.HelpError;
             }
 
@@ -185,13 +185,13 @@ namespace APMOkSvc.Code
 
                 if (!string.IsNullOrEmpty(sInstallArg) && !Enum.TryParse(sInstallArg, out installOptions))
                 {
-                    Console.Error.WriteLine("Неверный параметр '{0}'", sInstallArg);
+                    Console.Error.WriteLine("Wrong argument '{0}'", sInstallArg);
                     return StarterArgumensResult.HelpError;
                 }
 
                 if (ServiceInstaller.ServiceIsInstalled(servicename))
                 {
-                    Console.Error.WriteLine("Служба '{0}' уже установлена", servicename);
+                    Console.Error.WriteLine("Service '{0}' is already installed", servicename);
                     return StarterArgumensResult.ExitError;
                 }
 
@@ -213,7 +213,7 @@ namespace APMOkSvc.Code
                     Delay = 15 * 60 * 1000
                 };
                 ServiceInstaller.SetRecoveryOptions(servicename, sc1, sc2, sc3, 86400);
-                Console.WriteLine("Служба успешно установлена");
+                Console.WriteLine("Service successfully installed");
                 return StarterArgumensResult.ExitNoError;
             }
             if (uninstall)
@@ -222,69 +222,69 @@ namespace APMOkSvc.Code
                     ServiceInstaller.Uninstall(servicename);
                 else
                 {
-                    Console.Error.WriteLine("Служба '{0}' не установлена", servicename);
+                    Console.Error.WriteLine("Service '{0}' is not installed", servicename);
                     return StarterArgumensResult.ExitError;
                 }
-                Console.WriteLine("Установка службы отменена");
+                Console.WriteLine("Service successfully uninstalled");
                 return StarterArgumensResult.ExitNoError;
             }
             if (start)
             {
                 if (!ServiceInstaller.ServiceIsInstalled(servicename))
                 {
-                    Console.Error.WriteLine("Служба '{0}' не установлена", servicename);
+                    Console.Error.WriteLine("Service '{0}' is not installed", servicename);
                     return StarterArgumensResult.ExitError;
                 }
                 ServiceInstaller.StartService(servicename);
-                Console.WriteLine("Служба запущена");
+                Console.WriteLine("Service started");
                 return StarterArgumensResult.ExitNoError;
             }
             if (stop)
             {
                 if (!ServiceInstaller.ServiceIsInstalled(servicename))
                 {
-                    Console.Error.WriteLine("Служба '{0}' не установлена", servicename);
+                    Console.Error.WriteLine("Service '{0}' is not installed", servicename);
                     return StarterArgumensResult.ExitError;
                 }
                 ServiceInstaller.StopService(servicename);
-                Console.WriteLine("Служба остановлена");
+                Console.WriteLine("Service stopped");
                 return StarterArgumensResult.ExitNoError;
             }
             if (restart)
             {
                 if (!ServiceInstaller.ServiceIsInstalled(servicename))
                 {
-                    Console.Error.WriteLine("Служба '{0}' не установлена", servicename);
+                    Console.Error.WriteLine("Service '{0}' is not installed", servicename);
                     return StarterArgumensResult.ExitError;
                 }
                 ServiceInstaller.StopService(servicename);
-                Console.WriteLine("Служба остановлена");
+                Console.WriteLine("Service stopped");
                 Thread.Sleep(ServiceRestartDelay);
                 ServiceInstaller.StartService(servicename);
-                Console.WriteLine("Служба запущена");
+                Console.WriteLine("Service started");
                 return StarterArgumensResult.ExitNoError;
             }
             if (status)
             {
                 if (!ServiceInstaller.ServiceIsInstalled(servicename))
                 {
-                    Console.Error.WriteLine("Служба '{0}' не установлена", servicename);
+                    Console.Error.WriteLine("Service '{0}' is not installed", servicename);
                     return StarterArgumensResult.ExitError;
                 }
                 var state = ServiceInstaller.GetServiceStatus(servicename);
                 string descr = state switch
                 {
-                    ServiceState.Stopped => "остановлена",
-                    ServiceState.NotFound => "не найдена",
-                    ServiceState.PausePending => "в ожидании паузы",
-                    ServiceState.Paused => "приостановлена",
-                    ServiceState.Running => "запущена",
-                    ServiceState.StartPending => "в ожидании запуска",
-                    ServiceState.StopPending => "в ожидании остановки",
-                    ServiceState.ContinuePending => "в ожидании продолжения",
-                    _ => "в неизвестном состоянии",
+                    ServiceState.Stopped => "stopped",
+                    ServiceState.NotFound => "not found",
+                    ServiceState.PausePending => "in pause pending",
+                    ServiceState.Paused => "paused",
+                    ServiceState.Running => "running",
+                    ServiceState.StartPending => "in start pending",
+                    ServiceState.StopPending => "in stop pending",
+                    ServiceState.ContinuePending => "in continue pending",
+                    _ => "in unknown state",
                 };
-                Console.WriteLine($"Служба {servicename} {descr}");
+                Console.WriteLine($"Service {servicename} is {descr}");
                 return StarterArgumensResult.ExitNoError;
             }
             if (WindowsServiceHelpers.IsWindowsService())
@@ -298,16 +298,16 @@ namespace APMOkSvc.Code
         public void ShowHelp()
         {
             Console.WriteLine(VersionHelper.Version);
-            Console.WriteLine("Использование:\t{0} <arg>", file);
-            Console.WriteLine("Где <arg> - одно из:");
-            Console.WriteLine("-h, -?, --help                    Показать это сообщение и выйти");
-            Console.WriteLine("-i, --install [<StartUpMode>]     Установить службу и указать режим запуска: Manual/Automatic/Disabled");
-            Console.WriteLine("-u, --uninstall                   Отменить установку службы");
-            Console.WriteLine("-s, --start                       Запустить службу");
-            Console.WriteLine("-k, --kill, --stop                Остановить службу");
-            Console.WriteLine("-r, --restart                     Перезапустить службу");
-            Console.WriteLine("-t, --status                      Получить информацию о состоянии службы");
-            Console.WriteLine("-c, --console                     Запустить, как консольное приложение");
+            Console.WriteLine("Using:\t{0} <arg>", file);
+            Console.WriteLine("where <arg> - are:");
+            Console.WriteLine("-h, -?, --help                    Show this help and exit");
+            Console.WriteLine("-i, --install [<StartUpMode>]     Install service and select start-up mode: Manual/Automatic/Disabled");
+            Console.WriteLine("-u, --uninstall                   Uninstall service");
+            Console.WriteLine("-s, --start                       Run service");
+            Console.WriteLine("-k, --kill, --stop                Stop service");
+            Console.WriteLine("-r, --restart                     Restart service");
+            Console.WriteLine("-t, --status                      Get service status");
+            Console.WriteLine("-c, --console                     Run as console app");
         }
 
         private static void MooW()
@@ -342,7 +342,7 @@ namespace APMOkSvc.Code
                     return StarterRunResult.Success;
                 }
 
-                Console.WriteLine($"Попробуйте `{file} --help' для справки");
+                Console.WriteLine($"Try `{file} --help'");
                 return StarterRunResult.Success;
             }
             catch (Exception ex)
