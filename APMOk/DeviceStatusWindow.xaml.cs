@@ -274,7 +274,7 @@ namespace APMOk
             if (ApmValue == 0U)
             {
                 var configuration = _scopeServiceProvider.GetRequiredService<Services.Configuration>();
-                var res = await configuration.ResetDriveAPMConfigurationAsync(new() { DeviceID = deviceId }, CancellationToken.None);
+                var res = await configuration.ResetDriveAPMConfigurationAsync(new() { DeviceID = deviceId, PowerSource = powerSource }, CancellationToken.None);
                 result = (res?.ReplyResult ?? 0) != 0;
             }
             else
@@ -286,7 +286,7 @@ namespace APMOk
 
             if (result)
                 RunDiskInfoReaderTask();
-            
+
             e.Handled = true;
         }
 

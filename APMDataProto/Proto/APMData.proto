@@ -103,10 +103,10 @@ message DriveAPMConfigurationReply {
 }
 
 message ResetDriveRequest {
-	string DeviceID		= 1;
+	string DeviceID				= 1;
+	EPowerSource PowerSource	= 2;
 }
 
 message ResetDriveReply {
 	int32 ReplyResult	= 1;
-	string DeviceID		= 2;
 }

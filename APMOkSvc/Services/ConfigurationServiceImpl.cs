@@ -86,10 +86,20 @@ namespace APMOkSvc.Services
                 var configItem = await dataContext.ConfigDataSet.SingleOrDefaultAsync(item => item.DeviceID == request.DeviceID, cancellationToken);
                 if (configItem is not null)
                 {
-                    dataContext.ConfigDataSet.Remove(configItem);
-                    await dataContext.SaveChangesAsync(cancellationToken);
+                    switch (request.PowerSource)
+                    {
+                        case EPowerSource.Mains:
+                            configItem.OnMains = 0U;
+                            break;
+                        case EPowerSource.Battery:
+                            configItem.OnBatteries = 0U;
+                            break;
+                    }
+                    dataContext.ConfigDataSet.Update(configItem);
+                    _logger.LogTrace("Updated item: {0}", configItem);
+                    var records = await dataContext.SaveChangesAsync(cancellationToken);
+                    _logger.LogTrace("Updated: {0} records", records);
                     reply.ReplyResult = 1;
-                    reply.DeviceID = configItem.DeviceID;
                 }
             }
             catch (Exception ex)

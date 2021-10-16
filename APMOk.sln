@@ -13,6 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APMOkLib", "APMOkLib\APMOkL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APMDataProto", "APMDataProto\APMDataProto.csproj", "{A789F645-8E36-42B5-8DD1-8B4133FBCE84}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F3F70CB-A424-4CD4-992C-D306E24D2F5F}"
+	ProjectSection(SolutionItems) = preProject
+		TODO.txt = TODO.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

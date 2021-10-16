@@ -155,7 +155,7 @@ namespace APMOkSvc.Services
                         _logger.LogTrace("Added: {0}", configData);
                     }
                     var records = await dataContext.SaveChangesAsync(cancellationToken);
-                    _logger.LogTrace("Updated: {0} records", records);
+                    _logger.LogTrace("Added: {0} records", records);
                 }
             }
             catch (Exception ex)

@@ -380,6 +380,7 @@ namespace APMOkSvc.Code
             logger.Info("Running {0}", Environment.OSVersion.VersionString);
             hostbuilder = hostbuilder.UseWindowsService();
             logger.Info("Using Windows Service");
+            logger.Info("Using socket path: {0}", socketPathProvider.GetSocketPath());
 
             var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
             var pathToContentRoot = Path.GetDirectoryName(pathToExe);
