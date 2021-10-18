@@ -6,6 +6,13 @@
 		<Platforms>x64</Platforms>
 		<NeutralLanguage>en</NeutralLanguage>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Version>1.0</Version>
+		<Authors>Evgeniy Podkopaev</Authors>
+		<Product>APMOk</Product>
+		<Description>Hard drives APM managment utility working service</Description>
+		<Copyright>GPL</Copyright>
+		<PackageIcon>checked.ico</PackageIcon>
+		<PackageIconUrl />
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -64,6 +71,10 @@
 	  <None Update="Main.settings">
 	    <Generator>SettingsSingleFileGenerator</Generator>
 	    <LastGenOutput>Main.Designer.cs</LastGenOutput>
+	  </None>
+	  <None Include="..\APMOk\Properties\checked.ico">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
 	  </None>
 	</ItemGroup>
 

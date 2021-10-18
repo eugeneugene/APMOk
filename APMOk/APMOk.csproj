@@ -7,6 +7,13 @@
 		<Platforms>x64</Platforms>
 		<StartupObject>APMOk.App</StartupObject>
 		<NeutralLanguage>en</NeutralLanguage>
+		<Version>1.0</Version>
+		<Authors>Evgeniy Podkopaev</Authors>
+		<Company />
+		<Description>Hard drives APM managment utility</Description>
+		<Copyright>GPL</Copyright>
+		<PackageIcon>checked.ico</PackageIcon>
+		<PackageIconUrl />
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -22,6 +29,10 @@
 		<None Remove="appsettings.json" />
 		<None Remove="Checked.ico" />
 		<None Remove="Proto\APMData.proto" />
+		<None Include="Properties\checked.ico">
+		  <Pack>True</Pack>
+		  <PackagePath></PackagePath>
+		</None>
 		<Resource Include="Properties\checked.ico" />
 		<None Remove="Error.ico" />
 		<Content Include="appsettings.Development.json">
