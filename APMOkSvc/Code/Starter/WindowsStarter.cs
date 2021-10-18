@@ -395,11 +395,13 @@ namespace APMOkSvc.Code
                 webBuilder.ConfigureKestrel(options =>
                 {
                     var configuration = options.ApplicationServices.GetService(typeof(IConfiguration)) as IConfiguration;
-                    var path = configuration["Kestrel:EndpointDefaults:Certificate:Path"];
-                    var password = configuration["Kestrel:EndpointDefaults:Certificate:Password"];
                     options.ListenUnixSocket(socketPathProvider.GetSocketPath(), options =>
                     {
+#if HTTPS
+                        var path = configuration["Kestrel:EndpointDefaults:Certificate:Path"];
+                        var password = configuration["Kestrel:EndpointDefaults:Certificate:Password"];
                         options.UseHttps(path, password);
+#endif
                         options.Protocols = HttpProtocols.Http2;
                     });
                 });

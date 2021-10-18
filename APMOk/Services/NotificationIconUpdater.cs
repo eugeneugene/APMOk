@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace APMOk.Services
 {
-    public class NotificationIconUpdater : IHostedService
+    internal class NotificationIconUpdater : IHostedService
     {
         private readonly APMOkModel _apmOkModel;
         private readonly TaskbarIcon _taskbarIcon;
@@ -18,7 +18,8 @@ namespace APMOk.Services
 
         //private bool IgnoreUpdate = false;
 
-        public NotificationIconUpdater(APMOkModel apmOkModel, TaskbarIcon taskbarIcon, ITask<DiskInfoReaderTask> diskInfoReaderTask, ITask<PowerStatusReaderTask> batteryStatusReaderTask)
+        public NotificationIconUpdater(APMOkModel apmOkModel, TaskbarIcon taskbarIcon,
+            ITask<DiskInfoReaderTask> diskInfoReaderTask, ITask<PowerStatusReaderTask> batteryStatusReaderTask)
         {
             _apmOkModel = apmOkModel;
             _taskbarIcon = taskbarIcon;

@@ -1,4 +1,5 @@
-﻿using APMOkLib.CustomConfiguration;
+﻿using APMOkLib;
+using APMOkLib.CustomConfiguration;
 using APMOkLib.RecurrentTasks;
 using APMOkSvc.Code;
 using APMOkSvc.Data;
@@ -28,11 +29,13 @@ namespace APMOkSvc
             });
             services.AddDbContext<DataContext>();
             services.AddHostedService<PowerStateWatcher>();
+            services.AddHostedService<SocketFileChangePermissionHelper>();
             services.AddSingleton<PowerStateContainer>();
             services.AddTransient<DiskInfoServiceImpl>();
             services.AddTransient<APMServiceImpl>();
             services.AddTransient<PowerStateServiceImpl>();
             services.AddTransient<ConfigurationServiceImpl>();
+            services.AddTransient<ISocketPathProvider, SocketPathProvider>();
             services.AddGrpc();
 #if DEBUG
             services.AddSingleton<TestDriveService>();

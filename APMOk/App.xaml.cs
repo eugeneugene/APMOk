@@ -1,5 +1,4 @@
-﻿using APMData;
-using APMOk.Code;
+﻿using APMOk.Code;
 using APMOk.Models;
 using APMOk.Services;
 using APMOk.Tasks;
@@ -10,15 +9,10 @@ using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Markup;
 
 namespace APMOk
@@ -50,6 +44,7 @@ namespace APMOk
                     services.AddSingleton<APMOkModel>();
                     services.AddSingleton<NotifyIconViewModel>();
                     services.AddTransient<ISocketPathProvider, SocketPathProvider>();
+                    services.AddTransient<IGrpcChannelProvider, GrpcChannelProvider>();
                     services.AddTransient<DiskInfo>();
                     services.AddTransient<PowerState>();
                     services.AddTransient<APM>();
@@ -74,7 +69,6 @@ namespace APMOk
 
                 var _notifyIconViewModel = host.Services.GetRequiredService<NotifyIconViewModel>();
                 notifyIcon.DataContext = _notifyIconViewModel;
-                //notifyIcon.TrayContextMenuOpen += NotifyIconTrayContextMenuOpen;
                 base.OnStartup(e);
             }
             catch (Exception ex)
