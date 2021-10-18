@@ -13,6 +13,10 @@
 		<DefineConstants>TRACE</DefineConstants>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	  <DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Google.Protobuf" Version="3.17.3" />
 		<PackageReference Include="Grpc.Net.Client" Version="2.39.0" />

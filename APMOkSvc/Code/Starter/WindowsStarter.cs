@@ -323,10 +323,18 @@ namespace APMOkSvc.Code
 
         public async Task<StarterRunResult> ProcessHostRunAsync(CancellationToken cancellationToken)
         {
+            EventWaitHandle @event = null;
             try
             {
                 foreach (var line in VersionHelper.VersionLines)
                     logger.Info(line);
+
+                @event = new(true, EventResetMode.AutoReset, "__APMOKSVC_MUTEX", out bool created);
+                if (!created)
+                {
+                    logger.Fatal("Another instance of the service is already running");
+                    return StarterRunResult.Error;
+                }
 
                 var hostbuilder = CreateHostBuilder(HostArgs.ToArray());
                 if (WindowsServiceHelpers.IsWindowsService())
@@ -353,6 +361,7 @@ namespace APMOkSvc.Code
             finally
             {
                 LogManager.Shutdown();
+                @event?.Dispose();
             }
         }
 
