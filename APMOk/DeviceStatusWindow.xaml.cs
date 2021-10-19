@@ -296,5 +296,16 @@ namespace APMOk
             if (diskInfoReaderTask.IsStarted && !diskInfoReaderTask.IsRunningRightNow)
                 diskInfoReaderTask.TryRunImmediately();
         }
+
+        private void SetAPMCustomValueMenuExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            throw new NotImplementedException("Not implemented");
+        }
+
+        private void SetAPMCustomValueMenuCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = APMValue is not null && APMValue.Current != 0;
+            e.Handled = true;
+        }
     }
 }

@@ -21,6 +21,10 @@
             CanExecute="SetAPMValueMenuCanExecute"
             Command="localcommands:APMOkCommands.SetAPMValueMenuCommand"
             Executed="SetAPMValueMenuExecuted" />
+        <CommandBinding
+            CanExecute="SetAPMCustomValueMenuCanExecute"
+            Command="localcommands:APMOkCommands.SetAPMCustomValueMenuCommand"
+            Executed="SetAPMCustomValueMenuExecuted" />
     </Window.CommandBindings>
     <Window.Resources>
         <CollectionViewSource x:Key="DeviceStatusDataSource" CollectionViewType="ListCollectionView" />
@@ -131,6 +135,15 @@
                         </localcode:APMCommandParameter>
                     </MenuItem.CommandParameter>
                 </MenuItem>
+                <Separator />
+                <MenuItem Header="Custom value..." Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>localcommands:APMOkCommands.SetAPMCustomValueMenuCommand</MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <localcode:APMCustomValueCommandParameter>
+                            <localcode:APMCustomValueCommandParameter.PowerSource>Mains</localcode:APMCustomValueCommandParameter.PowerSource>
+                        </localcode:APMCustomValueCommandParameter>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="OnBatteries">
                 <MenuItem Header="H/W default (after next power cycle)" Style="{StaticResource MenuItemAlignStyle}">
@@ -187,6 +200,15 @@
                             <localcode:APMCommandParameter.PowerSource>Battery</localcode:APMCommandParameter.PowerSource>
                             <localcode:APMCommandParameter.ApmValue>254</localcode:APMCommandParameter.ApmValue>
                         </localcode:APMCommandParameter>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Custom value..." Style="{StaticResource MenuItemAlignStyle}">
+                    <MenuItem.Command>localcommands:APMOkCommands.SetAPMCustomValueMenuCommand</MenuItem.Command>
+                    <MenuItem.CommandParameter>
+                        <localcode:APMCustomValueCommandParameter>
+                            <localcode:APMCustomValueCommandParameter.PowerSource>Battery</localcode:APMCustomValueCommandParameter.PowerSource>
+                        </localcode:APMCustomValueCommandParameter>
                     </MenuItem.CommandParameter>
                 </MenuItem>
             </MenuItem>

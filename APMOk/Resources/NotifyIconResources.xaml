@@ -5,7 +5,7 @@
     <ContextMenu x:Key="SysTrayMenu" x:Shared="false">
         <MenuItem Command="{Binding ShowWindowCommand}" Header="APM Info" />
         <Separator />
-        <MenuItem Command="{Binding ExitApplicationCommand}" Header="Exit" />
+        <MenuItem Command="{Binding ExitApplicationCommand}" Header="Close" />
     </ContextMenu>
     <tb:TaskbarIcon
         x:Key="NotifyIcon"
