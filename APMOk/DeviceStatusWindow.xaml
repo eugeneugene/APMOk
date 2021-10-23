@@ -10,7 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="APM Info"
     Width="800"
-    Height="388"
+    Height="412"
     x:ClassModifier="internal"
     Loaded="WindowLoaded"
     ResizeMode="CanMinimize"
@@ -214,202 +214,205 @@
             </MenuItem>
         </ContextMenu>
     </Window.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="65" />
-            <RowDefinition Height="205" />
-            <RowDefinition Height="65" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="60*" />
-            <ColumnDefinition Width="40*" />
-        </Grid.ColumnDefinitions>
-        <GroupBox
-            Grid.Row="0"
-            Grid.Column="0"
-            Margin="5"
-            HorizontalContentAlignment="Center"
-            Header="Select disk">
-            <ComboBox
-                x:Name="SelectDiskCombo"
-                Height="22"
+    <StackPanel Orientation="Vertical">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="65" />
+                <RowDefinition Height="205" />
+                <RowDefinition Height="65" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="60*" />
+                <ColumnDefinition Width="40*" />
+            </Grid.ColumnDefinitions>
+            <GroupBox
+                Grid.Row="0"
+                Grid.Column="0"
                 Margin="5"
-                HorizontalContentAlignment="Stretch"
-                DataContext="{StaticResource DeviceStatusDataSource}"
-                DisplayMemberPath="Caption"
-                DropDownOpened="SelectDiskComboDropDownOpened"
-                ItemsSource="{Binding}"
-                SelectionChanged="SelectDiskComboSelectionChanged"
-                Style="{StaticResource ComboBoxEnabler}" />
-        </GroupBox>
-        <GroupBox
-            Grid.Row="0"
-            Grid.Column="1"
-            Margin="5"
-            HorizontalContentAlignment="Center"
-            Header="Power">
-            <Border
-                Margin="5"
-                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
-                BorderThickness="1">
-                <TextBlock
-                    x:Name="PowerStatus"
+                HorizontalContentAlignment="Center"
+                Header="Select disk">
+                <ComboBox
+                    x:Name="SelectDiskCombo"
                     Height="22"
-                    Margin="5,0,5,0"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Center"
-                    FontSize="14"
-                    Style="{StaticResource PowerStatus}" />
-            </Border>
-        </GroupBox>
-        <GroupBox
-            Grid.Row="1"
-            Grid.Column="0"
-            Margin="5"
-            Header="Status">
-            <DataGrid
-                x:Name="DriveStatusGrid"
+                    Margin="5"
+                    HorizontalContentAlignment="Stretch"
+                    DataContext="{StaticResource DeviceStatusDataSource}"
+                    DisplayMemberPath="Caption"
+                    DropDownOpened="SelectDiskComboDropDownOpened"
+                    ItemsSource="{Binding}"
+                    SelectionChanged="SelectDiskComboSelectionChanged"
+                    Style="{StaticResource ComboBoxEnabler}" />
+            </GroupBox>
+            <GroupBox
+                Grid.Row="0"
+                Grid.Column="1"
                 Margin="5"
-                AutoGenerateColumns="False"
-                CanUserAddRows="False"
-                CanUserDeleteRows="False"
-                CanUserResizeColumns="False"
-                CanUserResizeRows="False"
-                CanUserSortColumns="False"
-                ItemsSource="{Binding}"
-                ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                Style="{StaticResource DataGridEnabler}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn
-                        x:Name="DriveKey"
-                        Width="120"
-                        Binding="{Binding Key}"
-                        Header="Key"
-                        IsReadOnly="True" />
-                    <DataGridTextColumn
-                        x:Name="DriveValue"
-                        Width="309"
-                        Binding="{Binding Value}"
-                        Header="Value"
-                        IsReadOnly="True" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </GroupBox>
-        <GroupBox
-            Grid.Row="1"
-            Grid.Column="1"
-            Margin="5"
-            Header="Battery Status">
-            <DataGrid
-                x:Name="BatteryStatusGrid"
+                HorizontalContentAlignment="Center"
+                Header="Power">
+                <Border
+                    Margin="5"
+                    BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                    BorderThickness="1">
+                    <TextBlock
+                        x:Name="PowerStatus"
+                        Height="22"
+                        Margin="5,0,5,0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Style="{StaticResource PowerStatus}" />
+                </Border>
+            </GroupBox>
+            <GroupBox
+                Grid.Row="1"
+                Grid.Column="0"
                 Margin="5"
-                AutoGenerateColumns="False"
-                CanUserAddRows="False"
-                CanUserDeleteRows="False"
-                CanUserResizeColumns="False"
-                CanUserResizeRows="False"
-                CanUserSortColumns="False"
-                ItemsSource="{Binding}"
-                ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                Style="{StaticResource DataGridEnabler}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn
-                        x:Name="BatteryKey"
-                        Width="120"
-                        Binding="{Binding Key}"
-                        Header="Key"
-                        IsReadOnly="True" />
-                    <DataGridTextColumn
-                        x:Name="BatteryValue"
-                        Width="153"
-                        Binding="{Binding Value}"
-                        Header="Value"
-                        IsReadOnly="True" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </GroupBox>
-        <GroupBox
-            Grid.Row="2"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Margin="5"
-            Header="APM Value">
-            <Grid>
-                <Grid.RowDefinitions />
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="25*" />
-                    <ColumnDefinition Width="25*" />
-                    <ColumnDefinition Width="25*" />
-                    <ColumnDefinition Width="25*" />
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Row="0" Grid.Column="0">
+                Header="Status">
+                <DataGrid
+                    x:Name="DriveStatusGrid"
+                    Margin="5"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
+                    CanUserResizeColumns="False"
+                    CanUserResizeRows="False"
+                    CanUserSortColumns="False"
+                    ItemsSource="{Binding}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                    ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                    Style="{StaticResource DataGridEnabler}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            x:Name="DriveKey"
+                            Width="120"
+                            Binding="{Binding Key}"
+                            Header="Key"
+                            IsReadOnly="True" />
+                        <DataGridTextColumn
+                            x:Name="DriveValue"
+                            Width="309"
+                            Binding="{Binding Value}"
+                            Header="Value"
+                            IsReadOnly="True" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+            <GroupBox
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="5"
+                Header="Battery Status">
+                <DataGrid
+                    x:Name="BatteryStatusGrid"
+                    Margin="5"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
+                    CanUserResizeColumns="False"
+                    CanUserResizeRows="False"
+                    CanUserSortColumns="False"
+                    ItemsSource="{Binding}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                    Style="{StaticResource DataGridEnabler}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            x:Name="BatteryKey"
+                            Width="120"
+                            Binding="{Binding Key}"
+                            Header="Key"
+                            IsReadOnly="True" />
+                        <DataGridTextColumn
+                            x:Name="BatteryValue"
+                            Width="153"
+                            Binding="{Binding Value}"
+                            Header="Value"
+                            IsReadOnly="True" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+            <GroupBox
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="5"
+                Header="APM Value">
+                <Grid>
                     <Grid.RowDefinitions />
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80" />
-                        <ColumnDefinition />
+                        <ColumnDefinition Width="25*" />
+                        <ColumnDefinition Width="25*" />
+                        <ColumnDefinition Width="25*" />
+                        <ColumnDefinition Width="25*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock
+                    <Grid Grid.Row="0" Grid.Column="0">
+                        <Grid.RowDefinitions />
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="5">
+                            On Mains:
+                        </TextBlock>
+                        <TextBlock
+                            x:Name="OnMainsValue"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="5"
+                            Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.OnMains, Converter={StaticResource APMValueConverter}}" />
+                    </Grid>
+                    <Grid Grid.Row="0" Grid.Column="1">
+                        <Grid.RowDefinitions />
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="5">
+                            On batteries:
+                        </TextBlock>
+                        <TextBlock
+                            x:Name="OnBatteriesValue"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="5"
+                            Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.OnBatteries, Converter={StaticResource APMValueConverter}}" />
+                    </Grid>
+                    <Grid Grid.Row="0" Grid.Column="2">
+                        <Grid.RowDefinitions />
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="5">
+                            Current:
+                        </TextBlock>
+                        <TextBlock
+                            x:Name="CurrentValue"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="5"
+                            Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.Current, Converter={StaticResource APMValueConverter}}" />
+                    </Grid>
+                    <Button
+                        x:Name="SetApmValueButton"
                         Grid.Row="0"
-                        Grid.Column="0"
-                        Margin="5">
-                        On Mains:
-                    </TextBlock>
-                    <TextBlock
-                        x:Name="OnMainsValue"
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Margin="5"
-                        Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.OnMains, Converter={StaticResource APMValueConverter}}" />
+                        Grid.Column="3"
+                        Width="100"
+                        Height="22"
+                        Command="localcommands:APMOkCommands.SetAPMValueMenuCommand"
+                        Content="Set APM Value"
+                        Style="{StaticResource PressButtonEffectStyle}" />
                 </Grid>
-                <Grid Grid.Row="0" Grid.Column="1">
-                    <Grid.RowDefinitions />
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Margin="5">
-                        On batteries:
-                    </TextBlock>
-                    <TextBlock
-                        x:Name="OnBatteriesValue"
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Margin="5"
-                        Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.OnBatteries, Converter={StaticResource APMValueConverter}}" />
-                </Grid>
-                <Grid Grid.Row="0" Grid.Column="2">
-                    <Grid.RowDefinitions />
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Margin="5">
-                        Current:
-                    </TextBlock>
-                    <TextBlock
-                        x:Name="CurrentValue"
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Margin="5"
-                        Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=APMValue.Current, Converter={StaticResource APMValueConverter}}" />
-                </Grid>
-                <Button
-                    x:Name="SetApmValueButton"
-                    Grid.Row="0"
-                    Grid.Column="3"
-                    Width="100"
-                    Height="22"
-                    Command="localcommands:APMOkCommands.SetAPMValueMenuCommand"
-                    Content="Set APM Value"
-                    Style="{StaticResource PressButtonEffectStyle}" />
-            </Grid>
-        </GroupBox>
-    </Grid>
+            </GroupBox>
+        </Grid>
+        <CheckBox Content="Start with Windows" x:Name="AutoRun" Margin="5" Checked="AutoRunChecked" Unchecked="AutoRunUnchecked" />
+    </StackPanel>
 </Window>

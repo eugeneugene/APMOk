@@ -5,12 +5,14 @@ using APMOk.Tasks;
 using APMOkLib;
 using APMOkLib.RecurrentTasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -67,6 +69,22 @@ namespace APMOk
             LoadPowerState();
             UpdateIcon();
             _apmOkModel.PropertyChanged += APMOkDataChanged;
+
+            try
+            {
+                var software = Registry.CurrentUser.OpenSubKey("SOFTWARE", false);
+                var microsoft = software.OpenSubKey("Microsoft", false);
+                var windows = microsoft.OpenSubKey("Windows", false);
+                var currentVersion = windows.OpenSubKey("CurrentVersion", false);
+                var run = currentVersion.OpenSubKey("Run", true);
+                if (run.GetValue("APMOk") is not null)
+                    AutoRun.IsChecked = true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception: {0}", ex.Message);
+            }
+
         }
 
         private void APMOkDataChanged(object sender, PropertyChangedEventArgs e)
@@ -345,6 +363,47 @@ namespace APMOk
         private void SetAPMCustomValueMenuCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = APMValue is not null && APMValue.Current != 0;
+            e.Handled = true;
+        }
+
+        private void AutoRunChecked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                var software = Registry.CurrentUser.OpenSubKey("SOFTWARE", false);
+                var microsoft = software.OpenSubKey("Microsoft", false);
+                var windows = microsoft.OpenSubKey("Windows", false);
+                var currentVersion = windows.OpenSubKey("CurrentVersion", false);
+                var run = currentVersion.OpenSubKey("Run", true);
+                if (Path.GetExtension(strExeFilePath) == ".dll")
+                    strExeFilePath = Path.ChangeExtension(strExeFilePath, ".exe");
+                if (strExeFilePath.Contains(' '))
+                    strExeFilePath = @"""" + strExeFilePath + @"""";
+                run.SetValue("APMOk", strExeFilePath);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception: {0}", ex.Message);
+            }
+            e.Handled = true;
+        }
+
+        private void AutoRunUnchecked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var software = Registry.CurrentUser.OpenSubKey("SOFTWARE", false);
+                var microsoft = software.OpenSubKey("Microsoft", false);
+                var windows = microsoft.OpenSubKey("Windows", false);
+                var currentVersion = windows.OpenSubKey("CurrentVersion", false);
+                var run = currentVersion.OpenSubKey("Run", true);
+                run.DeleteValue("APMOk");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception: {0}", ex.Message);
+            }
             e.Handled = true;
         }
     }

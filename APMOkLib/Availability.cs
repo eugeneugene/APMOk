@@ -1,4 +1,4 @@
-﻿using Ardalis.SmartEnum;
+﻿using APMOkLib.SmartEnum;
 
 namespace APMOkLib
 {
