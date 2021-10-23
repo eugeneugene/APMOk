@@ -10,7 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="APM Info"
     Width="800"
-    Height="384"
+    Height="388"
     x:ClassModifier="internal"
     Loaded="WindowLoaded"
     ResizeMode="CanMinimize"
@@ -21,10 +21,6 @@
             CanExecute="SetAPMValueMenuCanExecute"
             Command="localcommands:APMOkCommands.SetAPMValueMenuCommand"
             Executed="SetAPMValueMenuExecuted" />
-        <CommandBinding
-            CanExecute="SetAPMCustomValueMenuCanExecute"
-            Command="localcommands:APMOkCommands.SetAPMCustomValueMenuCommand"
-            Executed="SetAPMCustomValueMenuExecuted" />
     </Window.CommandBindings>
     <Window.Resources>
         <CollectionViewSource x:Key="DeviceStatusDataSource" CollectionViewType="ListCollectionView" />
@@ -77,6 +73,10 @@
                     CanExecute="SetAPMValueCanExecute"
                     Command="localcommands:APMOkCommands.SetAPMValueCommand"
                     Executed="SetAPMValueExecuted" />
+                <CommandBinding
+                    CanExecute="SetAPMCustomValueMenuCanExecute"
+                    Command="localcommands:APMOkCommands.SetAPMCustomValueMenuCommand"
+                    Executed="SetAPMCustomValueMenuExecuted" />
             </ContextMenu.CommandBindings>
             <MenuItem Header="OnMains">
                 <MenuItem Header="H/W default (after next power cycle)" Style="{StaticResource MenuItemAlignStyle}">
@@ -217,7 +217,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="65" />
-            <RowDefinition Height="201" />
+            <RowDefinition Height="205" />
             <RowDefinition Height="65" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>

@@ -1,0 +1,61 @@
+﻿<Window
+    x:Class="APMOk.SetAPMCustomValueWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:APMOk"
+    xmlns:localcommands="clr-namespace:APMOk.Commands"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Set Custom Value"
+    Width="493"
+    Height="266"
+    BorderThickness="3,3,3,3"
+    Loaded="WindowLoaded"
+    ResizeMode="NoResize"
+    ShowInTaskbar="False"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="ThreeDBorderWindow"
+    mc:Ignorable="d">
+    <Window.CommandBindings>
+        <CommandBinding
+            CanExecute="ButtonOkCommandCanExecute"
+            Command="localcommands:APMOkCommands.ButtonOkCommand"
+            Executed="ButtonOkCommandExecuted" />
+    </Window.CommandBindings>
+    <StackPanel Orientation="Vertical">
+        <StackPanel Margin="20,20,20,0" Orientation="Horizontal">
+            <Label>Power Source:</Label>
+            <Label
+                Name="PowerSource"
+                Width="85"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center">
+                Unknown
+            </Label>
+            <Label>Custom APM Value:</Label>
+            <TextBox
+                Name="CustomValue"
+                Width="75"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                MaxLines="1">
+                0
+            </TextBox>
+        </StackPanel>
+        <GroupBox Margin="15" Header="Tips">
+            <TextBlock Margin="5">
+                Minimum power consumption with Standby (Value = 1)<LineBreak />
+                Intermediate power management levels with Standby, (2 ≥ Value ≥ 127)<LineBreak />
+                Minimum power consumption without Standby (Value = 128)<LineBreak />
+                Intermediate power management levels without Standby (129 ≥ Value ≥ 253)<LineBreak />
+                Maximum performance, No APM (Value = 254)</TextBlock>
+        </GroupBox>
+        <Button
+            x:Name="OkButton"
+            Width="80"
+            Command="localcommands:APMOkCommands.ButtonOkCommand"
+            Content="Ok"
+            IsDefault="True" />
+    </StackPanel>
+
+</Window>

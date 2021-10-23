@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -264,8 +265,20 @@ namespace APMOk
 
         private async void SetAPMValueExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            var parameter = e.Parameter as APMCommandParameter;
-            Debug.Assert(parameter != null);
+            try
+            {
+                if (e.Parameter is APMCommandParameter parameter)
+                    await SetAPMValueAsync(parameter);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception: {0}", ex.Message);
+            }
+            e.Handled = true;
+        }
+
+        private async Task SetAPMValueAsync(APMCommandParameter parameter)
+        {
             uint ApmValue = parameter.ApmValue;
             EPowerSource powerSource = parameter.PowerSource;
 
@@ -286,8 +299,6 @@ namespace APMOk
 
             if (result)
                 RunDiskInfoReaderTask();
-
-            e.Handled = true;
         }
 
         private void RunDiskInfoReaderTask()
@@ -297,9 +308,38 @@ namespace APMOk
                 diskInfoReaderTask.TryRunImmediately();
         }
 
-        private void SetAPMCustomValueMenuExecuted(object sender, ExecutedRoutedEventArgs e)
+        private async void SetAPMCustomValueMenuExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            throw new NotImplementedException("Not implemented");
+            try
+            {
+                if (e.Parameter is APMCustomValueCommandParameter parameter)
+                {
+                    uint value = parameter.PowerSource switch
+                    {
+                        EPowerSource.Mains => APMValue.OnMains,
+                        EPowerSource.Battery => APMValue.OnBatteries,
+                        _ => 0U,
+                    };
+                    var dlg = new SetAPMCustomValueWindow(new APMCommandParameter()
+                    {
+                        ApmValue = value,
+                        PowerSource = parameter.PowerSource,
+                    });
+                    if (dlg.ShowDialog() ?? false)
+                    {
+                        await SetAPMValueAsync(new APMCommandParameter()
+                        {
+                            ApmValue = dlg.APMCommandParameter.ApmValue,
+                            PowerSource = dlg.APMCommandParameter.PowerSource,
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Exception: {0}", ex.Message);
+            }
+            e.Handled = true;
         }
 
         private void SetAPMCustomValueMenuCanExecute(object sender, CanExecuteRoutedEventArgs e)
