@@ -31,7 +31,7 @@ namespace APMOkLib
             return MakeString(ob, string.Empty, null);
         }
 
-        public static string MakeString(object ob, string format, IFormatProvider formatProvider)
+        public static string MakeString(object ob, string format, IFormatProvider? formatProvider)
         {
             if (format is null)
                 throw new ArgumentNullException(nameof(format));
@@ -57,7 +57,7 @@ namespace APMOkLib
             return Encoding.UTF8.GetString(jsonUtf8Bytes);
         }
 
-        public virtual string ToString(string format, IFormatProvider formatProvider)
+        public virtual string ToString(string? format, IFormatProvider? formatProvider)
         {
             return MakeString(this, format ?? string.Empty, formatProvider);
         }

@@ -16,7 +16,7 @@ namespace APMOkLib
             return base.ToString(format);
         }
 
-        public override string ToString(string format, IFormatProvider formatProvider)
+        public override string ToString(string? format, IFormatProvider? formatProvider)
         {
             if (string.IsNullOrWhiteSpace(format))
                 return base.ToString("E", formatProvider);

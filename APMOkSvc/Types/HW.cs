@@ -16,7 +16,7 @@ namespace APMOkSvc.Types
         [DllImport("hw.dll", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "SetAPM")]
         private static extern int SetAPMPriv([In] string dskName, [In] byte val, [In] bool disable);
 
-        public static int EnumerateDisks(out IEnumerable<HWDiskInfo> diskInfo)
+        public static int EnumerateDisks(out IEnumerable<HWDiskInfo>? diskInfo)
         {
             int EnumDiskInfoSize = Marshal.SizeOf(new HWDiskInfo());
             IntPtr ptr = Marshal.AllocHGlobal(EnumDiskInfoSize * 16);
@@ -27,7 +27,10 @@ namespace APMOkSvc.Types
                 {
                     var result = new HWDiskInfo[16];
                     for (int i = 0; i < 16; i++)
-                        result[i] = (HWDiskInfo)Marshal.PtrToStructure(new IntPtr(ptr.ToInt64() + (i * EnumDiskInfoSize)), typeof(HWDiskInfo));
+                    {
+                        var data = Marshal.PtrToStructure(new IntPtr(ptr.ToInt64() + (i * EnumDiskInfoSize)), typeof(HWDiskInfo));
+                        result[i] = (HWDiskInfo)data!;
+                    }
                     diskInfo = result;
                 }
                 else

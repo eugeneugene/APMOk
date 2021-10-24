@@ -13,6 +13,8 @@
 		<Copyright>GPL</Copyright>
 		<PackageIcon>checked.ico</PackageIcon>
 		<PackageIconUrl />
+		<StartupObject>APMOkSvc.Program</StartupObject>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

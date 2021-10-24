@@ -59,7 +59,7 @@ namespace APMOkLib
 
         public static bool TryDecryptLoginPwd(string LoginPwd, out string login, out string pwd, out string salt)
         {
-            string dec = null;
+            string? dec = null;
             login = string.Empty;
             pwd = string.Empty;
             salt = string.Empty;

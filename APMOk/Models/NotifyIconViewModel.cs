@@ -27,7 +27,7 @@ namespace APMOk.Models
         {
             CommandAction = () =>
             {
-                if (deviceStatusWindow == null || deviceStatusWindow.IsClosed())
+                if (deviceStatusWindow is null || deviceStatusWindow.IsClosed())
                     deviceStatusWindow = _services.GetService(typeof(DeviceStatusWindow)) as DeviceStatusWindow;
 
                 if (deviceStatusWindow is not null)

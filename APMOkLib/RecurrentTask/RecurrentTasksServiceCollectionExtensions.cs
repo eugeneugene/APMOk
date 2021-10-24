@@ -8,11 +8,11 @@ namespace APMOkLib.RecurrentTasks
     {
         public static IServiceCollection AddTask<TRunnable>(
             this IServiceCollection services,
-            Action<TaskStartupOptions<TRunnable>> optionsAction = null,
+            Action<TaskStartupOptions<TRunnable>>? optionsAction = null,
             ServiceLifetime runnableLifetime = ServiceLifetime.Transient)
             where TRunnable : IRunnable
         {
-            if (services == null)
+            if (services is null)
             {
                 throw new ArgumentNullException(nameof(services));
             }

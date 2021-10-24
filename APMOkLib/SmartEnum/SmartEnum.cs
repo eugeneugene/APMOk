@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 namespace APMOkLib.SmartEnum
 {
     /// <summary>
-    /// A base type to use for creating smart enums with inner value of type <see cref="System.Int32"/>.
+    /// A base type to use for creating smart enums with inner value of type <see cref="int"/>.
     /// </summary>
     /// <typeparam name="TEnum">The type that is inheriting from this class.</typeparam>
     /// <remarks></remarks>
@@ -16,8 +16,8 @@ namespace APMOkLib.SmartEnum
         SmartEnum<TEnum, int>
         where TEnum : SmartEnum<TEnum, int>
     {
-        protected SmartEnum(string name, int value) :
-            base(name, value)
+        protected SmartEnum(string name, int value)
+            : base(name, value)
         {
         }
     }
@@ -35,18 +35,21 @@ namespace APMOkLib.SmartEnum
         where TValue : IEquatable<TValue>, IComparable<TValue>
     {
         static readonly Lazy<Dictionary<string, TEnum>> _fromName =
-            new Lazy<Dictionary<string, TEnum>>(() => GetAllOptions().ToDictionary(item => item.Name));
+            new(() => GetAllOptions().ToDictionary(item => item.Name));
 
         static readonly Lazy<Dictionary<string, TEnum>> _fromNameIgnoreCase =
-            new Lazy<Dictionary<string, TEnum>>(() => GetAllOptions().ToDictionary(item => item.Name, StringComparer.OrdinalIgnoreCase));
+            new(() => GetAllOptions().ToDictionary(item => item.Name, StringComparer.OrdinalIgnoreCase));
 
         static readonly Lazy<Dictionary<TValue, TEnum>> _fromValue =
-            new Lazy<Dictionary<TValue, TEnum>>(() =>
+            new(() =>
             {
                 // multiple enums with same value are allowed but store only one per value
                 var dictionary = new Dictionary<TValue, TEnum>();
                 foreach (var item in GetAllOptions())
                 {
+                    if (item._value is null)
+                        throw new NullReferenceException("Value cannot be null");
+
                     if (!dictionary.ContainsKey(item._value))
                         dictionary.Add(item._value, item);
                 }
@@ -56,12 +59,12 @@ namespace APMOkLib.SmartEnum
         private static IEnumerable<TEnum> GetAllOptions()
         {
             Type baseType = typeof(TEnum);
-            IEnumerable<Type> enumTypes = Assembly.GetAssembly(baseType).GetTypes().Where(t => baseType.IsAssignableFrom(t));
+            IEnumerable<Type> enumTypes = Assembly.GetAssembly(baseType)!.GetTypes().Where(t => baseType.IsAssignableFrom(t));
 
-            List<TEnum> options = new List<TEnum>();
+            List<TEnum> options = new();
             foreach (Type enumType in enumTypes)
             {
-                List<TEnum> typeEnumOptions = enumType.GetFieldsOfType<TEnum>();
+                var typeEnumOptions = enumType.GetFieldsOfType<TEnum>();
                 options.AddRange(typeEnumOptions);
             }
 
@@ -79,27 +82,25 @@ namespace APMOkLib.SmartEnum
                 .AsReadOnly();
 
         private readonly string _name;
-        private readonly TValue _value;
+        private readonly TValue? _value;
 
         /// <summary>
         /// Gets the name.
         /// </summary>
-        /// <value>A <see cref="String"/> that is the name of the <see cref="SmartEnum{TEnum, TValue}"/>.</value>
-        public string Name =>
-            _name;
+        /// <value>A <see cref="string"/> that is the name of the <see cref="SmartEnum{TEnum, TValue}"/>.</value>
+        public string Name => _name;
 
         /// <summary>
         /// Gets the value.
         /// </summary>
         /// <value>A <typeparamref name="TValue"/> that is the value of the <see cref="SmartEnum{TEnum, TValue}"/>.</value>
-        public TValue Value =>
-            _value;
+        public TValue? Value => _value;
 
         protected SmartEnum(string name, TValue value)
         {
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
                 ThrowHelper.ThrowArgumentNullOrEmptyException(nameof(name));
-            if (value == null)
+            if (value is null)
                 ThrowHelper.ThrowArgumentNullException(nameof(value));
 
             _name = name;
@@ -128,7 +129,7 @@ namespace APMOkLib.SmartEnum
         /// <seealso cref="SmartEnum{TEnum, TValue}.TryFromName(string, bool, out TEnum)"/>
         public static TEnum FromName(string name, bool ignoreCase = false)
         {
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
                 ThrowHelper.ThrowArgumentNullOrEmptyException(nameof(name));
 
             if (ignoreCase)
@@ -139,10 +140,9 @@ namespace APMOkLib.SmartEnum
             TEnum FromName(Dictionary<string, TEnum> dictionary)
             {
                 if (!dictionary.TryGetValue(name, out var result))
-                {
                     ThrowHelper.ThrowNameNotFoundException<TEnum, TValue>(name);
-                }
-                return result;
+
+                return result!;
             }
         }
 
@@ -160,7 +160,7 @@ namespace APMOkLib.SmartEnum
         /// <seealso cref="SmartEnum{TEnum, TValue}.FromName(string, bool)"/>
         /// <seealso cref="SmartEnum{TEnum, TValue}.TryFromName(string, bool, out TEnum)"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryFromName(string name, out TEnum result) =>
+        public static bool TryFromName(string name, out TEnum? result) =>
             TryFromName(name, false, out result);
 
         /// <summary>
@@ -177,9 +177,9 @@ namespace APMOkLib.SmartEnum
         /// <exception cref="ArgumentException"><paramref name="name"/> is <c>null</c>.</exception> 
         /// <seealso cref="SmartEnum{TEnum, TValue}.FromName(string, bool)"/>
         /// <seealso cref="SmartEnum{TEnum, TValue}.TryFromName(string, out TEnum)"/>
-        public static bool TryFromName(string name, bool ignoreCase, out TEnum result)
+        public static bool TryFromName(string name, bool ignoreCase, out TEnum? result)
         {
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
             {
                 result = default;
                 return false;
@@ -202,15 +202,14 @@ namespace APMOkLib.SmartEnum
         /// <exception cref="SmartEnumNotFoundException"><paramref name="value"/> does not exist.</exception> 
         /// <seealso cref="SmartEnum{TEnum, TValue}.FromValue(TValue, TEnum)"/>
         /// <seealso cref="SmartEnum{TEnum, TValue}.TryFromValue(TValue, out TEnum)"/>
-        public static TEnum FromValue(TValue value)
+        public static TEnum? FromValue(TValue value)
         {
-            if (value == null)
+            if (value is null)
                 ThrowHelper.ThrowArgumentNullException(nameof(value));
 
-            if (!_fromValue.Value.TryGetValue(value, out var result))
-            {
-                ThrowHelper.ThrowValueNotFoundException<TEnum, TValue>(value);
-            }
+            if (!_fromValue.Value.TryGetValue(value!, out var result))
+                ThrowHelper.ThrowValueNotFoundException<TEnum, TValue>(value!);
+
             return result;
         }
 
@@ -227,13 +226,12 @@ namespace APMOkLib.SmartEnum
         /// <seealso cref="SmartEnum{TEnum, TValue}.TryFromValue(TValue, out TEnum)"/>
         public static TEnum FromValue(TValue value, TEnum defaultValue)
         {
-            if (value == null)
+            if (value is null)
                 ThrowHelper.ThrowArgumentNullException(nameof(value));
 
-            if (!_fromValue.Value.TryGetValue(value, out var result))
-            {
+            if (!_fromValue.Value.TryGetValue(value!, out var result))
                 return defaultValue;
-            }
+
             return result;
         }
 
@@ -249,9 +247,9 @@ namespace APMOkLib.SmartEnum
         /// </returns>
         /// <seealso cref="SmartEnum{TEnum, TValue}.FromValue(TValue)"/>
         /// <seealso cref="SmartEnum{TEnum, TValue}.FromValue(TValue, TEnum)"/>
-        public static bool TryFromValue(TValue value, out TEnum result)
+        public static bool TryFromValue(TValue value, out TEnum? result)
         {
-            if (value == null)
+            if (value is null)
             {
                 result = default;
                 return false;
@@ -260,19 +258,17 @@ namespace APMOkLib.SmartEnum
             return _fromValue.Value.TryGetValue(value, out result);
         }
 
-        public override string ToString() =>
-            _name;
+        public override string ToString() => _name;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override int GetHashCode() =>
-            _value.GetHashCode();
+        public override int GetHashCode() => _value?.GetHashCode() ?? 0;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override bool Equals(object obj) =>
+        public override bool Equals(object? obj) =>
             (obj is SmartEnum<TEnum, TValue> other) && Equals(other);
 
         /// <summary>
@@ -280,10 +276,10 @@ namespace APMOkLib.SmartEnum
         /// </summary>
         /// <param name="other">An <see cref="SmartEnum{TEnum, TValue}"/> value to compare to this instance.</param>
         /// <returns><c>true</c> if <paramref name="other"/> has the same value as this instance; otherwise, <c>false</c>.</returns>
-        public virtual bool Equals(SmartEnum<TEnum, TValue> other)
+        public virtual bool Equals(SmartEnum<TEnum, TValue>? other)
         {
             // check if same instance
-            if (Object.ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
                 return true;
 
             // it's not same instance so 
@@ -291,7 +287,7 @@ namespace APMOkLib.SmartEnum
             if (other is null)
                 return false;
 
-            return _value.Equals(other._value);
+            return _value?.Equals(other._value) ?? false;
         }
 
         /// <summary>
@@ -301,7 +297,7 @@ namespace APMOkLib.SmartEnum
         /// <param name="smartEnumWhen">A collection of <see cref="SmartEnum{TEnum, TValue}"/> values to compare to this instance.</param>
         /// <returns>A executor object to execute a supplied action.</returns>
         public SmartEnumThen<TEnum, TValue> When(SmartEnum<TEnum, TValue> smartEnumWhen) =>
-            new SmartEnumThen<TEnum, TValue>(this.Equals(smartEnumWhen), false, this);
+            new(Equals(smartEnumWhen), false, this);
 
         /// <summary>
         /// When this instance is one of the specified <see cref="SmartEnum{TEnum, TValue}"/> parameters.
@@ -310,7 +306,7 @@ namespace APMOkLib.SmartEnum
         /// <param name="smartEnums">A collection of <see cref="SmartEnum{TEnum, TValue}"/> values to compare to this instance.</param>
         /// <returns>A executor object to execute a supplied action.</returns>
         public SmartEnumThen<TEnum, TValue> When(params SmartEnum<TEnum, TValue>[] smartEnums) =>
-            new SmartEnumThen<TEnum, TValue>(smartEnums.Contains(this), false, this);
+            new(smartEnums.Contains(this), false, this);
 
         /// When this instance is one of the specified <see cref="SmartEnum{TEnum, TValue}"/> parameters.
         /// Execute the action in the subsequent call to Then().
@@ -318,13 +314,13 @@ namespace APMOkLib.SmartEnum
         /// <param name="smartEnums">A collection of <see cref="SmartEnum{TEnum, TValue}"/> values to compare to this instance.</param>
         /// <returns>A executor object to execute a supplied action.</returns>
         public SmartEnumThen<TEnum, TValue> When(IEnumerable<SmartEnum<TEnum, TValue>> smartEnums) =>
-            new SmartEnumThen<TEnum, TValue>(smartEnums.Contains(this), false, this);
+            new(smartEnums.Contains(this), false, this);
 
         public static bool operator ==(SmartEnum<TEnum, TValue> left, SmartEnum<TEnum, TValue> right)
         {
             // Handle null on left side
             if (left is null)
-                return right is null; // null == null = true
+                return right is null; // null is null = true
 
             // Equals handles null on right side
             return left.Equals(right);
@@ -340,8 +336,16 @@ namespace APMOkLib.SmartEnum
         /// <param name="other">An <see cref="SmartEnum{TEnum, TValue}"/> value to compare to this instance.</param>
         /// <returns>A signed number indicating the relative values of this instance and <paramref name="other"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public virtual int CompareTo(SmartEnum<TEnum, TValue> other) =>
-            _value.CompareTo(other._value);
+        public virtual int CompareTo(SmartEnum<TEnum, TValue>? other)
+        {
+            if (_value is null)
+                ThrowHelper.ThrowArgumentNullException(nameof(_value));
+
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(nameof(other));
+
+            return _value!.CompareTo(other!._value);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator <(SmartEnum<TEnum, TValue> left, SmartEnum<TEnum, TValue> right) =>
@@ -360,11 +364,18 @@ namespace APMOkLib.SmartEnum
             left.CompareTo(right) >= 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static implicit operator TValue(SmartEnum<TEnum, TValue> smartEnum) =>
-            smartEnum._value;
+        public static implicit operator TValue?(SmartEnum<TEnum, TValue> smartEnum)
+        {
+            if (smartEnum is null)
+                ThrowHelper.ThrowArgumentNullException(nameof(smartEnum));
+
+            return smartEnum!._value;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator SmartEnum<TEnum, TValue>(TValue value) =>
-            FromValue(value);
+        public static explicit operator SmartEnum<TEnum, TValue>?(TValue value)
+        {
+            return FromValue(value);
+        }
     }
 }

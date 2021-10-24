@@ -9,18 +9,18 @@ namespace APMOkSvc.Types
         public uint Index;
         public ushort Availability;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
-        public string Caption;
+        public string? Caption;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
-        public string Description;
+        public string? Description;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
-        public string DeviceID;
+        public string? DeviceID;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)]
-        public string InterfaceType;
+        public string? InterfaceType;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
-        public string Manufacturer;
+        public string? Manufacturer;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
-        public string Model;
+        public string? Model;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
-        public string SerialNumber;
+        public string? SerialNumber;
     }
 }

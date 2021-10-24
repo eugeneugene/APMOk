@@ -41,7 +41,7 @@ namespace APMOkSvc.Services
             {
                 int res = HW.EnumerateDisks(out var diskInfoEnum);
 
-                if (res != 0)
+                if (res != 0 || diskInfoEnum is null)
                 {
                     if (EnumerateDisksErrors.Errors.ContainsKey(res))
                         _logger.LogError("Hardware error: {0}", EnumerateDisksErrors.Errors[res]);
@@ -83,7 +83,7 @@ namespace APMOkSvc.Services
             }
 
             _logger.LogTrace("Reply: {0}", reply);
-        
+
             return reply;
         }
     }

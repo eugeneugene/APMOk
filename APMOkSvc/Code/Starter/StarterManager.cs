@@ -16,7 +16,7 @@ namespace APMOkSvc.Code
 
         public void Add(params IStarter[] starters)
         {
-            if (starters == null)
+            if (starters is null)
                 return;
             foreach (var starter in starters)
                 _starters.Add(starter.Platform, starter);
@@ -24,7 +24,7 @@ namespace APMOkSvc.Code
 
         public void Add(IStarter starter)
         {
-            if (starter == null)
+            if (starter is null)
                 return;
             _starters.Add(starter.Platform, starter);
         }

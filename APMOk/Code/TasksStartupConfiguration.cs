@@ -12,6 +12,9 @@ namespace APMOk.Code
         public TasksStartupConfiguration(IConfiguration configuration, ConfigurationParameterFactory parameterFactory)
             : base("TasksStartup", configuration)
         {
+            if (parameterFactory is null)
+                throw new ArgumentNullException(nameof(parameterFactory));
+
             PowerStatusReader = parameterFactory.CreateParameter(this, nameof(PowerStatusReader), nameof(PowerStatusReader),
                 new TaskStartupParameterDecorator<ITaskStartup>(new TaskStartupParameter(TimeSpan.FromSeconds(1))), "Периодичность чтения статуса батареи");
             DiskStatusReader = parameterFactory.CreateParameter(this, nameof(DiskStatusReader), nameof(DiskStatusReader),

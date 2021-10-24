@@ -111,7 +111,7 @@ namespace APMOkLib
 
         public override int GetHashCode() => filename.GetHashCode();
 
-        public override bool Equals(object o)
+        public override bool Equals(object? o)
         {
             if (o is not UnixEndPoint other)
                 return false;

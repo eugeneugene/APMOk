@@ -42,7 +42,7 @@ namespace APMOkSvc.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            if (modelBuilder == null)
+            if (modelBuilder is null)
                 throw new ArgumentNullException(nameof(modelBuilder));
 
             base.OnModelCreating(modelBuilder);
@@ -50,6 +50,6 @@ namespace APMOkSvc.Data
             modelBuilder.Entity<ConfigData>().Property(p => p.Id).ValueGeneratedOnAdd();
         }
 
-        public DbSet<ConfigData> ConfigDataSet { get; set; }
+        public DbSet<ConfigData> ConfigDataSet { get; set; } = default!;
     }
 }

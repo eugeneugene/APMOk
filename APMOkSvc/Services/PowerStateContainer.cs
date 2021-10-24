@@ -10,15 +10,15 @@ namespace APMOkSvc.Services
     /// </summary>
     public class PowerStateContainer
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private PowerStateReply _powerState;
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private PowerStateReply? _powerState;
 
-        public PowerStateReply PowerState
+        public PowerStateReply? PowerState
         {
             get => _powerState;
             set
             {
-                if (_powerState == null || !_powerState.Equals(value))
+                if (_powerState is null || !_powerState.Equals(value))
                 {
                     _powerState = value;
                     NotifyPropertyChanged(nameof(PowerState));
@@ -26,7 +26,7 @@ namespace APMOkSvc.Services
             }
         }
 
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        private void NotifyPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             if (string.IsNullOrEmpty(propertyName))
                 return;

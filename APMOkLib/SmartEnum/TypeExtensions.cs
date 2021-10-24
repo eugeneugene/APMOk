@@ -7,12 +7,15 @@ namespace APMOkLib.SmartEnum
 {
     internal static class TypeExtensions
     {
-        public static List<TFieldType> GetFieldsOfType<TFieldType>(this Type type)
+        public static IEnumerable<TFieldType> GetFieldsOfType<TFieldType>(this Type type)
         {
-            return type.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
-                .Where(p => type.IsAssignableFrom(p.FieldType))
-                .Select(pi => (TFieldType)pi.GetValue(null))
-                .ToList();
+            foreach (var t in type.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .Where(p => type.IsAssignableFrom(p.FieldType)))
+            {
+                var t1 = (TFieldType?)t?.GetValue(null);
+                if (t1 is not null)
+                    yield return t1;
+            }
         }
     }
 }

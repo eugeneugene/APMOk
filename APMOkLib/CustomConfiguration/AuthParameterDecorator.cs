@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System;
 
 namespace APMOkLib.CustomConfiguration
 {
@@ -15,11 +16,20 @@ namespace APMOkLib.CustomConfiguration
 
         public AuthParameterDecorator(IConfigurationParameter<AuthParameter> authParameter)
         {
-            _defaultValue = authParameter.Value;
+            if (authParameter is null)
+                throw new ArgumentNullException(nameof(authParameter));
+
+            _defaultValue = authParameter.Value ?? throw new ArgumentException("Value cannot be null");
         }
 
         public AuthParameter ExtractValue(IConfiguration configuration, string section)
         {
+            if (configuration is null)
+                throw new ArgumentNullException(nameof(configuration));
+
+            if (string.IsNullOrEmpty(section))
+                throw new ArgumentException($"'{nameof(section)}' cannot be null or empty.", nameof(section));
+
             if (configuration.GetSection(section).Exists())
             {
                 var value = configuration.GetValue(section, string.Empty);

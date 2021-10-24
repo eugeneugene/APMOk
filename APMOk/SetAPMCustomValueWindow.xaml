@@ -54,7 +54,7 @@
             Width="80"
             Command="localcommands:APMOkCommands.ButtonOkCommand"
             Content="Ok"
-            IsDefault="True" />
+            IsDefault="True"  Style="{StaticResource PressButtonEffectStyle}" />
     </StackPanel>
 
 </Window>

@@ -14,18 +14,23 @@ namespace APMOkLib
 
         public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            if (DateTime.TryParseExact(reader.GetString(), Format, FormatProvider, DateTimeStyles.AssumeLocal, out DateTime result))
+            var str = reader.GetString();
+            if (str is null)
+                return default;
+
+            if (DateTime.TryParseExact(str, Format, FormatProvider, DateTimeStyles.AssumeLocal, out DateTime result))
                 return result;
             return null;
         }
 
         public override void Write(Utf8JsonWriter writer, DateTime? value, JsonSerializerOptions options)
         {
-            if (writer == null)
+            if (writer is null)
                 throw new ArgumentNullException(nameof(writer));
-            if (!value.HasValue)
+            if (value is null)
                 writer.WriteNullValue();
-            writer.WriteStringValue(value.Value.ToString(Format, FormatProvider));
+            else
+                writer.WriteStringValue(value.Value.ToString(Format, FormatProvider));
         }
 
         public string Convert(DateTime? dateTime) => dateTime?.ToString(Format, FormatProvider) ?? "null";

@@ -413,6 +413,6 @@
                 </Grid>
             </GroupBox>
         </Grid>
-        <CheckBox Content="Start with Windows" x:Name="AutoRun" Margin="5" Checked="AutoRunChecked" Unchecked="AutoRunUnchecked" />
+        <CheckBox Content="Start with Windows" x:Name="AutoRun" Margin="5" Checked="AutoRunChecked" Unchecked="AutoRunUnchecked" Width="130"  HorizontalAlignment="Left"/>
     </StackPanel>
 </Window>

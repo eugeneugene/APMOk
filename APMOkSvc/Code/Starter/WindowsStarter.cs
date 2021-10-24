@@ -51,7 +51,7 @@ namespace APMOkSvc.Code
 
         public StarterArgumensResult ProcessCommandArgumens(ICollection<string> args)
         {
-            if (args == null)
+            if (args is null)
             {
                 Console.Error.WriteLine("Arguments are null");
                 return StarterArgumensResult.ExitError;
@@ -159,9 +159,9 @@ namespace APMOkSvc.Code
             }
 
             int i = 0;
-            if (console) 
+            if (console)
                 ++i;
-            if (install)                
+            if (install)
                 ++i;
             if (uninstall)
                 ++i;
@@ -171,7 +171,7 @@ namespace APMOkSvc.Code
                 ++i;
             if (restart)
                 ++i;
-            if (status) 
+            if (status)
                 ++i;
             if (i > 1)
             {
@@ -323,11 +323,14 @@ namespace APMOkSvc.Code
 
         public async Task<StarterRunResult> ProcessHostRunAsync(CancellationToken cancellationToken)
         {
-            EventWaitHandle @event = null;
+            EventWaitHandle? @event = null;
             try
             {
-                foreach (var line in VersionHelper.VersionLines)
-                    logger.Info(line);
+                if (VersionHelper.VersionLines is not null)
+                {
+                    foreach (var line in VersionHelper.VersionLines)
+                        logger.Info(line);
+                }
 
                 @event = new(true, EventResetMode.AutoReset, "__APMOKSVC_INSTANCE", out bool created);
                 if (!created)
@@ -368,7 +371,7 @@ namespace APMOkSvc.Code
         private IHostBuilder CreateHostBuilder(string[] args)
         {
             var socketPathProvider = new SocketPathProvider();
-            
+
             var hostbuilder = Host.CreateDefaultBuilder(args);
 
             hostbuilder = hostbuilder.ConfigureLogging(logging =>
@@ -391,9 +394,14 @@ namespace APMOkSvc.Code
             logger.Info("Using Windows Service");
             logger.Info("Using socket path: {0}", socketPathProvider.GetSocketPath());
 
-            var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
-            var pathToContentRoot = Path.GetDirectoryName(pathToExe);
-            Directory.SetCurrentDirectory(pathToContentRoot);
+            var Module = Process.GetCurrentProcess().MainModule;
+            if (Module is not null)
+            {
+                var pathToExe = Module.FileName;
+                var pathToContentRoot = Path.GetDirectoryName(pathToExe);
+                if (pathToContentRoot is not null)
+                    Directory.SetCurrentDirectory(pathToContentRoot);
+            }
 
             if (File.Exists(socketPathProvider.GetSocketPath()))
                 File.Delete(socketPathProvider.GetSocketPath());

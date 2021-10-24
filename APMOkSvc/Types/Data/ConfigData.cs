@@ -15,7 +15,7 @@ namespace APMOkSvc.Types.Data
         public Guid Id { get; set; }
 
         [Required]
-        public string DeviceID { get; set; }
+        public string? DeviceID { get; set; }
 
         [Required]
         public uint OnMains { get; set; }

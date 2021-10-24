@@ -7,7 +7,7 @@ namespace APMOkLib.CustomConfiguration
     {
         public static TaskOptions AutoStart(this TaskOptions taskOptions, ITaskStartup taskStartup)
         {
-            if (taskOptions == null)
+            if (taskOptions is null)
                 throw new ArgumentNullException(nameof(taskOptions));
             taskOptions.Interval = taskStartup.Interval;
             taskOptions.FirstRunDelay = taskStartup.FirstRunDelay;

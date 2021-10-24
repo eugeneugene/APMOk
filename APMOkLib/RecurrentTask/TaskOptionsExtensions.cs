@@ -6,7 +6,7 @@ namespace APMOkLib.RecurrentTasks
     {
         public static TaskOptions AutoStart(this TaskOptions taskOptions, TimeSpan interval)
         {
-            if (taskOptions == null)
+            if (taskOptions is null)
                 throw new ArgumentNullException(nameof(taskOptions));
             taskOptions.Interval = interval;
             return taskOptions;
@@ -19,7 +19,7 @@ namespace APMOkLib.RecurrentTasks
 
         public static TaskOptions AutoStart(this TaskOptions taskOptions, TimeSpan interval, TimeSpan firstRunDelay)
         {
-            if (taskOptions == null)
+            if (taskOptions is null)
                 throw new ArgumentNullException(nameof(taskOptions));
             taskOptions.Interval = interval;
             taskOptions.FirstRunDelay = firstRunDelay;

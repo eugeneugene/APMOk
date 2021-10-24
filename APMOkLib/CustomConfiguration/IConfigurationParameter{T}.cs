@@ -3,7 +3,7 @@
 
     public interface IConfigurationParameter<T> : IConfigurationParameter
     {
-        T Value { get; }
-        T DefaultValue { get; }
+        T? Value { get; }
+        T? DefaultValue { get; }
     }
 }

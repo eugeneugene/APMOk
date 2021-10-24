@@ -12,10 +12,10 @@ namespace APMOkLib
         private class EnumInfo
         {
             public string Name;
-            public Enum EnumValue;
+            public Enum? EnumValue;
             public ulong RawValue;
 
-            public EnumInfo(string name, Enum enumValue, ulong rawValue)
+            public EnumInfo(string name, Enum? enumValue, ulong rawValue)
             {
                 Name = name;
                 EnumValue = enumValue;
@@ -24,16 +24,16 @@ namespace APMOkLib
         }
 
         private readonly bool _AllowIntegerValues;
-        private readonly Type _UnderlyingType;
+        private readonly Type? _UnderlyingType;
         private readonly Type _EnumType;
         private readonly TypeCode _EnumTypeCode;
         private readonly bool _IsFlags;
         private readonly Dictionary<ulong, EnumInfo> _RawToTransformed;
         private readonly Dictionary<string, EnumInfo> _TransformedToRaw;
 
-        public JsonStringEnumStringNumConverter(JsonNamingPolicy namingPolicy, bool allowIntegerValues, Type underlyingType)
+        public JsonStringEnumStringNumConverter(JsonNamingPolicy? namingPolicy, bool allowIntegerValues, Type? underlyingType)
         {
-            Debug.Assert((typeof(T).IsEnum && underlyingType == null) || (Nullable.GetUnderlyingType(typeof(T)) == underlyingType), "Generic type is invalid");
+            Debug.Assert((typeof(T).IsEnum && underlyingType is null) || (Nullable.GetUnderlyingType(typeof(T)) == underlyingType), "Generic type is invalid");
 
             _AllowIntegerValues = allowIntegerValues;
             _UnderlyingType = underlyingType;
@@ -49,7 +49,7 @@ namespace APMOkLib
 
             for (int i = 0; i < builtInNames.Length; i++)
             {
-                Enum enumValue = (Enum)builtInValues.GetValue(i);
+                var enumValue = (Enum?)builtInValues.GetValue(i);
                 ulong rawValue = GetEnumValue(enumValue);
 
                 string name = builtInNames[i];
@@ -66,7 +66,7 @@ namespace APMOkLib
 
             if (token == JsonTokenType.String)
             {
-                string enumString = reader.GetString();
+                string enumString = reader.GetString() ?? string.Empty;
 
                 if (_IsFlags)
                 {
@@ -77,9 +77,9 @@ namespace APMOkLib
                         (string val11, ulong? val12) = ParseStringEnum(flagValue);
 
                         // Case sensitive search attempted first.
-                        if (_TransformedToRaw.TryGetValue(val11, out EnumInfo enumInfo1))
+                        if (_TransformedToRaw.TryGetValue(val11, out EnumInfo? enumInfo1))
                             calculatedValue |= enumInfo1.RawValue;
-                        else if (val12 is not null && _TransformedToRaw.TryGetValue(val12.Value.ToString(), out EnumInfo enumInfo3))
+                        else if (val12 is not null && _TransformedToRaw.TryGetValue(val12.Value.ToString(), out EnumInfo? enumInfo3))
                             calculatedValue |= enumInfo3.RawValue;
                         else
                         {
@@ -98,7 +98,7 @@ namespace APMOkLib
                             // Search by the numeric part at last
                             if (!matched)
                             {
-                                if (val12 is not null && _RawToTransformed.TryGetValue(val12.Value, out EnumInfo enumInfo4))
+                                if (val12 is not null && _RawToTransformed.TryGetValue(val12.Value, out EnumInfo? enumInfo4))
                                 {
                                     calculatedValue |= enumInfo4.RawValue;
                                     matched = true;
@@ -116,7 +116,7 @@ namespace APMOkLib
                 (string val21, ulong? val22) = ParseStringEnum(enumString);
 
                 // Case sensitive search attempted first.
-                if (_TransformedToRaw.TryGetValue(val21, out EnumInfo enumInfo2))
+                if (_TransformedToRaw.TryGetValue(val21, out EnumInfo? enumInfo2))
                     return (T)Enum.ToObject(_EnumType, enumInfo2.RawValue);
 
                 // Case insensitive search attempted second.
@@ -127,7 +127,7 @@ namespace APMOkLib
                 }
 
                 // Search by the numeric part at last
-                if (val22 is not null && _RawToTransformed.TryGetValue(val22.Value, out EnumInfo enumInfo5))
+                if (val22 is not null && _RawToTransformed.TryGetValue(val22.Value, out EnumInfo? enumInfo5))
                     return (T)Enum.ToObject(_EnumType, enumInfo5.RawValue);
 
                 throw new JsonException($"Unknown value {enumString}.");
@@ -178,12 +178,12 @@ namespace APMOkLib
 
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         {
-            // Note: There is no check for value == null because Json serializer won't call the converter in that case.
+            // Note: There is no check for value is null because Json serializer won't call the converter in that case.
             ulong rawValue = GetEnumValue(value!);
 
-            if (_RawToTransformed.TryGetValue(rawValue, out EnumInfo enumInfo))
+            if (_RawToTransformed.TryGetValue(rawValue, out EnumInfo? enumInfo1))
             {
-                writer.WriteStringValue($"{enumInfo.Name} ({enumInfo.RawValue})");
+                writer.WriteStringValue($"{enumInfo1.Name} ({enumInfo1.RawValue})");
                 return;
             }
 
@@ -194,8 +194,8 @@ namespace APMOkLib
                 StringBuilder Builder = new();
                 foreach (KeyValuePair<ulong, EnumInfo> enumItem in _RawToTransformed)
                 {
-                    enumInfo = enumItem.Value;
-                    if (!(value as Enum)!.HasFlag(enumInfo.EnumValue) || enumInfo.RawValue == 0) // Definitions with 'None' should hit the cache case.
+                    EnumInfo enumInfo = enumItem.Value;
+                    if (!(value as Enum)!.HasFlag(enumInfo.EnumValue!) || enumInfo.RawValue == 0) // Definitions with 'None' should hit the cache case.
                         continue;
 
                     // Track the value to make sure all bits are represented.
@@ -247,8 +247,11 @@ namespace APMOkLib
             }
         }
 
-        private ulong GetEnumValue(object value)
+        private ulong GetEnumValue(object? value)
         {
+            if (value is null)
+                return 0UL;
+
             return _EnumTypeCode switch
             {
                 TypeCode.Int32 => (ulong)(int)value,

@@ -27,7 +27,7 @@ namespace APMOkLib.CustomConfiguration
 
         public IReadOnlyCollection<ISmartConfiguration> SmartConfigurations => _parameters.Keys.AsReadOnly();
 
-        public IReadOnlyCollection<IConfigurationParameter> GetConfigurationParameters(ISmartConfiguration smartConfiguration)
+        public IReadOnlyCollection<IConfigurationParameter>? GetConfigurationParameters(ISmartConfiguration smartConfiguration)
         {
             if (smartConfiguration is null)
                 throw new ArgumentNullException(nameof(smartConfiguration));
@@ -46,10 +46,10 @@ namespace APMOkLib.CustomConfiguration
             public string Name { get; }
             public string Section { get; }
             public string Description { get; }
-            public T Value => _defaultValueDecorator.ExtractValue(_smartConfiguration.Configuration, Section);
-            public string StringValue => Value?.ToString();
-            public T DefaultValue => _defaultValueDecorator.DefaultValue;
-            public string StringDefaultValue => DefaultValue?.ToString();
+            public T? Value => _defaultValueDecorator.ExtractValue(_smartConfiguration.Configuration, Section);
+            public string? StringValue => Value!.ToString();
+            public T? DefaultValue => _defaultValueDecorator.DefaultValue;
+            public string? StringDefaultValue => DefaultValue!.ToString();
             public bool Exists => _smartConfiguration.Configuration.GetSection(Section).Exists();
 
             public ConfigurationParameter(ISmartConfiguration smartConfiguration, string name, string subSection, IParameterDecorator<T> defaultValueDecorator, string description)
@@ -58,7 +58,7 @@ namespace APMOkLib.CustomConfiguration
                 Name = name;
                 Section = _smartConfiguration.SectionName + ":" + subSection;
                 Description = description;
-                _defaultValueDecorator = defaultValueDecorator;
+                _defaultValueDecorator = defaultValueDecorator ?? throw new ArgumentNullException(nameof(defaultValueDecorator));
             }
         }
     }

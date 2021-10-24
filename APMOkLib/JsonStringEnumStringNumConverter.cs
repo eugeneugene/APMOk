@@ -10,7 +10,7 @@ namespace APMOkLib
     /// </summary>
     public class JsonStringEnumStringNumConverter : JsonConverterFactory
     {
-        private readonly JsonNamingPolicy _NamingPolicy;
+        private readonly JsonNamingPolicy? _NamingPolicy;
         private readonly bool _AllowIntegerValues;
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace APMOkLib
         /// True to allow undefined enum values. When true, if an enum value isn't
         /// defined it will output as a number rather than a string.
         /// </param>
-        public JsonStringEnumStringNumConverter(JsonNamingPolicy namingPolicy = null, bool allowIntegerValues = true)
+        public JsonStringEnumStringNumConverter(JsonNamingPolicy? namingPolicy = null, bool allowIntegerValues = true)
         {
             _NamingPolicy = namingPolicy;
             _AllowIntegerValues = allowIntegerValues;
@@ -40,27 +40,27 @@ namespace APMOkLib
         /// <inheritdoc/>
         public override bool CanConvert(Type typeToConvert)
         {
-            // Don't perform a typeToConvert == null check for performance. Trust our callers will be nice.
+            // Don't perform a typeToConvert is null check for performance. Trust our callers will be nice.
             return typeToConvert.IsEnum
                 || (typeToConvert.IsGenericType && TestNullableEnum(typeToConvert).IsNullableEnum);
         }
 
         /// <inheritdoc/>
-        public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+        public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         {
-            (bool IsNullableEnum, Type UnderlyingType) = TestNullableEnum(typeToConvert);
+            (bool IsNullableEnum, Type? UnderlyingType) = TestNullableEnum(typeToConvert);
 
-            return (JsonConverter)Activator.CreateInstance(
+            return (JsonConverter?)Activator.CreateInstance(
                 typeof(JsonStringEnumStringNumConverter<>).MakeGenericType(typeToConvert),
                 BindingFlags.Instance | BindingFlags.Public,
                 binder: null,
-                args: new object[] { _NamingPolicy, _AllowIntegerValues, IsNullableEnum ? UnderlyingType : null },
+                args: new object?[] { _NamingPolicy, _AllowIntegerValues, IsNullableEnum ? UnderlyingType : null },
                 culture: null);
         }
 
-        private static (bool IsNullableEnum, Type UnderlyingType) TestNullableEnum(Type typeToConvert)
+        private static (bool IsNullableEnum, Type? UnderlyingType) TestNullableEnum(Type typeToConvert)
         {
-            Type UnderlyingType = Nullable.GetUnderlyingType(typeToConvert);
+            Type? UnderlyingType = Nullable.GetUnderlyingType(typeToConvert);
 
             return (UnderlyingType?.IsEnum ?? false, UnderlyingType);
         }

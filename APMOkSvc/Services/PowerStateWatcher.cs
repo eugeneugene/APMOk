@@ -47,7 +47,7 @@ namespace APMOkSvc.Services
             return Task.CompletedTask;
         }
 
-        private async void PowerStateChangeDelegate(object sender, PropertyChangedEventArgs e)
+        private async void PowerStateChangeDelegate(object? sender, PropertyChangedEventArgs e)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace APMOkSvc.Services
             }
         }
 
-        private async Task PowerStateChangeAsync(object sender, PropertyChangedEventArgs e, CancellationToken cancellationToken)
+        private async Task PowerStateChangeAsync(object? sender, PropertyChangedEventArgs e, CancellationToken cancellationToken)
         {
             if (e.PropertyName == "PowerState")
             {

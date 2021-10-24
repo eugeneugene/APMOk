@@ -49,13 +49,13 @@ namespace APMOkSvc.Services
 #if DEBUG
                 if (request.DeviceID == _testDriveService.TestDriveDiskInfoEntry.DeviceID)
                 {
-                    reply.APMValue = _powerStatusContainer.PowerState.PowerState.PowerSource switch
+                    reply.APMValue = _powerStatusContainer.PowerState?.PowerState.PowerSource switch
                     {
                         EPowerSource.Mains => _testDriveService.OnMainsApmValue,
                         EPowerSource.Battery => _testDriveService.OnBatteriesApmValue,
                         _ => 0U,
                     };
-                    reply.PowerSource = _powerStatusContainer.PowerState.PowerState.PowerSource;
+                    reply.PowerSource = _powerStatusContainer.PowerState?.PowerState.PowerSource ?? EPowerSource.Unknown;
                     reply.ReplyResult = 1;
                 }
                 else
@@ -63,7 +63,7 @@ namespace APMOkSvc.Services
                 if (HW.GetAPM(request.DeviceID, out uint apmValue))
                 {
                     reply.APMValue = apmValue;
-                    reply.PowerSource = _powerStatusContainer.PowerState.PowerState.PowerSource;
+                    reply.PowerSource = _powerStatusContainer.PowerState?.PowerState.PowerSource ?? EPowerSource.Unknown;
                     reply.ReplyResult = 1;
                 }
                 else
@@ -89,7 +89,7 @@ namespace APMOkSvc.Services
             var reply = new APMReply { ReplyResult = 0, };
             try
             {
-                var powerSource = _powerStatusContainer.PowerState.PowerState.PowerSource;
+                var powerSource = _powerStatusContainer.PowerState?.PowerState.PowerSource ?? EPowerSource.Unknown;
 
 #if DEBUG
                 if (request.DeviceID == _testDriveService.TestDriveDiskInfoEntry.DeviceID)

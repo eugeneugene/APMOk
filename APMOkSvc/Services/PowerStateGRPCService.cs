@@ -21,7 +21,7 @@ namespace APMOkSvc.Services
             _logger.LogTrace("Creating {0}", GetType().Name);
         }
 
-        public override Task<PowerStateReply> GetPowerState(Empty request, ServerCallContext context)
+        public override Task<PowerStateReply?> GetPowerState(Empty request, ServerCallContext context)
         {
             var reply = _powerStatusContainer.PowerState;
 

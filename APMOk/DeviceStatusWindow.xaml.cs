@@ -149,7 +149,12 @@ namespace APMOk
 
             if (e.OriginalSource is ComboBox comboBox && comboBox.SelectedItem is DiskInfoEntry selectedItem)
             {
-                var availability = Availability.FromValue((ushort)selectedItem.Availability).Name;
+                var value = Availability.FromValue((ushort)selectedItem.Availability);
+
+                if (value is null)
+                    return;
+
+                var availability = value.Name;
                 DiskInfoItems[nameof(selectedItem.Availability)] = availability;
                 DiskInfoItems[nameof(selectedItem.Caption)] = selectedItem.Caption;
                 DiskInfoItems[nameof(selectedItem.Description)] = selectedItem.Description;

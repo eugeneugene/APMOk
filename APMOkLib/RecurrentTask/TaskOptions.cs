@@ -9,7 +9,7 @@ namespace APMOkLib.RecurrentTasks
         /// <summary>
         /// If non-null, current thread culture will be set to this value before <see cref="IRunnable.RunAsync"/> is called
         /// </summary>
-        public CultureInfo RunCulture { get; set; }
+        public CultureInfo? RunCulture { get; set; }
 
         /// <summary>
         /// Auto-start task when IHostedService.StartAsync is called (default <b>true</b>)
@@ -30,10 +30,10 @@ namespace APMOkLib.RecurrentTasks
         /// <summary>
         /// Return <b>false</b> to cancel/skip task run
         /// </summary>
-        public Func<IServiceProvider, ITask, Task<bool>> BeforeRun { get; set; }
+        public Func<IServiceProvider, ITask, Task<bool>>? BeforeRun { get; set; }
 
-        public Func<IServiceProvider, ITask, Task> AfterRunSuccess { get; set; }
+        public Func<IServiceProvider, ITask, Task>? AfterRunSuccess { get; set; }
 
-        public Func<IServiceProvider, ITask, Exception, Task> AfterRunFail { get; set; }
+        public Func<IServiceProvider, ITask, Exception, Task>? AfterRunFail { get; set; }
     }
 }

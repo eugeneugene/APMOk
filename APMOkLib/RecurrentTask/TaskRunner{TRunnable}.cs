@@ -14,9 +14,9 @@ namespace APMOkLib.RecurrentTasks
 
         private readonly ILogger logger;
 
-        private Task mainTask;
+        private Task? mainTask;
 
-        private CancellationTokenSource cancellationTokenSource;
+        private CancellationTokenSource? cancellationTokenSource;
 
         private bool disposed;
 
@@ -28,7 +28,7 @@ namespace APMOkLib.RecurrentTasks
         /// <param name="serviceScopeFactory">Фабрика для создания Scope (при запуске задачи)</param>
         public TaskRunner(ILoggerFactory loggerFactory, TaskOptions<TRunnable> options, IServiceScopeFactory serviceScopeFactory)
         {
-            if (loggerFactory == null)
+            if (loggerFactory is null)
                 throw new ArgumentNullException(nameof(loggerFactory));
        
             logger = loggerFactory.CreateLogger($"{GetType().Namespace}.{nameof(TaskRunner<TRunnable>)}<{typeof(TRunnable).FullName}>");
@@ -128,15 +128,15 @@ namespace APMOkLib.RecurrentTasks
         public void Stop()
         {
             logger.LogInformation("<{0}>.Stop() called...", RunnableType.Name);
-            if (mainTask == null)
+            if (mainTask is null)
                 throw new InvalidOperationException("Can't stop without start");
 
-            cancellationTokenSource.Cancel();
+            cancellationTokenSource?.Cancel();
         }
 
         public void TryRunImmediately()
         {
-            if (mainTask == null)
+            if (mainTask is null)
                 throw new InvalidOperationException("Can't run without Start");
 
             runImmediately.Set();
@@ -158,7 +158,7 @@ namespace APMOkLib.RecurrentTasks
                 catch (Exception ex)
                 {
                     logger.LogError(ex.ToString());
-                    cancellationTokenSource.Cancel();
+                    cancellationTokenSource?.Cancel();
                 }
 
                 if (cancellationToken.IsCancellationRequested)
@@ -232,7 +232,7 @@ namespace APMOkLib.RecurrentTasks
                 if (Options.Interval.Ticks == 0)
                 {
                     logger.LogWarning("Interval equal to zero. Stopping...");
-                    cancellationTokenSource.Cancel();
+                    cancellationTokenSource?.Cancel();
                 }
                 else
                     sleepInterval = Options.Interval; // return to normal (important after first run only)

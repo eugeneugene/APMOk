@@ -11,18 +11,21 @@ namespace APMOkLib.CustomConfiguration
 
         public TaskStartupParameterDecorator(T defaultValue)
         {
-            _defaultValue = defaultValue;
+            _defaultValue = defaultValue ?? throw new ArgumentNullException(nameof(defaultValue));
         }
 
         public TaskStartupParameterDecorator(IConfigurationParameter<T> defaultValue)
         {
-            _defaultValue = defaultValue.Value;
+            if (defaultValue is null)
+                throw new ArgumentNullException(nameof(defaultValue));
+
+            _defaultValue = defaultValue.Value ?? throw new ArgumentException("Default Value cannot be null");
         }
 
-        public T ExtractValue(IConfiguration configuration, string section)
+        public T? ExtractValue(IConfiguration configuration, string section)
         {
-            TimeSpan Interval = _defaultValue.Interval;
-            TimeSpan FirstRunDelay = _defaultValue.FirstRunDelay;
+            TimeSpan Interval = _defaultValue!.Interval;
+            TimeSpan FirstRunDelay = _defaultValue!.FirstRunDelay;
             if (configuration.GetSection(section).Exists())
             {
                 var val = configuration.GetValue(section, string.Empty);

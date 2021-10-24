@@ -56,7 +56,7 @@ namespace APMOk.Models
             get => _systemDiskInfo;
             set
             {
-                if (_systemDiskInfo == null || !_systemDiskInfo.Equals(value))
+                if (_systemDiskInfo is null || !_systemDiskInfo.Equals(value))
                 {
                     _systemDiskInfo = value;
                     NotifyPropertyChanged(nameof(SystemDiskInfo));
@@ -69,7 +69,7 @@ namespace APMOk.Models
             get => _powerState;
             set
             {
-                if (_powerState == null || !_powerState.Equals(value))
+                if (_powerState is null || !_powerState.Equals(value))
                 {
                     _powerState = value;
                     NotifyPropertyChanged(nameof(PowerState));

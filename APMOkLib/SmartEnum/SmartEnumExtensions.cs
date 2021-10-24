@@ -15,7 +15,7 @@ namespace APMOkLib.SmartEnum
         /// <param name="type"></param>
         /// <param name="genericArguments"></param>
         /// <returns></returns>
-        public static bool IsSmartEnum(this Type type, out Type[] genericArguments)
+        public static bool IsSmartEnum(this Type type, out Type[]? genericArguments)
         {
             if (type is null || type.IsAbstract || type.IsGenericTypeDefinition)
             {
@@ -23,34 +23,41 @@ namespace APMOkLib.SmartEnum
                 return false;
             }
 
+            Type? ntype = type;
             do
             {
-                if (type.IsGenericType &&
-                    type.GetGenericTypeDefinition() == typeof(SmartEnum<,>))
+                if (ntype!.IsGenericType && ntype.GetGenericTypeDefinition() == typeof(SmartEnum<,>))
                 {
-                    genericArguments = type.GetGenericArguments();
+                    genericArguments = ntype.GetGenericArguments();
                     return true;
                 }
 
-                type = type.BaseType;
+                ntype = ntype.BaseType;
             }
-            while (!(type is null));
+            while (ntype is not null);
 
             genericArguments = null;
             return false;
         }
 
-        public static bool TryGetValues(this Type type, out IEnumerable<object> enums)
+        public static bool TryGetValues(this Type type, out IEnumerable<object>? enums)
         {
-            while (type != null)
+            Type? ntype = type;
+            while (ntype is not null)
             {
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(SmartEnum<,>))
+                if (ntype.IsGenericType && ntype.GetGenericTypeDefinition() == typeof(SmartEnum<,>))
                 {
-                    var listPropertyInfo = type.GetProperty("List", BindingFlags.Public | BindingFlags.Static);
-                    enums = (IEnumerable<object>)listPropertyInfo.GetValue(type, null);
+                    var listPropertyInfo = ntype.GetProperty("List", BindingFlags.Public | BindingFlags.Static);
+                    if (listPropertyInfo is null)
+                    {
+                        enums = null;
+                        return false;
+                    }
+
+                    enums = (IEnumerable<object>?)listPropertyInfo.GetValue(ntype!, null);
                     return true;
                 }
-                type = type.BaseType;
+                ntype = ntype.BaseType;
             }
 
             enums = null;

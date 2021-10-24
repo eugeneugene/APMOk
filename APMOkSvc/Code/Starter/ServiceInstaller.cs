@@ -25,7 +25,7 @@ namespace APMOkSvc.Code
 
         #region OpenSCManager
         [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern IntPtr OpenSCManager(string machineName, string databaseName, ScmAccessRights dwDesiredAccess);
+        private static extern IntPtr OpenSCManager(string? machineName, string? databaseName, ScmAccessRights dwDesiredAccess);
         #endregion
 
         #region OpenService
@@ -35,7 +35,9 @@ namespace APMOkSvc.Code
 
         #region CreateService
         [DllImport("advapi32.dll", EntryPoint = "CreateServiceW", ExactSpelling = true, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern IntPtr CreateService(IntPtr hSCManager, string lpServiceName, string lpDisplayName, ServiceAccessRights dwDesiredAccess, int dwServiceType, ServiceBootFlag dwStartType, ServiceError dwErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, IntPtr lpdwTagId, string lpDependencies, string lp, string lpPassword);
+        private static extern IntPtr CreateService(IntPtr hSCManager, string lpServiceName, string lpDisplayName, ServiceAccessRights dwDesiredAccess,
+            int dwServiceType, ServiceBootFlag dwStartType, ServiceError dwErrorControl, string lpBinaryPathName, string? lpLoadOrderGroup,
+            IntPtr lpdwTagId, string? lpDependencies, string? lp, string? lpPassword);
         #endregion
 
         #region CloseServiceHandle
@@ -84,7 +86,19 @@ namespace APMOkSvc.Code
                 IntPtr service = OpenService(scm, serviceName, ServiceAccessRights.AllAccess);
 
                 if (service == IntPtr.Zero)
-                    service = CreateService(scm, serviceName, displayName, ServiceAccessRights.AllAccess, SERVICE_WIN32_OWN_PROCESS, bootFlag, ServiceError.Normal, fileName, null, IntPtr.Zero, null, null, null);
+                    service = CreateService(hSCManager: scm,
+                        lpServiceName: serviceName,
+                        lpDisplayName: displayName,
+                        dwDesiredAccess: ServiceAccessRights.AllAccess,
+                        dwServiceType: SERVICE_WIN32_OWN_PROCESS,
+                        dwStartType: bootFlag,
+                        dwErrorControl: ServiceError.Normal,
+                        lpBinaryPathName: fileName,
+                        lpLoadOrderGroup: null,
+                        lpdwTagId: IntPtr.Zero,
+                        lpDependencies: null,
+                        lp: null,
+                        lpPassword: null);
 
                 if (service == IntPtr.Zero)
                 {
@@ -525,7 +539,7 @@ namespace APMOkSvc.Code
     {
         public string lpDescription;
 
-        public override bool Equals(object obj) => string.Equals(lpDescription, obj.ToString());
+        public override bool Equals(object? obj) => lpDescription.Equals(obj);
 
         public override int GetHashCode() => lpDescription.GetHashCode();
 
@@ -539,13 +553,13 @@ namespace APMOkSvc.Code
     {
         public int dwResetPeriod;
         [MarshalAs(UnmanagedType.LPWStr)]
-        public string lpRebootMsg;
+        public string? lpRebootMsg;
         [MarshalAs(UnmanagedType.LPWStr)]
-        public string lpCommand;
+        public string? lpCommand;
         public int cActions;
         public IntPtr lpsaActions;
 
-        public override bool Equals(object obj) => obj switch
+        public override bool Equals(object? obj) => obj switch
         {
             SERVICE_FAILURE_ACTIONS o => dwResetPeriod == o.dwResetPeriod && lpRebootMsg == o.lpRebootMsg && lpCommand == o.lpCommand && cActions == o.cActions && lpsaActions == o.lpsaActions,
             _ => false
@@ -576,7 +590,7 @@ namespace APMOkSvc.Code
         public ScActionType Type;
         public int Delay;
 
-        public override bool Equals(object obj) => obj switch
+        public override bool Equals(object? obj) => obj switch
         {
             SC_ACTION o => Type == o.Type && Delay == o.Delay,
             _ => false

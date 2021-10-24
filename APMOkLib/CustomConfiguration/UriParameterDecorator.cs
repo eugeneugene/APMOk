@@ -5,24 +5,27 @@ namespace APMOkLib.CustomConfiguration
 {
     public class UriParameterDecorator : IParameterDecorator<Uri>
     {
-        private readonly Uri _defaultUri = null;
+        private readonly Uri? _defaultUri = null;
 
-        public Uri DefaultValue => _defaultUri;
+        public Uri? DefaultValue => _defaultUri;
 
         public UriParameterDecorator()
         { }
 
-        public UriParameterDecorator(Uri uri)
+        public UriParameterDecorator(Uri? uri)
         {
-            _defaultUri = uri;
+            _defaultUri = uri ?? throw new ArgumentNullException(nameof(uri));
         }
 
-        public UriParameterDecorator(IConfigurationParameter<Uri> uriParameter)
+        public UriParameterDecorator(IConfigurationParameter<Uri>? uriParameter)
         {
-            _defaultUri = uriParameter.Value;
+            if (uriParameter is null)
+                throw new ArgumentNullException(nameof(uriParameter));
+
+            _defaultUri = uriParameter.Value ?? throw new ArgumentException("Default Value cannot be null");
         }
 
-        public Uri ExtractValue(IConfiguration configuration, string section)
+        public Uri? ExtractValue(IConfiguration configuration, string section)
         {
             if (configuration.GetSection(section).Exists())
             {

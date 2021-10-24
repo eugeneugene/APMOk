@@ -15,8 +15,8 @@
             Valid = valid;
         }
 
-        public string Login { get; }
-        public string Password { get; }
+        public string? Login { get; }
+        public string? Password { get; }
         public bool Valid { get; }
     }
 }

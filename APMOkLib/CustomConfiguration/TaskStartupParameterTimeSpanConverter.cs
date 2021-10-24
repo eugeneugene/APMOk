@@ -8,7 +8,7 @@ namespace APMOkLib.CustomConfiguration
     {
         public override TimeSpan Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            string enumValue = reader.GetString();
+            var enumValue = reader.GetString();
             if (TimeSpan.TryParse(enumValue, out TimeSpan result))
                 return result;
 

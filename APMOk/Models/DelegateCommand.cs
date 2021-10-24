@@ -18,7 +18,7 @@ namespace APMOk.Models
 
         public bool CanExecute(object? parameter)
         {
-            return CanExecuteFunc == null || CanExecuteFunc();
+            return CanExecuteFunc is null || CanExecuteFunc();
         }
 
         public event EventHandler? CanExecuteChanged

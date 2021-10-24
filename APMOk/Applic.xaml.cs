@@ -12,6 +12,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 
@@ -22,6 +23,26 @@ namespace APMOk
         private IHost? host = null;
         private TaskbarIcon? notifyIcon = null;
         private bool disposedValue = false;
+
+        [STAThread()]
+        public static void Main()
+        {
+            EventWaitHandle? @event = null;
+            try
+            {
+                @event = new(true, EventResetMode.AutoReset, "__APMOKAPP_INSTANCE", out bool created);
+                if (!created)
+                    return;
+
+                Applic app = new();
+                app.InitializeComponent();
+                app.Run();
+            }
+            finally
+            {
+                @event?.Dispose();
+            }
+        }
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -55,8 +76,16 @@ namespace APMOk
                     services.AddSingleton<ConfigurationParameterFactory>();
                     services.AddSingleton<ITasksStartupConfiguration, TasksStartupConfiguration>();
 
-                    services.AddTask<PowerStatusReaderTask>(options => options.TaskOptions.AutoStart(options.ServiceProvider.GetRequiredService<ITasksStartupConfiguration>().PowerStatusReader.Value));
-                    services.AddTask<DiskInfoReaderTask>(options => options.TaskOptions.AutoStart(options.ServiceProvider.GetRequiredService<ITasksStartupConfiguration>().DiskStatusReader.Value));
+                    services.AddTask<PowerStatusReaderTask>((options) =>
+                    {
+                        var service = options.ServiceProvider.GetRequiredService<ITasksStartupConfiguration>();
+                            options.TaskOptions.AutoStart(service.PowerStatusReader.Value!);
+                    });
+                    services.AddTask<DiskInfoReaderTask>((options) =>
+                    {
+                        var service = options.ServiceProvider.GetRequiredService<ITasksStartupConfiguration>();
+                            options.TaskOptions.AutoStart(service.DiskStatusReader.Value!);
+                    });
                 });
                 host = hostBuilder.Build();
                 await host.StartAsync();
