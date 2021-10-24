@@ -40,7 +40,7 @@ namespace APMOk.Services
             return Task.CompletedTask;
         }
 
-        private void APMOkDataPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void APMOkDataPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "ConnectFailure" && !_apmOkModel.ConnectFailure)
             {

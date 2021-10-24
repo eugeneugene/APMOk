@@ -63,8 +63,8 @@ namespace APMOk.Models
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             if (string.IsNullOrEmpty(propertyName))
                 return;
@@ -72,14 +72,14 @@ namespace APMOk.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public bool Equals(APMValueProperty other)
+        public bool Equals(APMValueProperty? other)
         {
             if (ReferenceEquals(this, other))
                 return true;
-            return _onMains == other.OnMains && _onBatteries == other._onBatteries && _current == other._current;
+            return other is not null && _onMains ==  other.OnMains && _onBatteries == other._onBatteries && _current == other._current;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as APMValueProperty);
         }

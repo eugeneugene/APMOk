@@ -6,6 +6,6 @@ namespace APMOk.Services
     internal interface IGrpcChannelProvider
     {
         GrpcChannel GetHttpGrpcChannel();
-        GrpcChannel GetHttpsGrpcChannel(RemoteCertificateValidationCallback remoteCertificateValidationCallback = null);
+        GrpcChannel GetHttpsGrpcChannel(RemoteCertificateValidationCallback? remoteCertificateValidationCallback = null);
     }
 }

@@ -13,7 +13,7 @@ namespace APMOk.Models
     public class NotifyIconViewModel
     {
         private readonly IServiceProvider _services;
-        private DeviceStatusWindow deviceStatusWindow;
+        private DeviceStatusWindow? deviceStatusWindow;
 
         public NotifyIconViewModel(IServiceProvider services)
         {
@@ -30,16 +30,19 @@ namespace APMOk.Models
                 if (deviceStatusWindow == null || deviceStatusWindow.IsClosed())
                     deviceStatusWindow = _services.GetService(typeof(DeviceStatusWindow)) as DeviceStatusWindow;
 
-                if (!deviceStatusWindow.IsVisible)
-                    deviceStatusWindow.Show();
+                if (deviceStatusWindow is not null)
+                {
+                    if (!deviceStatusWindow.IsVisible)
+                        deviceStatusWindow.Show();
 
-                if (deviceStatusWindow.WindowState == WindowState.Minimized)
-                    deviceStatusWindow.WindowState = WindowState.Normal;
+                    if (deviceStatusWindow.WindowState == WindowState.Minimized)
+                        deviceStatusWindow.WindowState = WindowState.Normal;
 
-                deviceStatusWindow.Activate();
-                deviceStatusWindow.Topmost = true;  // important
-                deviceStatusWindow.Topmost = false; // important
-                deviceStatusWindow.Focus();         // important
+                    deviceStatusWindow.Activate();
+                    deviceStatusWindow.Topmost = true;  // important
+                    deviceStatusWindow.Topmost = false; // important
+                    deviceStatusWindow.Focus();         // important
+                }
             }
         };
 

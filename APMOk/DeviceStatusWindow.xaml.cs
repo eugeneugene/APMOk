@@ -43,7 +43,7 @@ namespace APMOk
 
         public ObservableConcurrentDictionary<string, object> PowerStateItems { get; } = new();
 
-        public APMValueProperty APMValue { get; }
+        public APMValueProperty? APMValue { get; }
 
         public DeviceStatusWindow(IServiceProvider scopeServiceProvider, APMOkModel apmOkModel)
         {
@@ -52,8 +52,9 @@ namespace APMOk
             _scopeServiceProvider = scopeServiceProvider;
             _apmOkModel = apmOkModel;
 
-            CollectionViewSource deviceStatusDataSource = FindResource("DeviceStatusDataSource") as CollectionViewSource;
-            deviceStatusDataSource.Source = DiskInfo;
+            CollectionViewSource? deviceStatusDataSource = FindResource("DeviceStatusDataSource") as CollectionViewSource;
+            if (deviceStatusDataSource is not null)
+                deviceStatusDataSource.Source = DiskInfo;
 
             DriveStatusGrid.DataContext = DiskInfoItems;
             BatteryStatusGrid.DataContext = PowerStateItems;
@@ -70,24 +71,16 @@ namespace APMOk
             UpdateIcon();
             _apmOkModel.PropertyChanged += APMOkDataChanged;
 
-            try
-            {
-                var software = Registry.CurrentUser.OpenSubKey("SOFTWARE", false);
-                var microsoft = software.OpenSubKey("Microsoft", false);
-                var windows = microsoft.OpenSubKey("Windows", false);
-                var currentVersion = windows.OpenSubKey("CurrentVersion", false);
-                var run = currentVersion.OpenSubKey("Run", true);
-                if (run.GetValue("APMOk") is not null)
-                    AutoRun.IsChecked = true;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Exception: {0}", ex.Message);
-            }
-
+            var software = Registry.CurrentUser.OpenSubKey("SOFTWARE", false);
+            var microsoft = software?.OpenSubKey("Microsoft", false);
+            var windows = microsoft?.OpenSubKey("Windows", false);
+            var currentVersion = windows?.OpenSubKey("CurrentVersion", false);
+            var run = currentVersion?.OpenSubKey("Run", true);
+            if (run?.GetValue("APMOk") is not null)
+                AutoRun.IsChecked = true;
         }
 
-        private void APMOkDataChanged(object sender, PropertyChangedEventArgs e)
+        private void APMOkDataChanged(object? sender, PropertyChangedEventArgs e)
         {
             Debug.WriteLine($"APMOkModel has changed: {e.PropertyName}");
             Debug.WriteLine("{0}", _apmOkModel);
@@ -170,9 +163,9 @@ namespace APMOk
 
         private void LoadAPMValue()
         {
-            string deviceId = DiskInfoItems[nameof(DiskInfoEntry.DeviceID)] as string;
+            var deviceId = DiskInfoItems[nameof(DiskInfoEntry.DeviceID)] as string;
             var value = _apmOkModel.GetAPMValue(deviceId);
-            if (value is not null)
+            if (APMValue is not null && value is not null)
             {
                 Debug.WriteLine($"APMValue {value}");
                 APMValue.OnMains = value.OnMains;
@@ -207,7 +200,7 @@ namespace APMOk
             if (_apmOkModel.SystemDiskInfo is null || _apmOkModel.SystemDiskInfo.ReplyResult == 0)
                 return;
 
-            string selectedSerial = null;
+            string? selectedSerial = null;
             if (SelectDiskCombo.SelectedItem is DiskInfoEntry selectedItem)
                 selectedSerial = selectedItem.SerialNumber;
 
@@ -300,7 +293,7 @@ namespace APMOk
             uint ApmValue = parameter.ApmValue;
             EPowerSource powerSource = parameter.PowerSource;
 
-            string deviceId = DiskInfoItems[nameof(DiskInfoEntry.DeviceID)] as string;
+            var deviceId = DiskInfoItems[nameof(DiskInfoEntry.DeviceID)] as string;
             bool result;
             if (ApmValue == 0U)
             {
@@ -334,8 +327,8 @@ namespace APMOk
                 {
                     uint value = parameter.PowerSource switch
                     {
-                        EPowerSource.Mains => APMValue.OnMains,
-                        EPowerSource.Battery => APMValue.OnBatteries,
+                        EPowerSource.Mains => APMValue?.OnMains ?? 0U,
+                        EPowerSource.Battery => APMValue?.OnBatteries ?? 0U,
                         _ => 0U,
                     };
                     var dlg = new SetAPMCustomValueWindow(new APMCommandParameter()
@@ -372,15 +365,18 @@ namespace APMOk
             {
                 string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
                 var software = Registry.CurrentUser.OpenSubKey("SOFTWARE", false);
-                var microsoft = software.OpenSubKey("Microsoft", false);
-                var windows = microsoft.OpenSubKey("Windows", false);
-                var currentVersion = windows.OpenSubKey("CurrentVersion", false);
-                var run = currentVersion.OpenSubKey("Run", true);
-                if (Path.GetExtension(strExeFilePath) == ".dll")
-                    strExeFilePath = Path.ChangeExtension(strExeFilePath, ".exe");
-                if (strExeFilePath.Contains(' '))
-                    strExeFilePath = @"""" + strExeFilePath + @"""";
-                run.SetValue("APMOk", strExeFilePath);
+                var microsoft = software?.OpenSubKey("Microsoft", false);
+                var windows = microsoft?.OpenSubKey("Windows", false);
+                var currentVersion = windows?.OpenSubKey("CurrentVersion", false);
+                var run = currentVersion?.OpenSubKey("Run", true);
+                if (run is not null)
+                {
+                    if (Path.GetExtension(strExeFilePath) == ".dll")
+                        strExeFilePath = Path.ChangeExtension(strExeFilePath, ".exe");
+                    if (strExeFilePath.Contains(' '))
+                        strExeFilePath = @"""" + strExeFilePath + @"""";
+                    run.SetValue("APMOk", strExeFilePath);
+                }
             }
             catch (Exception ex)
             {
@@ -394,11 +390,11 @@ namespace APMOk
             try
             {
                 var software = Registry.CurrentUser.OpenSubKey("SOFTWARE", false);
-                var microsoft = software.OpenSubKey("Microsoft", false);
-                var windows = microsoft.OpenSubKey("Windows", false);
-                var currentVersion = windows.OpenSubKey("CurrentVersion", false);
-                var run = currentVersion.OpenSubKey("Run", true);
-                run.DeleteValue("APMOk");
+                var microsoft = software?.OpenSubKey("Microsoft", false);
+                var windows = microsoft?.OpenSubKey("Windows", false);
+                var currentVersion = windows?.OpenSubKey("CurrentVersion", false);
+                var run = currentVersion?.OpenSubKey("Run", true);
+                run?.DeleteValue("APMOk");
             }
             catch (Exception ex)
             {

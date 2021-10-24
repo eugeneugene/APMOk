@@ -17,10 +17,10 @@ using System.Windows.Markup;
 
 namespace APMOk
 {
-    public partial class App : Application, IDisposable
+    public partial class Applic : Application, IDisposable
     {
-        private IHost host = null;
-        private TaskbarIcon notifyIcon = null;
+        private IHost? host = null;
+        private TaskbarIcon? notifyIcon = null;
         private bool disposedValue = false;
 
         protected override async void OnStartup(StartupEventArgs e)
@@ -81,7 +81,7 @@ namespace APMOk
         protected override async void OnExit(ExitEventArgs e)
         {
             await host.StopAsync(TimeSpan.FromSeconds(5));
-            host.Dispose();
+            host?.Dispose();
             host = null;
             base.OnExit(e);
         }

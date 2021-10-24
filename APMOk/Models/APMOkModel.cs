@@ -13,17 +13,17 @@ namespace APMOk.Models
     /// </summary>
     public class APMOkModel : JsonToString, INotifyPropertyChanged
     {
-        private DisksReply _systemDiskInfo;
-        private PowerStateReply _powerState;
+        private DisksReply? _systemDiskInfo;
+        private PowerStateReply? _powerState;
         private bool _connectFailure;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         private readonly ObservableConcurrentDictionary<string, APMValueProperty> APMValueDictionary = new();
 
-        public APMValueProperty GetAPMValue(string deviceID)
+        public APMValueProperty? GetAPMValue(string? deviceID)
         {
-            if (APMValueDictionary.ContainsKey(deviceID))
+            if (deviceID is not null && APMValueDictionary.ContainsKey(deviceID))
                 return APMValueDictionary[deviceID];
             return null;
         }
@@ -39,7 +39,7 @@ namespace APMOk.Models
                     value.OnBatteries = apmValueProperty.OnBatteries;
                     value.Current = apmValueProperty.Current;
                     Debug.WriteLine($"{deviceID}, Updated APMValueProperty: {value}");
-                    PropertyChanged.Invoke(this, new(nameof(APMValueDictionary)));
+                    PropertyChanged?.Invoke(this, new(nameof(APMValueDictionary)));
                 }
             }
             else
@@ -47,11 +47,11 @@ namespace APMOk.Models
                 var value = new APMValueProperty(apmValueProperty.OnMains, apmValueProperty.OnBatteries, apmValueProperty.Current);
                 APMValueDictionary[deviceID] = value;
                 Debug.WriteLine($"{deviceID}, New APMValueProperty: {value}");
-                PropertyChanged.Invoke(this, new(nameof(APMValueDictionary)));
+                PropertyChanged?.Invoke(this, new(nameof(APMValueDictionary)));
             }
         }
 
-        public DisksReply SystemDiskInfo
+        public DisksReply? SystemDiskInfo
         {
             get => _systemDiskInfo;
             set
@@ -64,7 +64,7 @@ namespace APMOk.Models
             }
         }
 
-        public PowerStateReply PowerState
+        public PowerStateReply? PowerState
         {
             get => _powerState;
             set
@@ -90,7 +90,7 @@ namespace APMOk.Models
             }
         }
 
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        private void NotifyPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             if (string.IsNullOrEmpty(propertyName))
                 return;

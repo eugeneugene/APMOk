@@ -47,7 +47,7 @@ namespace APMOk.Tasks
                         DeviceID = entry.DeviceID,
                     }, cancellationToken);
 
-                    DriveAPMConfigurationReplyEntry driveAPMConfiguration = null;
+                    DriveAPMConfigurationReplyEntry? driveAPMConfiguration = null;
                     if (driveAPMConfigurationReply.ReplyResult != 0)
                         driveAPMConfiguration = driveAPMConfigurationReply.DriveAPMConfigurationReplyEntries.SingleOrDefault(item => item.DeviceID == entry.DeviceID);
                     if (driveAPMConfiguration is null)

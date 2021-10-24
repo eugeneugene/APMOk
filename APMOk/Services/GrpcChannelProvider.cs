@@ -17,7 +17,7 @@ namespace APMOk.Services
             _socketPathProvider = socketPathProvider;
         }
 
-        private static bool TrueRemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => true;
+        private static bool TrueRemoteCertificateValidationCallback(object sender, X509Certificate? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors) => true;
 
         public GrpcChannel GetHttpGrpcChannel()
         {
@@ -37,7 +37,7 @@ namespace APMOk.Services
             return channel;
         }
 
-        public GrpcChannel GetHttpsGrpcChannel(RemoteCertificateValidationCallback remoteCertificateValidationCallback = null)
+        public GrpcChannel GetHttpsGrpcChannel(RemoteCertificateValidationCallback? remoteCertificateValidationCallback = null)
         {
             var udsEndPoint = new UnixDomainSocketEndPoint(_socketPathProvider.GetSocketPath());
             var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);

@@ -7,7 +7,7 @@ namespace APMOk.Code.Converters
 {
     internal class PowerSourceConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is PowerStateReply reply)
             {
