@@ -1,9 +1,11 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace APMOk
 {
     internal static class Program
     {
+        [STAThread()]
         public static void Main()
         {
             EventWaitHandle? @event = null;
