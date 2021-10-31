@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace APMOkLib.CustomConfiguration
 {
-
     public class TaskStartupParameter : JsonToString, ITaskStartup
     {
         [JsonConverter(typeof(TaskStartupParameterTimeSpanConverter))]

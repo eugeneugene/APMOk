@@ -76,7 +76,7 @@ namespace APMOk.Models
         {
             if (ReferenceEquals(this, other))
                 return true;
-            return other is not null && _onMains ==  other.OnMains && _onBatteries == other._onBatteries && _current == other._current;
+            return other is not null && _onMains == other.OnMains && _onBatteries == other._onBatteries && _current == other._current;
         }
 
         public override bool Equals(object? obj)

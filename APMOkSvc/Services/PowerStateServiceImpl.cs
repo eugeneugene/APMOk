@@ -62,9 +62,9 @@ namespace APMOkSvc.Services
             {
                 _logger.LogError("{0}", ex);
             }
-     
+
             _logger.LogTrace("Reply: {0}", reply);
-       
+
             return reply;
         }
     }

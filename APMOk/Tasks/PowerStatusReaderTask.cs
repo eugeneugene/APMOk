@@ -25,7 +25,7 @@ namespace APMOk.Tasks
 
                 var diskInfoService = scopeServiceProvider.GetRequiredService<Services.PowerState>();
                 var reply = await diskInfoService.GetPowerStateAsync(cancellationToken);
-            
+
                 if (reply is null)
                     throw new Exception("Service is offline");
 

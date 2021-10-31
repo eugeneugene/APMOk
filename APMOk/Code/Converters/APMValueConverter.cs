@@ -10,7 +10,7 @@ namespace APMOk.Code.Converters
         {
             return value switch
             {
-                uint v when v == 0 => "Not set",
+                uint v when v == 0 => "N/A",
                 uint v when v > 0 && v <= 254 => value.ToString(),
                 _ => "Invalid",
             };

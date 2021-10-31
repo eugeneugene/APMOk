@@ -18,7 +18,7 @@ namespace APMOkLib.CustomConfiguration
         {
             if (defaultValue is null)
                 throw new ArgumentNullException(nameof(defaultValue));
-            
+
             _defaultValue = defaultValue.Value;
         }
 

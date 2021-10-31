@@ -63,10 +63,6 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="MenuItemAlignStyle" TargetType="{x:Type MenuItem}">
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="VerticalContentAlignment" Value="Top" />
-        </Style>
         <ContextMenu x:Key="SetApmValueContextMenu" x:Shared="false">
             <ContextMenu.CommandBindings>
                 <CommandBinding
@@ -79,7 +75,7 @@
                     Executed="SetAPMCustomValueMenuExecuted" />
             </ContextMenu.CommandBindings>
             <MenuItem Header="OnMains">
-                <MenuItem Header="H/W default (after next power cycle)" Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="H/W default (after next power cycle)">
                     <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
                     <MenuItem.CommandParameter>
                         <localcode:APMCommandParameter>
@@ -88,7 +84,7 @@
                         </localcode:APMCommandParameter>
                     </MenuItem.CommandParameter>
                 </MenuItem>
-                <MenuItem Header="Minimum power consumption with Standby (1)" Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="Minimum power consumption with Standby (1)">
                     <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
                     <MenuItem.CommandParameter>
                         <localcode:APMCommandParameter>
@@ -97,7 +93,7 @@
                         </localcode:APMCommandParameter>
                     </MenuItem.CommandParameter>
                 </MenuItem>
-                <MenuItem Header="Intermediate power management levels with Standby (2-127)" Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="Intermediate power management levels with Standby (2-127)">
                     <MenuItem.Command>
                         localcommands:APMOkCommands.SetAPMValueCommand
                     </MenuItem.Command>
@@ -108,7 +104,7 @@
                         </localcode:APMCommandParameter>
                     </MenuItem.CommandParameter>
                 </MenuItem>
-                <MenuItem Header="Minimum power consumption without Standby (128)" Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="Minimum power consumption without Standby (128)">
                     <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
                     <MenuItem.CommandParameter>
                         <localcode:APMCommandParameter>
@@ -117,7 +113,7 @@
                         </localcode:APMCommandParameter>
                     </MenuItem.CommandParameter>
                 </MenuItem>
-                <MenuItem Header="Intermediate power management levels without Standby (129-253)" Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="Intermediate power management levels without Standby (129-253)">
                     <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
                     <MenuItem.CommandParameter>
                         <localcode:APMCommandParameter>
@@ -126,7 +122,7 @@
                         </localcode:APMCommandParameter>
                     </MenuItem.CommandParameter>
                 </MenuItem>
-                <MenuItem Header="Maximum performance (254)" Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="Maximum performance (254)">
                     <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
                     <MenuItem.CommandParameter>
                         <localcode:APMCommandParameter>
@@ -136,7 +132,7 @@
                     </MenuItem.CommandParameter>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="Custom value..." Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="Custom value...">
                     <MenuItem.Command>localcommands:APMOkCommands.SetAPMCustomValueMenuCommand</MenuItem.Command>
                     <MenuItem.CommandParameter>
                         <localcode:APMCustomValueCommandParameter>
@@ -146,7 +142,7 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="OnBatteries">
-                <MenuItem Header="H/W default (after next power cycle)" Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="H/W default (after next power cycle)">
                     <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
                     <MenuItem.CommandParameter>
                         <localcode:APMCommandParameter>
@@ -155,7 +151,7 @@
                         </localcode:APMCommandParameter>
                     </MenuItem.CommandParameter>
                 </MenuItem>
-                <MenuItem Header="Minimum power consumption with Standby (1)" Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="Minimum power consumption with Standby (1)">
                     <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
                     <MenuItem.CommandParameter>
                         <localcode:APMCommandParameter>
@@ -164,7 +160,7 @@
                         </localcode:APMCommandParameter>
                     </MenuItem.CommandParameter>
                 </MenuItem>
-                <MenuItem Header="Intermediate power management levels with Standby (2-127)" Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="Intermediate power management levels with Standby (2-127)">
                     <MenuItem.Command>
                         localcommands:APMOkCommands.SetAPMValueCommand
                     </MenuItem.Command>
@@ -175,7 +171,7 @@
                         </localcode:APMCommandParameter>
                     </MenuItem.CommandParameter>
                 </MenuItem>
-                <MenuItem Header="Minimum power consumption without Standby (128)" Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="Minimum power consumption without Standby (128)">
                     <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
                     <MenuItem.CommandParameter>
                         <localcode:APMCommandParameter>
@@ -184,7 +180,7 @@
                         </localcode:APMCommandParameter>
                     </MenuItem.CommandParameter>
                 </MenuItem>
-                <MenuItem Header="Intermediate power management levels without Standby (129-253)" Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="Intermediate power management levels without Standby (129-253)">
                     <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
                     <MenuItem.CommandParameter>
                         <localcode:APMCommandParameter>
@@ -193,7 +189,7 @@
                         </localcode:APMCommandParameter>
                     </MenuItem.CommandParameter>
                 </MenuItem>
-                <MenuItem Header="Maximum performance (254)" Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="Maximum performance (254)">
                     <MenuItem.Command>localcommands:APMOkCommands.SetAPMValueCommand</MenuItem.Command>
                     <MenuItem.CommandParameter>
                         <localcode:APMCommandParameter>
@@ -203,7 +199,7 @@
                     </MenuItem.CommandParameter>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="Custom value..." Style="{StaticResource MenuItemAlignStyle}">
+                <MenuItem Header="Custom value...">
                     <MenuItem.Command>localcommands:APMOkCommands.SetAPMCustomValueMenuCommand</MenuItem.Command>
                     <MenuItem.CommandParameter>
                         <localcode:APMCustomValueCommandParameter>
@@ -413,6 +409,13 @@
                 </Grid>
             </GroupBox>
         </Grid>
-        <CheckBox Content="Start with Windows" x:Name="AutoRun" Margin="5" Checked="AutoRunChecked" Unchecked="AutoRunUnchecked" Width="130"  HorizontalAlignment="Left"/>
+        <CheckBox
+            x:Name="AutoRun"
+            Width="130"
+            Margin="5"
+            HorizontalAlignment="Left"
+            Checked="AutoRunChecked"
+            Content="Start with Windows"
+            Unchecked="AutoRunUnchecked" />
     </StackPanel>
 </Window>

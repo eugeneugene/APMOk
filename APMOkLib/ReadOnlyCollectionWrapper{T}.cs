@@ -6,6 +6,7 @@ namespace APMOkLib
     public class ReadOnlyCollectionWrapper<T> : IReadOnlyCollection<T>
     {
         private readonly ICollection<T> _collection;
+
         public ReadOnlyCollectionWrapper(ICollection<T> collection)
         {
             _collection = collection;

@@ -16,8 +16,6 @@ namespace APMOk.Services
         private readonly ITask<DiskInfoReaderTask> _diskInfoReaderTask;
         private readonly ITask<PowerStatusReaderTask> _batteryStatusReaderTask;
 
-        //private bool IgnoreUpdate = false;
-
         public NotificationIconUpdater(APMOkModel apmOkModel, TaskbarIcon taskbarIcon,
             ITask<DiskInfoReaderTask> diskInfoReaderTask, ITask<PowerStatusReaderTask> batteryStatusReaderTask)
         {
@@ -67,11 +65,11 @@ namespace APMOk.Services
                     {
                         case APMData.EPowerSource.Mains:
                             _taskbarIcon.Icon = Properties.Resources.Checked;
-                            _taskbarIcon.ToolTipText = "Online";
+                            _taskbarIcon.ToolTipText = "Mains";
                             break;
                         case APMData.EPowerSource.Battery:
                             _taskbarIcon.Icon = Properties.Resources.Battery;
-                            _taskbarIcon.ToolTipText = "Offline";
+                            _taskbarIcon.ToolTipText = "Batteries";
                             break;
                         default:
                             _taskbarIcon.Icon = Properties.Resources.Error;

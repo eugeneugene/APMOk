@@ -9,7 +9,7 @@ namespace APMOk.Services
     /// Управление питанием дисков
     /// DI Lifetime: Transient
     /// </summary>
-    internal class APM 
+    internal class APM
     {
         private readonly IGrpcChannelProvider _grpcChannelProvider;
 

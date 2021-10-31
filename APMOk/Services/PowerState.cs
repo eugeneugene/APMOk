@@ -10,7 +10,7 @@ namespace APMOk.Services
     /// Получить информацию о текущем состоянии питания
     /// DI Lifetime: Transient
     /// </summary>
-    internal class PowerState 
+    internal class PowerState
     {
         private readonly IGrpcChannelProvider _grpcChannelProvider;
 

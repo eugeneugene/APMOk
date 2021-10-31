@@ -50,7 +50,7 @@ namespace APMOkSvc.Services
                     type: AccessControlType.Allow));
                 fInfo.SetAccessControl(fSecurity);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError("{0}", ex);
             }

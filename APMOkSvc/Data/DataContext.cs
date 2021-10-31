@@ -37,7 +37,7 @@ namespace APMOkSvc.Data
 
             optionsBuilder.UseSqlite(_connectionStringsConfiguration.DataContext.Value);
             optionsBuilder.EnableSensitiveDataLogging(_environment.IsDevelopment());
-            //optionsBuilder.EnableDetailedErrors(_environment.IsDevelopment());
+            optionsBuilder.EnableDetailedErrors(_environment.IsDevelopment());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

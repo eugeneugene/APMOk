@@ -20,9 +20,9 @@ namespace APMOk
 {
     public partial class Applic : Application, IDisposable
     {
-        private IHost? host = null;
-        private TaskbarIcon? notifyIcon = null;
-        private bool disposedValue = false;
+        private IHost? host;
+        private TaskbarIcon? notifyIcon;
+        private bool disposedValue;
 
         [STAThread()]
         public static void Main()

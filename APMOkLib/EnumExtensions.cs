@@ -31,7 +31,7 @@ namespace APMOkLib
                 return default;
 
             var attribute = value.GetAttribute<EnumMemberAttribute>();
-            
+
             return attribute is null ? value.ToString() : attribute.Value;
         }
 
