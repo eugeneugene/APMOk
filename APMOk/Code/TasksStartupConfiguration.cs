@@ -16,9 +16,9 @@ namespace APMOk.Code
                 throw new ArgumentNullException(nameof(parameterFactory));
 
             PowerStatusReader = parameterFactory.CreateParameter(this, nameof(PowerStatusReader), nameof(PowerStatusReader),
-                new TaskStartupParameterDecorator<ITaskStartup>(new TaskStartupParameter(TimeSpan.FromSeconds(1))), "Периодичность чтения статуса батареи");
+                new TaskStartupParameterDecorator<ITaskStartup>(new TaskStartupParameter(TimeSpan.FromSeconds(1))), "Battery status read delay");
             DiskStatusReader = parameterFactory.CreateParameter(this, nameof(DiskStatusReader), nameof(DiskStatusReader),
-                new TaskStartupParameterDecorator<ITaskStartup>(new TaskStartupParameter(TimeSpan.FromMinutes(1))), "Периодичность чтения информации о жёстких дисках");
+                new TaskStartupParameterDecorator<ITaskStartup>(new TaskStartupParameter(TimeSpan.FromMinutes(1))), "Harddrives' information read delay");
         }
     }
 }

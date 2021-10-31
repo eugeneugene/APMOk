@@ -11,7 +11,7 @@ namespace APMOkSvc.Code
             : base("ConnectionStrings", configuration)
         {
             DataContext = parameterFactory.CreateParameter(this, nameof(DataContext), nameof(DataContext), new SimpleParameterDecorator<string>(string.Empty),
-                "Строка подключения DataContext");
+                "DataContext connection string");
         }
     }
 }

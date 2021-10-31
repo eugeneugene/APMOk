@@ -4,6 +4,8 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<Platforms>x64</Platforms>
 		<Nullable>enable</Nullable>
+		<Copyright>MIT License</Copyright>
+		<Version>1.0</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

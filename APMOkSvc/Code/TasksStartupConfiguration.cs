@@ -12,7 +12,7 @@ namespace APMOkSvc.Code
             : base("TasksStartup", configuration)
         {
             PowerStatusReader = parameterFactory.CreateParameter(this, nameof(PowerStatusReader), nameof(PowerStatusReader),
-                new TaskStartupParameterDecorator<ITaskStartup>(new TaskStartupParameter(TimeSpan.FromSeconds(0.5))), "Периодичность чтения статуса батареи");
+                new TaskStartupParameterDecorator<ITaskStartup>(new TaskStartupParameter(TimeSpan.FromSeconds(0.5))), "Battery status check delay");
         }
     }
 }

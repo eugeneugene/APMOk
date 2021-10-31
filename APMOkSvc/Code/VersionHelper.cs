@@ -61,14 +61,6 @@ namespace APMOkSvc.Code
             }
         }
 
-        private static DateTime BuildDate(FileVersionInfo fvi)
-        {
-            DateTime build = new(2000, 1, 1);
-            build = build.AddDays(fvi.FileBuildPart);
-            build = build.AddSeconds(fvi.FilePrivatePart * 2.0);
-            return build;
-        }
-
-        private static string VersionLineInt(FileVersionInfo fvi) => $"{fvi.ProductName} {fvi.ProductVersion}, {fvi.FileVersion} ({BuildDate(fvi):G})";
+        private static string VersionLineInt(FileVersionInfo fvi) => $"{fvi.ProductName} {fvi.ProductVersion}, {fvi.FileVersion}";
     }
 }

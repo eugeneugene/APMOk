@@ -11,7 +11,7 @@
 		<Authors>Evgeniy Podkopaev</Authors>
 		<Company />
 		<Description>Hard drives APM managment utility</Description>
-		<Copyright>GPL</Copyright>
+		<Copyright>MIT License</Copyright>
 		<PackageIcon>checked.ico</PackageIcon>
 		<PackageIconUrl />
 		<PlatformTarget>x64</PlatformTarget>
