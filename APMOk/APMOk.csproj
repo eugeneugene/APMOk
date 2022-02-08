@@ -16,6 +16,7 @@
 		<Nullable>enable</Nullable>
 		<AssemblyVersion>1.0.1</AssemblyVersion>
 		<FileVersion>1.0.1</FileVersion>
+		<ApplicationIcon>Properties\checked.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -39,6 +40,7 @@
 		  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 		  <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
+		<Content Include="Properties\checked.ico" />
 		<Resource Include="Properties\error.ico" />
 	</ItemGroup>
 

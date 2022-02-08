@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Description" xml:space="preserve">
-    <value>APMOkSvc service</value>
+    <value>APMOkSvc</value>
   </data>
   <data name="LongDescription" xml:space="preserve">
-    <value>APMOkSvc service provides services for APMOk application</value>
+    <value>APMOkSvc provides services for APMOk application</value>
   </data>
   <data name="ServiceName" xml:space="preserve">
     <value>APMOkSvc</value>
