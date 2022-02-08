@@ -1,18 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0-windows</TargetFramework>
 		<Platforms>x64</Platforms>
 		<Copyright>MIT License</Copyright>
 		<Version>1.0</Version>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DefineConstants>TRACE;DEBUG</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DefineConstants>TRACE</DefineConstants>
+		<AssemblyVersion>1.0.1</AssemblyVersion>
+		<FileVersion>1.0.1</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

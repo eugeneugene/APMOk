@@ -42,7 +42,6 @@ namespace APMOkLib
             var options = new JsonSerializerOptions()
             {
                 Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                IgnoreNullValues = false,
             };
 
             if (formatProvider is not null)

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -44,7 +45,7 @@ namespace APMOkSvc.Code
         {
             var ass = Assembly.GetExecutingAssembly();
             location = Path.ChangeExtension(ass.Location, "exe");
-            if (location.Contains(" ", StringComparison.InvariantCulture))
+            if (location.Contains(' ', StringComparison.InvariantCulture))
                 location = $"\"{location}\"";
             file = Path.GetFileName(ass.Location);
         }
@@ -189,6 +190,12 @@ namespace APMOkSvc.Code
                     return StarterArgumensResult.HelpError;
                 }
 
+                if (!IsAdministrator())
+                {
+                    Console.Error.WriteLine("You have to be an administrator to install the service");
+                    return StarterArgumensResult.ExitError;
+                }
+
                 if (ServiceInstaller.ServiceIsInstalled(servicename))
                 {
                     Console.Error.WriteLine("Service '{0}' is already installed", servicename);
@@ -218,6 +225,12 @@ namespace APMOkSvc.Code
             }
             if (uninstall)
             {
+                if (!IsAdministrator())
+                {
+                    Console.Error.WriteLine("You have to be an administrator to uninstall the service");
+                    return StarterArgumensResult.ExitError;
+                }
+
                 if (ServiceInstaller.ServiceIsInstalled(servicename))
                     ServiceInstaller.Uninstall(servicename);
                 else
@@ -230,6 +243,12 @@ namespace APMOkSvc.Code
             }
             if (start)
             {
+                if (!IsAdministrator())
+                {
+                    Console.Error.WriteLine("You have to be an administrator to start the service");
+                    return StarterArgumensResult.ExitError;
+                }
+
                 if (!ServiceInstaller.ServiceIsInstalled(servicename))
                 {
                     Console.Error.WriteLine("Service '{0}' is not installed", servicename);
@@ -241,6 +260,12 @@ namespace APMOkSvc.Code
             }
             if (stop)
             {
+                if (!IsAdministrator())
+                {
+                    Console.Error.WriteLine("You have to be an administrator to stop the service");
+                    return StarterArgumensResult.ExitError;
+                }
+
                 if (!ServiceInstaller.ServiceIsInstalled(servicename))
                 {
                     Console.Error.WriteLine("Service '{0}' is not installed", servicename);
@@ -252,6 +277,12 @@ namespace APMOkSvc.Code
             }
             if (restart)
             {
+                if (!IsAdministrator())
+                {
+                    Console.Error.WriteLine("You have to be an administrator to restart the service");
+                    return StarterArgumensResult.ExitError;
+                }
+                
                 if (!ServiceInstaller.ServiceIsInstalled(servicename))
                 {
                     Console.Error.WriteLine("Service '{0}' is not installed", servicename);
@@ -266,6 +297,12 @@ namespace APMOkSvc.Code
             }
             if (status)
             {
+                if (!IsAdministrator())
+                {
+                    Console.Error.WriteLine("You have to be an administrator to check the status");
+                    return StarterArgumensResult.ExitError;
+                }
+
                 if (!ServiceInstaller.ServiceIsInstalled(servicename))
                 {
                     Console.Error.WriteLine("Service '{0}' is not installed", servicename);
@@ -293,6 +330,13 @@ namespace APMOkSvc.Code
                 return StarterArgumensResult.Run;
 
             return StarterArgumensResult.HelpNoError;
+        }
+
+        private static bool IsAdministrator()
+        {
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
         public void ShowHelp()
