@@ -404,18 +404,18 @@
   FunctionEnd
 
 ; Эта функция не используется, поэтому закомментировал её, чтобы избавится от предупреждений компилятора NSIS
-  Function un.Service
-    !insertmacro FUNC_SERVICE "un."
-  FunctionEnd
+;  Function un.Service
+;    !insertmacro FUNC_SERVICE "un."
+;  FunctionEnd
  
   Function GetParam
     !insertmacro FUNC_GETPARAM
   FunctionEnd
  
 ; Эта функция не используется, поэтому закомментировал её, чтобы избавится от предупреждений компилятора NSIS
-  Function un.GetParam
-    !insertmacro FUNC_GETPARAM
-  FunctionEnd
+;  Function un.GetParam
+;    !insertmacro FUNC_GETPARAM
+;  FunctionEnd
  
   !undef APITAG
 !endif

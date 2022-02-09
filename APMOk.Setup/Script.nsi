@@ -10,6 +10,7 @@ Unicode True
 !include "x64.nsh"
 !include "logiclib.nsh"
 !include "servicelib.nsh"
+!include "nsProcess.nsh"
 
 ;--------------------------------
 ;General
@@ -98,6 +99,8 @@ Page custom customFinish customFinishLeave
 ;Installer Sections
 
 Section !$(SecAPMOk) SecAPMOk
+  Call stopAPMOk
+
   SectionIn RO
   SetOutPath "$INSTDIR"
 
@@ -155,15 +158,7 @@ Section "Uninstall"
   nsExec::Exec '"$INSTDIR\APMOkSvc\APMOkSvc.exe" /k'
   nsExec::Exec '"$INSTDIR\APMOkSvc\APMOkSvc.exe" /u'
 
-  nsProcess::_FindProcess "APMOk.exe" $R0
-  ${If} $R0 == 0
-    DetailPrint "APMOk.exe is running. Closing it down"
-    nsProcess::_KillProcess "APMOk.exe" $R0
-    DetailPrint "Waiting for APMOk.exe to close"
-    Sleep 2000  
-  ${Else}
-    DetailPrint "APMOk.exe was not found to be running"        
-  ${EndIf}
+  Call un.stopAPMOk
 
   Delete "$INSTDIR\APMOkSvc\*"
   RMDir "$INSTDIR\APMOkSvc"
@@ -215,17 +210,32 @@ Function un.onInit
   StrCmp $R0 0 +3
     MessageBox MB_OK|MB_ICONEXCLAMATION "Установка уже запущена" /SD IDOK
     Abort
+FunctionEnd
 
-  ; Get the current status of a service
-  Push "running"
-  Push "${SERVICE}"
-  Push ""
-  Call un.Service
-  Pop $0 ;response
-  ${If} $0 == "true"
-    MessageBox MB_OK|MB_ICONEXCLAMATION "Сервис должен быть остановлен перед установкой" /SD IDOK
-    Abort
-  ${EndIf}
+Function stopAPMOk
+  stopAPMOkloop:
+  ${nsProcess::FindProcess} "APMOk.exe" $R0
+  StrCmp $R0 0 0 stopAPMOkend
+
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION 'Close "APMOk" before continue$\nOk - Try again$\nCancel - Try to kill "APMOk" and continue' IDOK stopAPMOkloop IDCANCEL 0
+  ${nsProcess::KillProcess} "APMOk.exe" $R0
+  Sleep 1000
+
+  stopAPMOkend:
+  ${nsProcess::Unload}
+FunctionEnd
+
+Function un.stopAPMOk
+  stopAPMOkloop:
+  ${nsProcess::FindProcess} "APMOk.exe" $R0
+  StrCmp $R0 0 0 stopAPMOkend
+
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION 'Close "APMOk" before continue$\nOk - Try again$\nCancel - Try to kill "APMOk" and continue' IDOK stopAPMOkloop IDCANCEL 0
+  ${nsProcess::KillProcess} "APMOk.exe" $R0
+  Sleep 1000
+
+  stopAPMOkend:
+  ${nsProcess::Unload}
 FunctionEnd
 
 Function customFinish
@@ -235,7 +245,7 @@ Function customFinish
   ${NSD_CreateLabel} 0 20u 75% 8u "Установка успешно завершена!"
   Pop $0
 
-  ${NSD_CreateCheckbox} 0 40u 75% 8u "Установить сервис?"
+  ${NSD_CreateCheckbox} 0 40u 75% 8u "Установить и запустить сервис APMOkSvc?"
   Pop $cbInstallService
 
   nsDialogs::Show
@@ -257,7 +267,8 @@ Function FinishShow
   ShowWindow $mui.FinishPage.Run ${SW_HIDE}
   goto FinishShowEnd
   FinishShowEnable:
-  nsExec::Exec '"$INSTDIR\APMOkSvc/APMOkSvc.exe" /i'
+  nsExec::Exec '"$INSTDIR\APMOkSvc\APMOkSvc.exe" /i'
+  nsExec::Exec '"$INSTDIR\APMOkSvc\APMOkSvc.exe" /s'
   ${NSD_Uncheck} $mui.FinishPage.Run
   ShowWindow $mui.FinishPage.Run ${SW_SHOW}
   FinishShowEnd:
