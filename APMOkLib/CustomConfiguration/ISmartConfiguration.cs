@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace APMOkLib.CustomConfiguration
+namespace APMOkLib.CustomConfiguration;
+
+public interface ISmartConfiguration
 {
-    public interface ISmartConfiguration
-    {
-        string SectionName { get; }
-        IConfiguration Configuration { get; }
-    }
+    string SectionName { get; }
+    IConfiguration Configuration { get; }
 }

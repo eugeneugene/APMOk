@@ -1,8 +1,7 @@
-﻿namespace APMOkLib.RecurrentTasks
+﻿namespace APMOkLib.RecurrentTasks;
+
+public interface ITask<TRunnable> : ITask
+    where TRunnable : IRunnable
 {
-    public interface ITask<TRunnable> : ITask
-        where TRunnable : IRunnable
-    {
-        // Nothing
-    }
+    // Nothing
 }

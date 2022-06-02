@@ -2,10 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace APMOkLib.RecurrentTasks
+namespace APMOkLib.RecurrentTasks;
+
+public interface IRunnable
 {
-    public interface IRunnable
-    {
-        Task RunAsync(ITask currentTask, IServiceProvider scopeServiceProvider, CancellationToken cancellationToken);
-    }
+    Task RunAsync(ITask currentTask, IServiceProvider scopeServiceProvider, CancellationToken cancellationToken);
 }

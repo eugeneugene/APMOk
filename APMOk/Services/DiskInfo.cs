@@ -1,30 +1,54 @@
 ﻿using APMData;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Grpc.Net.Client;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace APMOk.Services
+namespace APMOk.Services;
+
+/// <summary>
+/// Получить информацию о системных дисках
+/// DI Lifetime: Singleton
+/// </summary>
+internal class DiskInfo : IDisposable
 {
-    /// <summary>
-    /// Получить информацию о системных дисках
-    /// DI Lifetime: Transient
-    /// </summary>
-    internal class DiskInfo
+    private readonly GrpcChannel _channel;
+    private bool disposedValue;
+
+    public DiskInfo(IGrpcChannelProvider grpcChannelProvider)
     {
-        private readonly IGrpcChannelProvider _grpcChannelProvider;
+        if (grpcChannelProvider is null)
+            throw new ArgumentNullException(nameof(grpcChannelProvider));
 
-        public DiskInfo(IGrpcChannelProvider grpcChannelProvider)
-        {
-            _grpcChannelProvider = grpcChannelProvider;
-        }
+        _channel = grpcChannelProvider.GetHttpGrpcChannel();
+    }
 
-        public async Task<DisksReply> EnumerateDisksAsync(CancellationToken cancellationToken)
+    public async Task<DisksReply> EnumerateDisksAsync(CancellationToken cancellationToken)
+    {
+        var client = new DiskInfoService.DiskInfoServiceClient(_channel);
+        var reply = await client.EnumerateDisksAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
+        return reply;
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
         {
-            using var channel = _grpcChannelProvider.GetHttpGrpcChannel();
-            var client = new DiskInfoService.DiskInfoServiceClient(channel);
-            var reply = await client.EnumerateDisksAsync(new Empty(), new CallOptions(cancellationToken: cancellationToken));
-            return reply;
+            if (disposing)
+            {
+                _channel.Dispose();
+            }
+
+            disposedValue = true;
         }
+    }
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

@@ -5,7 +5,9 @@
 		<UserSecretsId>dotnet-APMOkSvc-29FF406E-ED1A-4831-B643-AF357DA51037</UserSecretsId>
 		<Platforms>x64</Platforms>
 		<NeutralLanguage>en</NeutralLanguage>
-		<Version>1.0</Version>
+		<Version>1.2</Version>
+		<AssemblyVersion>1.2.*</AssemblyVersion>
+		<FileVersion>1.2</FileVersion>
 		<Authors>Evgeniy Podkopaev</Authors>
 		<Product>APMOk</Product>
 		<Description>Hard drives APM managment utility working service</Description>
@@ -14,17 +16,16 @@
 		<PackageIconUrl />
 		<StartupObject>APMOkSvc.Program</StartupObject>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>1.0.1</AssemblyVersion>
-		<FileVersion>1.0.1</FileVersion>
+		<Deterministic>false</Deterministic>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
-		<PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />
+		<PackageReference Include="Grpc.AspNetCore" Version="2.46.0" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.0.0" />
 		<PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="5.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.11" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="6.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.5" />
 	</ItemGroup>
 
 	<ItemGroup>

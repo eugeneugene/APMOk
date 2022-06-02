@@ -1,11 +1,10 @@
 ﻿using Grpc.Net.Client;
 using System.Net.Security;
 
-namespace APMOk.Services
+namespace APMOk.Services;
+
+internal interface IGrpcChannelProvider
 {
-    internal interface IGrpcChannelProvider
-    {
-        GrpcChannel GetHttpGrpcChannel();
-        GrpcChannel GetHttpsGrpcChannel(RemoteCertificateValidationCallback? remoteCertificateValidationCallback = null);
-    }
+    GrpcChannel GetHttpGrpcChannel();
+    GrpcChannel GetHttpsGrpcChannel(RemoteCertificateValidationCallback? remoteCertificateValidationCallback = null);
 }

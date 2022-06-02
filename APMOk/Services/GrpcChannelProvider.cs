@@ -1,62 +1,66 @@
 ﻿using APMOkLib;
 using Grpc.Net.Client;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 
-namespace APMOk.Services
+namespace APMOk.Services;
+
+/// <summary>
+/// GrpcChannelProvider
+/// DI Lifetime: Singleton
+/// </summary>
+internal class GrpcChannelProvider : IGrpcChannelProvider
 {
-    internal class GrpcChannelProvider : IGrpcChannelProvider
+    private readonly UnixDomainSocketConnectionFactory _connectionFactory;
+
+    public GrpcChannelProvider(ISocketPathProvider socketPathProvider)
     {
-        private readonly ISocketPathProvider _socketPathProvider;
+        if (socketPathProvider is null)
+            throw new ArgumentNullException(nameof(socketPathProvider));
 
-        public GrpcChannelProvider(ISocketPathProvider socketPathProvider)
+        var _udsEndPoint = new UnixDomainSocketEndPoint(socketPathProvider.GetSocketPath());
+        _connectionFactory = new UnixDomainSocketConnectionFactory(_udsEndPoint);
+    }
+
+    private static bool TrueRemoteCertificateValidationCallback(object sender, X509Certificate? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors) => true;
+
+    public GrpcChannel GetHttpGrpcChannel()
+    {
+        var socketsHttpHandler = new SocketsHttpHandler
         {
-            _socketPathProvider = socketPathProvider;
-        }
+            ConnectCallback = _connectionFactory.ConnectAsync,
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+        };
 
-        private static bool TrueRemoteCertificateValidationCallback(object sender, X509Certificate? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors) => true;
-
-        public GrpcChannel GetHttpGrpcChannel()
+        var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
         {
-            var udsEndPoint = new UnixDomainSocketEndPoint(_socketPathProvider.GetSocketPath());
-            var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
-            var socketsHttpHandler = new SocketsHttpHandler
-            {
-                ConnectCallback = connectionFactory.ConnectAsync,
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-            };
+            HttpHandler = socketsHttpHandler,
+        });
 
-            var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
-            {
-                HttpHandler = socketsHttpHandler,
-            });
+        return channel;
+    }
 
-            return channel;
-        }
-
-        public GrpcChannel GetHttpsGrpcChannel(RemoteCertificateValidationCallback? remoteCertificateValidationCallback = null)
+    public GrpcChannel GetHttpsGrpcChannel(RemoteCertificateValidationCallback? remoteCertificateValidationCallback = null)
+    {
+        var socketsHttpsHandler = new SocketsHttpHandler
         {
-            var udsEndPoint = new UnixDomainSocketEndPoint(_socketPathProvider.GetSocketPath());
-            var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
-            var socketsHttpHandler = new SocketsHttpHandler
+            ConnectCallback = _connectionFactory.ConnectAsync,
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+            SslOptions = new SslClientAuthenticationOptions
             {
-                ConnectCallback = connectionFactory.ConnectAsync,
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-                SslOptions = new SslClientAuthenticationOptions
-                {
-                    RemoteCertificateValidationCallback = remoteCertificateValidationCallback ?? TrueRemoteCertificateValidationCallback,
-                }
-            };
+                RemoteCertificateValidationCallback = remoteCertificateValidationCallback ?? TrueRemoteCertificateValidationCallback,
+            }
+        };
 
-            var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
-            {
-                HttpHandler = socketsHttpHandler,
-            });
+        var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
+        {
+            HttpHandler = socketsHttpsHandler,
+        });
 
-            return channel;
-        }
+        return channel;
     }
 }

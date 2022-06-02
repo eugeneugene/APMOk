@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace APMOkLib.CustomConfiguration
+namespace APMOkLib.CustomConfiguration;
+
+public interface ITaskStartup
 {
-    public interface ITaskStartup
-    {
-        TimeSpan Interval { get; }
-        TimeSpan FirstRunDelay { get; }
-    }
+    TimeSpan Interval { get; }
+    TimeSpan FirstRunDelay { get; }
 }

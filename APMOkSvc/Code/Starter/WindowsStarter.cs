@@ -282,7 +282,7 @@ namespace APMOkSvc.Code
                     Console.Error.WriteLine("You have to be an administrator to restart the service");
                     return StarterArgumensResult.ExitError;
                 }
-                
+
                 if (!ServiceInstaller.ServiceIsInstalled(servicename))
                 {
                     Console.Error.WriteLine("Service '{0}' is not installed", servicename);
@@ -436,7 +436,6 @@ namespace APMOkSvc.Code
             logger.Info("Running {0}", Environment.OSVersion.VersionString);
             hostbuilder = hostbuilder.UseWindowsService();
             logger.Info("Using Windows Service");
-            logger.Info("Using socket path: {0}", socketPathProvider.GetSocketPath());
 
             var Module = Process.GetCurrentProcess().MainModule;
             if (Module is not null)
@@ -447,23 +446,23 @@ namespace APMOkSvc.Code
                     Directory.SetCurrentDirectory(pathToContentRoot);
             }
 
-            if (File.Exists(socketPathProvider.GetSocketPath()))
-                File.Delete(socketPathProvider.GetSocketPath());
-
             hostbuilder = hostbuilder.ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<TStartup>();
-                webBuilder.ConfigureKestrel(options =>
+                webBuilder.ConfigureKestrel(kestrelServerOptions =>
                 {
-                    var configuration = options.ApplicationServices.GetService(typeof(IConfiguration)) as IConfiguration;
-                    options.ListenUnixSocket(socketPathProvider.GetSocketPath(), options =>
+                    kestrelServerOptions.ListenUnixSocket(socketPathProvider.GetSocketPath(), listenOptions =>
                     {
+                        logger.Info("Using socket path: {0}", listenOptions.SocketPath);
+                        if (File.Exists(listenOptions.SocketPath))
+                            File.Delete(listenOptions.SocketPath);
 #if HTTPS
+                        var configuration = options.ApplicationServices.GetService(typeof(IConfiguration)) as IConfiguration;
                         var path = configuration["Kestrel:EndpointDefaults:Certificate:Path"];
                         var password = configuration["Kestrel:EndpointDefaults:Certificate:Password"];
                         options.UseHttps(path, password);
 #endif
-                        options.Protocols = HttpProtocols.Http2;
+                        listenOptions.Protocols = HttpProtocols.Http2;
                     });
                 });
             });

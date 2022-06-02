@@ -1,21 +1,20 @@
 ﻿using System;
 
-namespace APMOkLib.RecurrentTasks
+namespace APMOkLib.RecurrentTasks;
+
+public class TaskRunStatus
 {
-    public class TaskRunStatus
-    {
-        public TaskRunResult LastResult { get; set; }
+    public TaskRunResult LastResult { get; set; }
 
-        public DateTimeOffset LastRunTime { get; set; }
+    public DateTimeOffset LastRunTime { get; set; }
 
-        public DateTimeOffset LastSuccessTime { get; set; }
+    public DateTimeOffset LastSuccessTime { get; set; }
 
-        public DateTimeOffset FirstFailTime { get; set; }
+    public DateTimeOffset FirstFailTime { get; set; }
 
-        public int FailsCount { get; set; }
+    public int FailsCount { get; set; }
 
-        public Exception? LastException { get; set; }
+    public Exception? LastException { get; set; }
 
-        public DateTimeOffset NextRunTime { get; set; }
-    }
+    public DateTimeOffset NextRunTime { get; set; }
 }

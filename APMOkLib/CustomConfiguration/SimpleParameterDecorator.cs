@@ -1,36 +1,35 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 
-namespace APMOkLib.CustomConfiguration
+namespace APMOkLib.CustomConfiguration;
+
+public class SimpleParameterDecorator<T> : IParameterDecorator<T>
 {
-    public class SimpleParameterDecorator<T> : IParameterDecorator<T>
+    private readonly T _defaultValue;
+
+    public T DefaultValue => _defaultValue;
+
+    public SimpleParameterDecorator(T defaultValue)
     {
-        private readonly T? _defaultValue;
+        _defaultValue = defaultValue ?? throw new ArgumentException("Default Value cannot be null");
+    }
 
-        public T? DefaultValue => _defaultValue;
+    public SimpleParameterDecorator(IConfigurationParameter<T>? defaultValue)
+    {
+        if (defaultValue is null)
+            throw new ArgumentNullException(nameof(defaultValue));
 
-        public SimpleParameterDecorator(T defaultValue)
-        {
-            _defaultValue = defaultValue ?? throw new ArgumentException("Default Value cannot be null");
-        }
+        _defaultValue = defaultValue.Value;
+    }
 
-        public SimpleParameterDecorator(IConfigurationParameter<T>? defaultValue)
-        {
-            if (defaultValue is null)
-                throw new ArgumentNullException(nameof(defaultValue));
+    public T ExtractValue(IConfiguration configuration, string section)
+    {
+        if (configuration is null)
+            throw new ArgumentNullException(nameof(configuration));
 
-            _defaultValue = defaultValue.Value;
-        }
+        if (string.IsNullOrEmpty(section))
+            throw new ArgumentException($"'{nameof(section)}' cannot be null or empty.", nameof(section));
 
-        public T ExtractValue(IConfiguration configuration, string section)
-        {
-            if (configuration is null)
-                throw new ArgumentNullException(nameof(configuration));
-
-            if (string.IsNullOrEmpty(section))
-                throw new ArgumentException($"'{nameof(section)}' cannot be null or empty.", nameof(section));
-
-            return configuration.GetValue(section, _defaultValue)!;
-        }
+        return configuration.GetValue(section, _defaultValue)!;
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace APMOk.Tasks
 {
-    public class PowerStatusReaderTask : IRunnable
+    internal class PowerStatusReaderTask : IRunnable
     {
         private readonly APMOkModel _apmOkData;
 

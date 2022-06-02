@@ -2,36 +2,35 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace APMOkSvc.Services
-{
-    /// <summary>
-    /// Container for the latest PowerStatus data
-    /// DI Lifetime: Singleton
-    /// </summary>
-    public class PowerStateContainer
-    {
-        public event PropertyChangedEventHandler? PropertyChanged;
-        private PowerStateReply? _powerState;
+namespace APMOkSvc.Services;
 
-        public PowerStateReply? PowerState
+/// <summary>
+/// Container for the latest PowerStatus data
+/// DI Lifetime: Singleton
+/// </summary>
+public class PowerStateContainer
+{
+    public event PropertyChangedEventHandler? PropertyChanged;
+    private PowerStateReply? _powerState;
+
+    public PowerStateReply? PowerState
+    {
+        get => _powerState;
+        set
         {
-            get => _powerState;
-            set
+            if (_powerState is null || !_powerState.Equals(value))
             {
-                if (_powerState is null || !_powerState.Equals(value))
-                {
-                    _powerState = value;
-                    NotifyPropertyChanged(nameof(PowerState));
-                }
+                _powerState = value;
+                NotifyPropertyChanged(nameof(PowerState));
             }
         }
+    }
 
-        private void NotifyPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            if (string.IsNullOrEmpty(propertyName))
-                return;
+    private void NotifyPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        if (string.IsNullOrEmpty(propertyName))
+            return;
 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

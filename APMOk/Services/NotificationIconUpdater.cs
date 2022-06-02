@@ -7,77 +7,76 @@ using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace APMOk.Services
+namespace APMOk.Services;
+
+internal class NotificationIconUpdater : IHostedService
 {
-    internal class NotificationIconUpdater : IHostedService
+    private readonly APMOkModel _apmOkModel;
+    private readonly TaskbarIcon _taskbarIcon;
+    private readonly ITask<DiskInfoReaderTask> _diskInfoReaderTask;
+    private readonly ITask<PowerStatusReaderTask> _batteryStatusReaderTask;
+
+    public NotificationIconUpdater(APMOkModel apmOkModel, TaskbarIcon taskbarIcon,
+        ITask<DiskInfoReaderTask> diskInfoReaderTask, ITask<PowerStatusReaderTask> batteryStatusReaderTask)
     {
-        private readonly APMOkModel _apmOkModel;
-        private readonly TaskbarIcon _taskbarIcon;
-        private readonly ITask<DiskInfoReaderTask> _diskInfoReaderTask;
-        private readonly ITask<PowerStatusReaderTask> _batteryStatusReaderTask;
+        _apmOkModel = apmOkModel;
+        _taskbarIcon = taskbarIcon;
+        _diskInfoReaderTask = diskInfoReaderTask;
+        _batteryStatusReaderTask = batteryStatusReaderTask;
+    }
 
-        public NotificationIconUpdater(APMOkModel apmOkModel, TaskbarIcon taskbarIcon,
-            ITask<DiskInfoReaderTask> diskInfoReaderTask, ITask<PowerStatusReaderTask> batteryStatusReaderTask)
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        UpdateIcon();
+        _apmOkModel.PropertyChanged += APMOkDataPropertyChanged;
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _apmOkModel.PropertyChanged -= APMOkDataPropertyChanged;
+        return Task.CompletedTask;
+    }
+
+    private void APMOkDataPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == "ConnectFailure" && !_apmOkModel.ConnectFailure)
         {
-            _apmOkModel = apmOkModel;
-            _taskbarIcon = taskbarIcon;
-            _diskInfoReaderTask = diskInfoReaderTask;
-            _batteryStatusReaderTask = batteryStatusReaderTask;
+            if (_apmOkModel.SystemDiskInfo is null && _diskInfoReaderTask.IsStarted)
+                _diskInfoReaderTask.TryRunImmediately();
+            if (_apmOkModel.PowerState is null && _batteryStatusReaderTask.IsStarted)
+                _batteryStatusReaderTask.TryRunImmediately();
         }
+        UpdateIcon();
+    }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+    private void UpdateIcon()
+    {
+        if (_apmOkModel.ConnectFailure)
+            _taskbarIcon.Icon = Properties.Resources.Error;
+        else
         {
-            UpdateIcon();
-            _apmOkModel.PropertyChanged += APMOkDataPropertyChanged;
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _apmOkModel.PropertyChanged -= APMOkDataPropertyChanged;
-            return Task.CompletedTask;
-        }
-
-        private void APMOkDataPropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "ConnectFailure" && !_apmOkModel.ConnectFailure)
+            var PowerSource = APMData.EPowerSource.Unknown;
+            if (_apmOkModel.PowerState is not null && _apmOkModel.PowerState.ReplyResult == 1)
+                PowerSource = _apmOkModel.PowerState.PowerState.PowerSource;
+            _taskbarIcon.Dispatcher.Invoke(() =>
             {
-                if (_apmOkModel.SystemDiskInfo is null && _diskInfoReaderTask.IsStarted)
-                    _diskInfoReaderTask.TryRunImmediately();
-                if (_apmOkModel.PowerState is null && _batteryStatusReaderTask.IsStarted)
-                    _batteryStatusReaderTask.TryRunImmediately();
-            }
-            UpdateIcon();
-        }
-
-        private void UpdateIcon()
-        {
-            if (_apmOkModel.ConnectFailure)
-                _taskbarIcon.Icon = Properties.Resources.Error;
-            else
-            {
-                var PowerSource = APMData.EPowerSource.Unknown;
-                if (_apmOkModel.PowerState is not null && _apmOkModel.PowerState.ReplyResult == 1)
-                    PowerSource = _apmOkModel.PowerState.PowerState.PowerSource;
-                _taskbarIcon.Dispatcher.Invoke(() =>
+                switch (PowerSource)
                 {
-                    switch (PowerSource)
-                    {
-                        case APMData.EPowerSource.Mains:
-                            _taskbarIcon.Icon = Properties.Resources.Checked;
-                            _taskbarIcon.ToolTipText = "Mains";
-                            break;
-                        case APMData.EPowerSource.Battery:
-                            _taskbarIcon.Icon = Properties.Resources.Battery;
-                            _taskbarIcon.ToolTipText = "Batteries";
-                            break;
-                        default:
-                            _taskbarIcon.Icon = Properties.Resources.Error;
-                            _taskbarIcon.ToolTipText = "Error";
-                            break;
-                    }
-                });
-            }
+                    case APMData.EPowerSource.Mains:
+                        _taskbarIcon.Icon = Properties.Resources.Checked;
+                        _taskbarIcon.ToolTipText = "Mains";
+                        break;
+                    case APMData.EPowerSource.Battery:
+                        _taskbarIcon.Icon = Properties.Resources.Battery;
+                        _taskbarIcon.ToolTipText = "Batteries";
+                        break;
+                    default:
+                        _taskbarIcon.Icon = Properties.Resources.Error;
+                        _taskbarIcon.ToolTipText = "Error";
+                        break;
+                }
+            });
         }
     }
 }

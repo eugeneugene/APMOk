@@ -8,108 +8,110 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace APMOkSvc.Services
+namespace APMOkSvc.Services;
+
+/// <summary>
+/// Implementation of Configuration GRPC Service
+/// DI Lifetime: Transient
+/// </summary>
+public class ConfigurationServiceImpl
 {
-    /// <summary>
-    /// Implementation of Configuration GRPC Service
-    /// DI Lifetime: Transient
-    /// </summary>
-    public class ConfigurationServiceImpl
-    {
-        private readonly ILogger _logger;
-        private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly ILogger _logger;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 #if DEBUG
-        private readonly TestDriveService _testDriveService;
+    private readonly TestDriveService _testDriveService;
 #endif
 
-        public ConfigurationServiceImpl(ILogger<ConfigurationServiceImpl> logger, IServiceScopeFactory serviceScopeFactory
 #if DEBUG
-           , TestDriveService testDriveService
+    public ConfigurationServiceImpl(ILogger<ConfigurationServiceImpl> logger, IServiceScopeFactory serviceScopeFactory, TestDriveService testDriveService)
+    {
+        _logger = logger;
+        _serviceScopeFactory = serviceScopeFactory;
+        _testDriveService = testDriveService;
+        _logger.LogTrace("Creating {Name}", GetType().Name);
+    }
+#else
+    public ConfigurationServiceImpl(ILogger<ConfigurationServiceImpl> logger, IServiceScopeFactory serviceScopeFactory)
+    {
+        _logger = logger;
+        _serviceScopeFactory = serviceScopeFactory;
+        _logger.LogTrace("Creating {Name}", GetType().Name);
+    }
 #endif
-        )
+
+    public DriveAPMConfigurationReply GetDriveAPMConfiguration()
+    {
+        var reply = new DriveAPMConfigurationReply
         {
-            _logger = logger;
-            _serviceScopeFactory = serviceScopeFactory;
+            ReplyResult = 0
+        };
+        try
+        {
+            using var scope = _serviceScopeFactory.CreateScope();
+            var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+            reply.DriveAPMConfigurationReplyEntries.AddRange(dataContext.ConfigDataSet.Select(item => new DriveAPMConfigurationReplyEntry
+            {
+                DeviceID = item.DeviceID,
+                OnMains = item.OnMains,
+                OnBatteries = item.OnBatteries,
+            }));
+
 #if DEBUG
-            _testDriveService = testDriveService;
+            reply.DriveAPMConfigurationReplyEntries.Add(new DriveAPMConfigurationReplyEntry
+            {
+                DeviceID = _testDriveService.TestDriveDiskInfoEntry.DeviceID,
+                OnMains = _testDriveService.OnMainsApmValue,
+                OnBatteries = _testDriveService.OnBatteriesApmValue,
+            });
 #endif
-            _logger.LogTrace("Creating {0}", GetType().Name);
+            reply.ReplyResult = 1;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("{ex}", ex);
         }
 
-        public DriveAPMConfigurationReply GetDriveAPMConfiguration()
-        {
-            var reply = new DriveAPMConfigurationReply
-            {
-                ReplyResult = 0
-            };
-            try
-            {
-                using var scope = _serviceScopeFactory.CreateScope();
-                var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-                reply.DriveAPMConfigurationReplyEntries.AddRange(dataContext.ConfigDataSet.Select(item => new DriveAPMConfigurationReplyEntry
-                {
-                    DeviceID = item.DeviceID,
-                    OnMains = item.OnMains,
-                    OnBatteries = item.OnBatteries,
-                }));
+        _logger.LogTrace("Reply: {reply}", reply);
 
-#if DEBUG
-                reply.DriveAPMConfigurationReplyEntries.Add(new DriveAPMConfigurationReplyEntry
+        return reply;
+    }
+
+    public async Task<ResetDriveReply> ResetDriveAPMConfigurationAsync(ResetDriveRequest request, CancellationToken cancellationToken)
+    {
+        var reply = new ResetDriveReply
+        {
+            ReplyResult = 0
+        };
+        try
+        {
+            using var scope = _serviceScopeFactory.CreateScope();
+            var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+            var configItem = await dataContext.ConfigDataSet.SingleOrDefaultAsync(item => item.DeviceID == request.DeviceID, cancellationToken);
+            if (configItem is not null)
+            {
+                switch (request.PowerSource)
                 {
-                    DeviceID = _testDriveService.TestDriveDiskInfoEntry.DeviceID,
-                    OnMains = _testDriveService.OnMainsApmValue,
-                    OnBatteries = _testDriveService.OnBatteriesApmValue,
-                });
-#endif
+                    case EPowerSource.Mains:
+                        configItem.OnMains = 0U;
+                        break;
+                    case EPowerSource.Battery:
+                        configItem.OnBatteries = 0U;
+                        break;
+                }
+                dataContext.ConfigDataSet.Update(configItem);
+                _logger.LogTrace("Updated item: {item}", configItem);
+                var records = await dataContext.SaveChangesAsync(cancellationToken);
+                _logger.LogTrace("Updated: {records} records", records);
                 reply.ReplyResult = 1;
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.ToString());
-            }
-
-            _logger.LogTrace("Reply: {0}", reply);
-
-            return reply;
         }
-
-        public async Task<ResetDriveReply> ResetDriveAPMConfigurationAsync(ResetDriveRequest request, CancellationToken cancellationToken)
+        catch (Exception ex)
         {
-            var reply = new ResetDriveReply
-            {
-                ReplyResult = 0
-            };
-            try
-            {
-                using var scope = _serviceScopeFactory.CreateScope();
-                var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-                var configItem = await dataContext.ConfigDataSet.SingleOrDefaultAsync(item => item.DeviceID == request.DeviceID, cancellationToken);
-                if (configItem is not null)
-                {
-                    switch (request.PowerSource)
-                    {
-                        case EPowerSource.Mains:
-                            configItem.OnMains = 0U;
-                            break;
-                        case EPowerSource.Battery:
-                            configItem.OnBatteries = 0U;
-                            break;
-                    }
-                    dataContext.ConfigDataSet.Update(configItem);
-                    _logger.LogTrace("Updated item: {0}", configItem);
-                    var records = await dataContext.SaveChangesAsync(cancellationToken);
-                    _logger.LogTrace("Updated: {0} records", records);
-                    reply.ReplyResult = 1;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.ToString());
-            }
-
-            _logger.LogTrace("Reply: {0}", reply);
-
-            return reply;
+            _logger.LogError("{ex}", ex);
         }
+
+        _logger.LogTrace("Reply: {reply}", reply);
+
+        return reply;
     }
 }

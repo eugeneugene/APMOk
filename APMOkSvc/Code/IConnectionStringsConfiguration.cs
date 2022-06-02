@@ -1,9 +1,8 @@
 ﻿using APMOkLib.CustomConfiguration;
 
-namespace APMOkSvc.Code
+namespace APMOkSvc.Code;
+
+public interface IConnectionStringsConfiguration
 {
-    public interface IConnectionStringsConfiguration
-    {
-        IConfigurationParameter<string> DataContext { get; }
-    }
+    IConfigurationParameter<string> DataContext { get; }
 }

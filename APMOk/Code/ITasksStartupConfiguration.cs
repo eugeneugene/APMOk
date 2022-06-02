@@ -1,10 +1,9 @@
 ﻿using APMOkLib.CustomConfiguration;
 
-namespace APMOk.Code
+namespace APMOk.Code;
+
+public interface ITasksStartupConfiguration
 {
-    public interface ITasksStartupConfiguration
-    {
-        IConfigurationParameter<ITaskStartup> DiskStatusReader { get; }
-        IConfigurationParameter<ITaskStartup> PowerStatusReader { get; }
-    }
+    IConfigurationParameter<ITaskStartup> DiskStatusReader { get; }
+    IConfigurationParameter<ITaskStartup> PowerStatusReader { get; }
 }

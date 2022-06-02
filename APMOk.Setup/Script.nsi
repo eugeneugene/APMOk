@@ -16,7 +16,7 @@ Unicode True
 ;General
 
 !define PRODUCT "APMOk"
-!define VERSION "1.0"
+!define VERSION "1.2"
 !define SERVICE "APMOkSvc"
 
 Name "${PRODUCT} ${VERSION}"

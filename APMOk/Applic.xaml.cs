@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
+using Version = APMOk.Services.Version;
 
 namespace APMOk
 {
@@ -65,11 +66,12 @@ namespace APMOk
                     services.AddSingleton<APMOkModel>();
                     services.AddSingleton<NotifyIconViewModel>();
                     services.AddTransient<ISocketPathProvider, SocketPathProvider>();
-                    services.AddTransient<IGrpcChannelProvider, GrpcChannelProvider>();
-                    services.AddTransient<DiskInfo>();
-                    services.AddTransient<PowerState>();
-                    services.AddTransient<APM>();
-                    services.AddTransient<Configuration>();
+                    services.AddSingleton<IGrpcChannelProvider, GrpcChannelProvider>();
+                    services.AddSingleton<DiskInfo>();
+                    services.AddSingleton<PowerState>();
+                    services.AddSingleton<APM>();
+                    services.AddSingleton<Configuration>();
+                    services.AddSingleton<Version>();
                     services.AddTransient<DeviceStatusWindow>();
                     services.AddHostedService<NotificationIconUpdater>();
 
@@ -102,7 +104,7 @@ namespace APMOk
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                Debug.WriteLine(ex.Message);
                 throw;
             }
         }
@@ -117,7 +119,7 @@ namespace APMOk
 
         private void AppDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            Debug.WriteLine("Unhandled exception: {0}", e.Exception);
+            Debug.WriteLine($"Unhandled exception: {e.Exception}");
             if (e.Exception is COMException comException && comException.ErrorCode == -2147221040)
                 e.Handled = true;
         }

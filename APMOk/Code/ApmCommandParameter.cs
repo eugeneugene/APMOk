@@ -1,11 +1,10 @@
 ﻿using APMData;
 using APMOkLib;
 
-namespace APMOk.Code
+namespace APMOk.Code;
+
+public class APMCommandParameter : JsonEnumToString
 {
-    public class APMCommandParameter : JsonEnumToString
-    {
-        public EPowerSource PowerSource { get; set; }
-        public uint ApmValue { get; set; }
-    }
+    public EPowerSource PowerSource { get; set; }
+    public uint ApmValue { get; set; }
 }

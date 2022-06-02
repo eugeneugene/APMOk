@@ -1,38 +1,37 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 
-namespace APMOkLib.CustomConfiguration
+namespace APMOkLib.CustomConfiguration;
+
+public class TimeSpanSecondsParameterDecorator : IParameterDecorator<TimeSpan>
 {
-    public class TimeSpanSecondsParameterDecorator : IParameterDecorator<TimeSpan>
+    private readonly TimeSpan _defaultValue;
+
+    public TimeSpan DefaultValue => _defaultValue;
+
+    public TimeSpanSecondsParameterDecorator(TimeSpan DefaultValue)
     {
-        private readonly TimeSpan _defaultValue;
+        _defaultValue = DefaultValue;
+    }
 
-        public TimeSpan DefaultValue => _defaultValue;
+    public TimeSpanSecondsParameterDecorator(double Seconds)
+    {
+        _defaultValue = TimeSpan.FromSeconds(Seconds);
+    }
 
-        public TimeSpanSecondsParameterDecorator(TimeSpan DefaultValue)
+    public TimeSpanSecondsParameterDecorator(IConfigurationParameter<TimeSpan> timeSpanParameter)
+    {
+        _defaultValue = timeSpanParameter.Value;
+    }
+
+    public TimeSpan ExtractValue(IConfiguration configuration, string section)
+    {
+        if (configuration.GetSection(section).Exists())
         {
-            _defaultValue = DefaultValue;
+            var value = configuration.GetValue<double>(section);
+            return TimeSpan.FromSeconds(value);
         }
 
-        public TimeSpanSecondsParameterDecorator(double Seconds)
-        {
-            _defaultValue = TimeSpan.FromSeconds(Seconds);
-        }
-
-        public TimeSpanSecondsParameterDecorator(IConfigurationParameter<TimeSpan> timeSpanParameter)
-        {
-            _defaultValue = timeSpanParameter.Value;
-        }
-
-        public TimeSpan ExtractValue(IConfiguration configuration, string section)
-        {
-            if (configuration.GetSection(section).Exists())
-            {
-                var value = configuration.GetValue<double>(section);
-                return TimeSpan.FromSeconds(value);
-            }
-
-            return _defaultValue;
-        }
+        return _defaultValue;
     }
 }

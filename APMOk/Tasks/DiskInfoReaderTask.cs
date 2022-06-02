@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace APMOk.Tasks
 {
-    public class DiskInfoReaderTask : IRunnable
+    internal class DiskInfoReaderTask : IRunnable
     {
         private readonly APMOkModel _apmOkModel;
 

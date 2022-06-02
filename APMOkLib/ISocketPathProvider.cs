@@ -1,7 +1,6 @@
-﻿namespace APMOkLib
+﻿namespace APMOkLib;
+
+public interface ISocketPathProvider
 {
-    public interface ISocketPathProvider
-    {
-        string GetSocketPath();
-    }
+    string GetSocketPath();
 }

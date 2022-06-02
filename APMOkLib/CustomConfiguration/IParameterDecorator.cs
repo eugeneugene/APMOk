@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace APMOkLib.CustomConfiguration
+namespace APMOkLib.CustomConfiguration;
+
+public interface IParameterDecorator<T>
 {
-    public interface IParameterDecorator<T>
-    {
-        T? ExtractValue(IConfiguration configuration, string section);
-        T? DefaultValue { get; }
-    }
+    T ExtractValue(IConfiguration configuration, string section);
+    T DefaultValue { get; }
 }

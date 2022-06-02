@@ -1,9 +1,8 @@
 ﻿using APMOkLib.CustomConfiguration;
 
-namespace APMOkSvc.Code
+namespace APMOkSvc.Code;
+
+public interface ITasksStartupConfiguration
 {
-    public interface ITasksStartupConfiguration
-    {
-        IConfigurationParameter<ITaskStartup> PowerStatusReader { get; }
-    }
+    IConfigurationParameter<ITaskStartup> PowerStatusReader { get; }
 }

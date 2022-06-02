@@ -2,7 +2,7 @@
   "profiles": {
     "APMOkSvc": {
       "commandName": "Project",
-      "commandLineArgs": "/c",
+      "commandLineArgs": "/c /g",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       },

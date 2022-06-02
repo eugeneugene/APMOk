@@ -83,7 +83,7 @@ namespace APMOk
         private void APMOkDataChanged(object? sender, PropertyChangedEventArgs e)
         {
             Debug.WriteLine($"APMOkModel has changed: {e.PropertyName}");
-            Debug.WriteLine("{0}", _apmOkModel);
+            Debug.WriteLine(_apmOkModel);
 
             switch (e.PropertyName)
             {
@@ -109,7 +109,7 @@ namespace APMOk
         private void APMValueChanged(object sender, PropertyChangedEventArgs e)
         {
             Debug.WriteLine($"APMValue has changed: {e.PropertyName}");
-            Debug.WriteLine("{0}", APMValue);
+            Debug.WriteLine(APMValue);
         }
 
         private void LoadPowerState()
@@ -288,7 +288,7 @@ namespace APMOk
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Exception: {0}", ex.Message);
+                Debug.WriteLine(ex.Message);
             }
             e.Handled = true;
         }
@@ -353,7 +353,7 @@ namespace APMOk
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Exception: {0}", ex.Message);
+                Debug.WriteLine(ex.Message);
             }
             e.Handled = true;
         }
@@ -385,7 +385,7 @@ namespace APMOk
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Exception: {0}", ex.Message);
+                Debug.WriteLine(ex.Message);
             }
             e.Handled = true;
         }
@@ -403,7 +403,7 @@ namespace APMOk
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Exception: {0}", ex.Message);
+                Debug.WriteLine(ex.Message);
             }
             e.Handled = true;
         }

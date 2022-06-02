@@ -24,6 +24,10 @@ service ConfigurationService {
 	rpc ResetDriveAPMConfiguration (ResetDriveRequest) returns (ResetDriveReply);
 }
 
+service VersionService {
+	rpc GetServiceVersion (google.protobuf.Empty) returns (ServiceVersionReply);
+}
+
 message DiskInfoEntry {
 	uint32 Index			= 1;
 	uint32 Availability		= 2;
@@ -46,6 +50,7 @@ message CurrentAPMRequest {
 	string DeviceID = 1;
 }
 
+// ReplyResult нужно понимать как тип WINDOWS BOOL - 0 - ложь, иначе - истина
 message CurrentAPMReply {
 	int32 ReplyResult			= 1;
 	uint32 APMValue				= 2;
@@ -58,6 +63,7 @@ message APMRequest {
 	EPowerSource PowerSource	= 3;
 }
 
+// ReplyResult нужно понимать как тип WINDOWS BOOL - 0 - ложь, иначе - истина
 message APMReply {
 	int32 ReplyResult = 1;
 }
@@ -78,6 +84,7 @@ enum EPowerSource {
 	Battery		= 2;
 }
 
+// ReplyResult нужно понимать как тип WINDOWS BOOL - 0 - ложь, иначе - истина
 message PowerStateReply {
 	int32 ReplyResult			= 1;
 	PowerStateEntry PowerState	= 2;
@@ -97,6 +104,7 @@ message DriveAPMConfigurationReplyEntry {
 	uint32 OnBatteries	= 3;
 }
 
+// ReplyResult нужно понимать как тип WINDOWS BOOL - 0 - ложь, иначе - истина
 message DriveAPMConfigurationReply {
 	int32 ReplyResult															= 1;
 	repeated DriveAPMConfigurationReplyEntry DriveAPMConfigurationReplyEntries	= 2;
@@ -107,6 +115,17 @@ message ResetDriveRequest {
 	EPowerSource PowerSource	= 2;
 }
 
+// ReplyResult нужно понимать как тип WINDOWS BOOL - 0 - ложь, иначе - истина
 message ResetDriveReply {
 	int32 ReplyResult	= 1;
+}
+
+// ReplyResult нужно понимать как тип WINDOWS BOOL - 0 - ложь, иначе - истина
+message ServiceVersionReply {
+	int32 ReplyResult	= 1;
+	string ServiceName	= 2;
+	int32 Major			= 3;
+	int32 Minor			= 4;
+	int32 Build			= 5;
+	int32 Revision		= 6;
 }

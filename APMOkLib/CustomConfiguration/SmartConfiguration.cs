@@ -1,17 +1,16 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace APMOkLib.CustomConfiguration
+namespace APMOkLib.CustomConfiguration;
+
+public abstract class SmartConfiguration : ISmartConfiguration
 {
-    public abstract class SmartConfiguration : ISmartConfiguration
+    public SmartConfiguration(string sectionName, IConfiguration configuration)
     {
-        public SmartConfiguration(string sectionName, IConfiguration configuration)
-        {
-            SectionName = sectionName;
-            Configuration = configuration;
-        }
-
-        public string SectionName { get; }
-
-        public IConfiguration Configuration { get; }
+        SectionName = sectionName;
+        Configuration = configuration;
     }
+
+    public string SectionName { get; }
+
+    public IConfiguration Configuration { get; }
 }

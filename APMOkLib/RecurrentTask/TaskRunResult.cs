@@ -1,9 +1,8 @@
-﻿namespace APMOkLib.RecurrentTasks
+﻿namespace APMOkLib.RecurrentTasks;
+
+public enum TaskRunResult
 {
-    public enum TaskRunResult
-    {
-        Unknown,
-        Success,
-        Fail,
-    }
+    Unknown,
+    Success,
+    Fail,
 }

@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace APMOkLib
+namespace APMOkLib;
+
+public static class ReadOnlyCollectionWrapper
 {
-    public static class ReadOnlyCollectionWrapper
+    public static IReadOnlyCollection<T> AsReadOnly<T>(this ICollection<T> collection)
     {
-        public static IReadOnlyCollection<T> AsReadOnly<T>(this ICollection<T> collection)
-        {
-            return new ReadOnlyCollectionWrapper<T>(collection);
-        }
+        return new ReadOnlyCollectionWrapper<T>(collection);
     }
 }
